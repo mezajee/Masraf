@@ -956,6 +956,12 @@
         <div class="stat-value" id="total-intl" style="color: var(--green)">0</div>
       </div>
     </div>
+
+    <!-- Per person breakdown -->
+    <div id="person-breakdown" style="margin-top:16px; display:none;">
+      <div style="height:1px; background:rgba(255,255,255,0.06); margin-bottom:14px;"></div>
+      <div id="person-breakdown-rows" style="display:flex; flex-direction:column; gap:10px;"></div>
+    </div>
   </div>
 
   <!-- Filters -->
@@ -1153,9 +1159,9 @@ let accessToken  = null;
 const PERSON_COLOURS = {
   'abdulla': '#06D6A0', // Green
   'salama':  '#E9C46A', // Yellow
-  'driver':  '#F4A261', // Orange
-  'me':      '#457B9D', // Blue
-  'rashed':  '#457B9D', // Blue (same as Me)
+  'driver':  '#457B9D', // Blue
+  'me':      '#C4A464', // Gold
+  'rashed':  '#C4A464', // Gold (same as Me)
   'default': '#888888', // Grey fallback
 };
 
@@ -1583,6 +1589,50 @@ function applyFilter(filter) {
   document.getElementById('total-today').textContent = totalToday.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   document.getElementById('total-txns').textContent  = monthTx.length;
   document.getElementById('total-intl').textContent  = totalIntl;
+
+  // Per person breakdown — admin only
+  const breakdownEl = document.getElementById('person-breakdown');
+  const breakdownRows = document.getElementById('person-breakdown-rows');
+
+  if (userRole === 'admin') {
+    // Build per-person totals from month transactions
+    const personTotals = {};
+    monthTx.forEach(t => {
+      if (!t.person) return;
+      personTotals[t.person] = (personTotals[t.person] || 0) + t.amountAed;
+    });
+
+    const sorted = Object.entries(personTotals).sort((a, b) => b[1] - a[1]);
+    const maxSpend = sorted[0]?.[1] || 1;
+
+    breakdownRows.innerHTML = sorted.map(([person, spend]) => {
+      const color = personColour(person);
+      const pct   = Math.round((spend / totalMonth) * 100);
+      const barW  = Math.round((spend / maxSpend) * 100);
+      return `
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="
+            width:28px; height:28px; border-radius:8px; flex-shrink:0;
+            background:${color}22; border:1px solid ${color}44;
+            display:flex; align-items:center; justify-content:center;
+            font-size:10px; font-weight:700; color:${color};
+          ">${person[0].toUpperCase()}</div>
+          <div style="flex:1;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <span style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.8);">${person}</span>
+              <span style="font-size:12px; font-weight:700; color:${color};">${spend.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} <span style="font-size:10px; font-weight:400; color:rgba(255,255,255,0.3);">AED · ${pct}%</span></span>
+            </div>
+            <div style="background:rgba(255,255,255,0.06); border-radius:3px; height:4px; overflow:hidden;">
+              <div style="height:100%; width:${barW}%; background:${color}; border-radius:3px; transition:width 0.6s ease;"></div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    breakdownEl.style.display = 'block';
+  } else {
+    breakdownEl.style.display = 'none';
+  }
 
   renderTxList();
 }
