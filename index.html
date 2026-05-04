@@ -1134,7 +1134,11 @@
 // ── CONFIG ── Replace with your actual values
 const CLIENT_ID  = '946422288101-vf0sde7084c5rc28n61nkgo68bi97jg8.apps.googleusercontent.com';
 const SHEET_ID   = '1d39F8kq55LEMRlrNKQkyLqaVHjGFb0whzITBeqDKWgw';
-const SCOPES     = 'https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
+const SCOPES = [
+  'https://www.googleapis.com/auth/spreadsheets.readonly',
+  'https://www.googleapis.com/auth/userinfo.email',
+  'https://www.googleapis.com/auth/userinfo.profile'
+].join(' ');
 
 // ── STATE ──
 let currentUser  = null;
@@ -1194,8 +1198,9 @@ function signIn() {
     response_type: 'token',
     scope:         SCOPES,
     state:         state,
-    prompt:        'select_account',
-    include_granted_scopes: 'true',
+    prompt:        'consent',
+    access_type:   'online',
+    include_granted_scopes: 'false',
   });
 
   // Redirect to Google sign in
@@ -1213,6 +1218,7 @@ function signOut() {
   allTx         = [];
   sessionStorage.removeItem('oauth_state');
   sessionStorage.removeItem('access_token');
+  sessionStorage.removeItem('has_sheets_scope');
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('main-app').style.display     = 'none';
 }
@@ -1248,12 +1254,24 @@ function handleOAuthRedirect() {
 
   debug('Got token, length: ' + token.length);
 
+  // Check if spreadsheets scope was granted
+  const scopeStr = params.get('scope') || '';
+  const hasSheets = scopeStr.includes('spreadsheets');
+  debug('Has sheets scope: ' + hasSheets);
+
+  if (!hasSheets) {
+    history.replaceState(null, '', window.location.pathname);
+    showError('Sign in failed: Spreadsheets permission not granted. Please sign in again and approve all permissions.');
+    return true;
+  }
+
   // Clean the URL hash so token isn't visible
   history.replaceState(null, '', window.location.pathname);
 
   // Store and use the token
   accessToken = token;
   sessionStorage.setItem('access_token', token);
+  sessionStorage.setItem('has_sheets_scope', 'true');
   debug('Token stored in session');
 
   document.getElementById('login-screen').style.display = 'none';
@@ -1284,7 +1302,15 @@ function checkSavedToken() {
     return false;
   }
 
-  debug('Found saved token, validating...');
+  // Verify saved token has spreadsheets scope by checking a flag we set
+  const hasSheets = sessionStorage.getItem('has_sheets_scope');
+  if (!hasSheets) {
+    debug('Saved token missing sheets scope, clearing...');
+    sessionStorage.removeItem('access_token');
+    return false;
+  }
+
+  debug('Found saved token with correct scopes, validating...');
   accessToken = saved;
   document.getElementById('login-screen').style.display  = 'none';
   document.getElementById('loading-screen').style.display = 'flex';
