@@ -1421,13 +1421,27 @@ function parseTransactions(rows, role, cards) {
     const amountAed = parseFloat(r[9]) || 0;
     const amount    = parseFloat(r[6]) || 0;
 
-    // Parse date
+    // Parse date — Google Sheets stores as DD/MM/YYYY HH:MM
     let dateObj = null;
-    try { dateObj = new Date(r[1]); } catch(e) {}
+    const rawDate = (r[1] || '').toString().trim();
+
+    // Try DD/MM/YYYY HH:MM format first (primary format from our sheet)
+    const ddmm = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})/);
+    if (ddmm) {
+      const day   = parseInt(ddmm[1]);
+      const month = parseInt(ddmm[2]) - 1; // 0-based
+      const year  = parseInt(ddmm[3]);
+      const hours = parseInt(ddmm[4]);
+      const mins  = parseInt(ddmm[5]);
+      dateObj = new Date(year, month, day, hours, mins, 0);
+    }
+
+    // Fallback: try native Date parsing (for proper Date objects from new emails)
     if (!dateObj || isNaN(dateObj.getTime())) {
-      // Try DD/MM/YYYY HH:MM format
-      const m = (r[1] || '').match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
-      if (m) dateObj = new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5]);
+      try {
+        const d = new Date(rawDate);
+        if (!isNaN(d.getTime())) dateObj = d;
+      } catch(e) {}
     }
 
     result.push({
