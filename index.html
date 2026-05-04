@@ -1149,15 +1149,27 @@ let filteredTx   = [];
 let activeFilter = 'All';
 let accessToken  = null;
 
-// ── COLOUR PALETTE for merchant logos ──
-const COLOURS = [
-  ['#C8A97E','#2D1A00'], ['#2D6A4F','#E8FFE8'], ['#1A1A2E','#8888FF'],
-  ['#E63946','#FFE8E8'], ['#457B9D','#E8F4FF'], ['#6A0572','#FFE8FF'],
-  ['#06D6A0','#003322'], ['#E9C46A','#2D2000'], ['#F4A261','#2D1500'],
-  ['#264653','#E8FFFF'], ['#A8DADC','#001F2D'], ['#E76F51','#2D1200'],
-];
+// ── PERSON COLOUR MAP — fixed colours per cardholder ──
+const PERSON_COLOURS = {
+  'abdulla': '#06D6A0', // Green
+  'salama':  '#E9C46A', // Yellow
+  'driver':  '#F4A261', // Orange
+  'me':      '#457B9D', // Blue
+  'rashed':  '#457B9D', // Blue (same as Me)
+  'default': '#888888', // Grey fallback
+};
 
+function personColour(person) {
+  if (!person) return PERSON_COLOURS['default'];
+  return PERSON_COLOURS[person.toLowerCase()] || PERSON_COLOURS['default'];
+}
+
+// Keep merchant colour for non-person contexts if needed
 function merchantColour(name) {
+  const COLOURS = [
+    '#C4A464', '#06D6A0', '#457B9D', '#E63946',
+    '#6A0572', '#E9C46A', '#F4A261', '#264653',
+  ];
   let h = 0;
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
   return COLOURS[h % COLOURS.length];
@@ -1609,7 +1621,7 @@ function renderTxList() {
         </div>`;
 
     txs.forEach(tx => {
-      const [bg, fg] = merchantColour(tx.cleanName || tx.merchant);
+      const color    = personColour(tx.person);
       const name     = tx.cleanName || tx.merchant;
       const meta     = buildMeta(tx);
       const amtColor = tx.isIntl ? 'var(--green)' : 'var(--text)';
@@ -1619,7 +1631,7 @@ function renderTxList() {
 
       html += `
         <div class="tx-card" onclick="openModal('${tx.id}')">
-          <div class="tx-logo" style="background:${bg}22; border:1px solid ${bg}44; color:${bg};">
+          <div class="tx-logo" style="background:${color}22; border:1px solid ${color}44; color:${color};">
             ${initials(name)}
           </div>
           <div class="tx-info">
@@ -1716,10 +1728,10 @@ function renderCardsView() {
   document.getElementById('cardholders-list').innerHTML = Object.entries(persons)
     .sort((a, b) => b[1].spend - a[1].spend)
     .map(([name, data]) => {
-      const [bg] = merchantColour(name);
+      const color = personColour(name);
       return `
         <div class="cardholder-card">
-          <div class="cardholder-avatar" style="background:${bg}22; border:1px solid ${bg}44; color:${bg};">
+          <div class="cardholder-avatar" style="background:${color}22; border:1px solid ${color}44; color:${color};">
             ${initials(name)}
           </div>
           <div class="cardholder-info">
@@ -1727,7 +1739,7 @@ function renderCardsView() {
             <div class="cardholder-sub">${data.card} · ···· ${data.last4} · ${data.bank}</div>
           </div>
           <div class="cardholder-spend">
-            <div class="cardholder-amount">${data.spend.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
+            <div class="cardholder-amount" style="color:${color}">${data.spend.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
             <div class="cardholder-label">AED this month</div>
           </div>
         </div>`;
@@ -1756,13 +1768,13 @@ function openModal(txId) {
   const tx = allTx.find(t => t.id === txId);
   if (!tx) return;
 
-  const name = tx.cleanName || tx.merchant;
-  const [bg, fg] = merchantColour(name);
+  const name  = tx.cleanName || tx.merchant;
+  const color = personColour(tx.person);
 
   document.getElementById('modal-logo').textContent        = initials(name);
-  document.getElementById('modal-logo').style.background  = bg + '22';
-  document.getElementById('modal-logo').style.border      = `1px solid ${bg}44`;
-  document.getElementById('modal-logo').style.color       = bg;
+  document.getElementById('modal-logo').style.background  = color + '22';
+  document.getElementById('modal-logo').style.border      = `1px solid ${color}44`;
+  document.getElementById('modal-logo').style.color       = color;
   document.getElementById('modal-merchant').textContent   = name;
 
   const sub = [tx.category, tx.subCat].filter(Boolean).join(' · ');
