@@ -10,9 +10,7 @@
   <meta name="theme-color" content="#0A0A0F">
   <title>Masraf</title>
 
-  <!-- Google Identity Services -->
-
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- No external auth scripts needed - using redirect flow -->
 
   <style>
     /* ── RESET & BASE ── */
@@ -1144,7 +1142,6 @@ let userCards    = [];
 let allTx        = [];
 let filteredTx   = [];
 let activeFilter = 'All';
-let tokenClient  = null;
 let accessToken  = null;
 
 // ── COLOUR PALETTE for merchant logos ──
@@ -1168,34 +1165,122 @@ function initials(name) {
   return (words[0][0] + words[words.length - 1][0]).toUpperCase();
 }
 
-// ── AUTH ──
+// ── AUTH — Redirect flow for iPhone Safari compatibility ──
+const REDIRECT_URI = window.location.origin + window.location.pathname;
+const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+
 function signIn() {
-  if (!tokenClient) {
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: SCOPES,
-      callback: async (resp) => {
-        if (resp.error) { showError('Sign in failed: ' + resp.error); return; }
-        accessToken = resp.access_token;
-        showLoading(true);
-        await loadUserAndData();
-        showLoading(false);
-      },
-    });
-  }
-  tokenClient.requestAccessToken({ prompt: 'consent' });
+  // Store a random state value to verify on return
+  const state = Math.random().toString(36).substring(2);
+  sessionStorage.setItem('oauth_state', state);
+
+  // Build the OAuth URL
+  const params = new URLSearchParams({
+    client_id:     CLIENT_ID,
+    redirect_uri:  REDIRECT_URI,
+    response_type: 'token',
+    scope:         SCOPES,
+    state:         state,
+    prompt:        'select_account',
+  });
+
+  // Redirect to Google sign in
+  window.location.href = AUTH_URL + '?' + params.toString();
 }
 
 function signOut() {
-  if (accessToken) google.accounts.oauth2.revoke(accessToken);
+  if (accessToken) {
+    fetch(`https://oauth2.googleapis.com/revoke?token=${accessToken}`, { method: 'POST' });
+  }
   accessToken   = null;
   currentUser   = null;
   userRole      = 'user';
   userCards     = [];
   allTx         = [];
+  sessionStorage.removeItem('oauth_state');
+  sessionStorage.removeItem('access_token');
   document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('main-app').style.display     = 'none';
 }
+
+// ── Handle OAuth redirect on page load ──
+function handleOAuthRedirect() {
+  // Check if we're returning from OAuth with a token in the URL hash
+  const hash = window.location.hash.substring(1);
+  if (!hash) return false;
+
+  const params = new URLSearchParams(hash);
+  const token  = params.get('access_token');
+  const state  = params.get('state');
+  const error  = params.get('error');
+
+  if (error) {
+    // Clear hash and show error
+    history.replaceState(null, '', window.location.pathname);
+    showError('Sign in failed: ' + error);
+    return true;
+  }
+
+  if (!token) return false;
+
+  // Verify state to prevent CSRF
+  const savedState = sessionStorage.getItem('oauth_state');
+  if (state && savedState && state !== savedState) {
+    history.replaceState(null, '', window.location.pathname);
+    showError('Sign in failed: state mismatch. Please try again.');
+    return true;
+  }
+
+  // Clean the URL hash so token isn't visible
+  history.replaceState(null, '', window.location.pathname);
+
+  // Store and use the token
+  accessToken = token;
+  sessionStorage.setItem('access_token', token);
+
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('loading-screen').style.display = 'flex';
+
+  loadUserAndData().then(() => {
+    document.getElementById('loading-screen').style.display = 'none';
+  });
+
+  return true;
+}
+
+// ── Check for saved token on page load ──
+function checkSavedToken() {
+  const saved = sessionStorage.getItem('access_token');
+  if (!saved) return false;
+
+  accessToken = saved;
+  document.getElementById('login-screen').style.display  = 'none';
+  document.getElementById('loading-screen').style.display = 'flex';
+
+  loadUserAndData()
+    .then(() => {
+      document.getElementById('loading-screen').style.display = 'none';
+    })
+    .catch(() => {
+      // Token expired — clear and show login
+      sessionStorage.removeItem('access_token');
+      accessToken = null;
+      document.getElementById('loading-screen').style.display = 'none';
+      document.getElementById('login-screen').style.display   = 'flex';
+    });
+
+  return true;
+}
+
+// ── Init on page load ──
+window.addEventListener('load', () => {
+  // First check if returning from OAuth redirect
+  if (handleOAuthRedirect()) return;
+  // Then check for saved session token
+  if (checkSavedToken()) return;
+  // Otherwise show login screen
+  document.getElementById('login-screen').style.display = 'flex';
+});
 
 // ── LOAD DATA ──
 async function loadUserAndData() {
@@ -1649,15 +1734,15 @@ function showView(view) {
 // ── HELPERS ──
 function showLoading(show) {
   document.getElementById('loading-screen').style.display = show ? 'flex' : 'none';
-  document.getElementById('login-screen').style.display   = show ? 'none' : 'flex';
 }
 
 function showError(msg) {
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('main-app').style.display       = 'none';
+  document.getElementById('login-screen').style.display   = 'flex';
   const el = document.getElementById('error-banner');
-  el.textContent    = msg;
-  el.style.display  = 'block';
-  showLoading(false);
-  document.getElementById('login-screen').style.display = 'flex';
+  el.textContent   = msg;
+  el.style.display = 'block';
 }
 
 // ── PWA MANIFEST ──
