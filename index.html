@@ -602,7 +602,7 @@
 
     .sheet-actions {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 10px;
       margin-top: 24px;
     }
@@ -937,23 +937,25 @@
 
   <!-- Summary card -->
   <div class="summary-card fade-up">
-    <div class="summary-label">Month to date</div>
-    <div class="summary-amount">
-      <span id="total-month">0</span>
-      <span class="summary-currency">AED</span>
-    </div>
-    <div class="summary-stats">
-      <div class="stat-item">
-        <div class="stat-label">Today</div>
-        <div class="stat-value" id="total-today">0</div>
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+      <!-- Left: month total -->
+      <div style="flex:1; min-width:0;">
+        <div class="summary-label">Month to date</div>
+        <div class="summary-amount">
+          <span id="total-month">0</span>
+          <span class="summary-currency">AED</span>
+        </div>
       </div>
-      <div class="stat-item">
-        <div class="stat-label">Transactions</div>
-        <div class="stat-value" id="total-txns">0</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">International</div>
-        <div class="stat-value" id="total-intl" style="color: var(--green)">0</div>
+      <!-- Right: stats column -->
+      <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end; flex-shrink:0;">
+        <div style="text-align:right;">
+          <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); font-weight:400; margin-bottom:2px;">Today</div>
+          <div style="font-size:15px; font-weight:700;"><span id="total-today">0</span> <span style="font-size:10px; font-weight:400; color:rgba(255,255,255,0.4);">AED</span></div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); font-weight:400; margin-bottom:2px;">Transactions</div>
+          <div style="font-size:15px; font-weight:700;"><span id="total-txns">0</span> <span style="font-size:10px; font-weight:400; color:rgba(255,255,255,0.4);">Local</span> · <span id="total-intl" style="color:var(--green); font-size:15px; font-weight:700;">0</span> <span style="font-size:10px; font-weight:400; color:rgba(255,255,255,0.4);">Intl</span></div>
+        </div>
       </div>
     </div>
 
@@ -1127,10 +1129,6 @@
       <button class="action-btn">
         <span class="action-icon">🖼️</span>
         Add Photo
-      </button>
-      <button class="action-btn">
-        <span class="action-icon">✏️</span>
-        Edit Details
       </button>
     </div>
   </div>
@@ -1585,9 +1583,11 @@ function applyFilter(filter) {
   const totalToday = allTx.filter(t => isToday(t.dateObj)).reduce((s, t) => s + t.amountAed, 0);
   const totalIntl  = monthTx.filter(t => t.isIntl).length;
 
+  const totalLocal = monthTx.filter(t => !t.isIntl).length;
+
   document.getElementById('total-month').textContent = totalMonth.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   document.getElementById('total-today').textContent = totalToday.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-  document.getElementById('total-txns').textContent  = monthTx.length;
+  document.getElementById('total-txns').textContent  = totalLocal;
   document.getElementById('total-intl').textContent  = totalIntl;
 
   // Per person breakdown — admin only
