@@ -1388,8 +1388,13 @@ async function loadUserAndData() {
 
 async function sheetsGet(range) {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}`;
+  debug('Fetching: ' + url.substring(0, 80));
   const resp = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-  if (!resp.ok) throw new Error(`Sheets API error: ${resp.status}`);
+  if (!resp.ok) {
+    const body = await resp.text();
+    debug('API error body: ' + body.substring(0, 200));
+    throw new Error(`Sheets API error: ${resp.status}`);
+  }
   return resp.json();
 }
 
