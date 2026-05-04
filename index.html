@@ -1334,7 +1334,7 @@ async function loadUserAndData() {
 
     // 2. Check App_Users tab
     debug('Loading App_Users...');
-    const usersData = await sheetsGet('App_Users!A:D');
+    const usersData = await sheetsGet('App_User!A:D');
     const rows = usersData.values || [];
     debug('App_Users rows: ' + rows.length);
 
