@@ -1134,7 +1134,7 @@
 // ── CONFIG ── Replace with your actual values
 const CLIENT_ID  = '946422288101-vf0sde7084c5rc28n61nkgo68bi97jg8.apps.googleusercontent.com';
 const SHEET_ID   = '1d39F8kq55LEMRlrNKQkyLqaVHjGFb0whzITBeqDKWgw';
-const SCOPES     = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+const SCOPES     = 'https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
 
 // ── STATE ──
 let currentUser  = null;
@@ -1320,16 +1320,24 @@ window.addEventListener('load', () => {
 // ── LOAD DATA ──
 async function loadUserAndData() {
   try {
+    debug('Loading user info...');
     // 1. Get signed-in user info
     const infoResp = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
+    if (!infoResp.ok) {
+      throw new Error('Userinfo failed: ' + infoResp.status);
+    }
     const info = await infoResp.json();
     currentUser = info;
+    debug('User: ' + info.email);
 
     // 2. Check App_Users tab
+    debug('Loading App_Users...');
     const usersData = await sheetsGet('App_Users!A:D');
     const rows = usersData.values || [];
+    debug('App_Users rows: ' + rows.length);
+
     let matched = null;
     for (let i = 1; i < rows.length; i++) {
       if (rows[i][0] && rows[i][0].toLowerCase() === info.email.toLowerCase()) {
@@ -1339,10 +1347,11 @@ async function loadUserAndData() {
     }
 
     if (!matched) {
-      showError('Access denied. Your account is not registered in Masraf.');
-      showLoading(false);
-      return;
+      debug('No match for: ' + info.email);
+      throw new Error('Access denied. Email not registered: ' + info.email);
     }
+
+    debug('Matched: ' + matched.join(' | '));
 
     userRole  = (matched[2] || '').toLowerCase();
     userCards = (matched[3] || '').toLowerCase() === 'all'
@@ -1353,9 +1362,13 @@ async function loadUserAndData() {
     setupProfileUI(displayName, info.email);
 
     // 3. Load transactions
+    debug('Loading transactions...');
     const txData = await sheetsGet('Transactions_Raw!A:X');
     const txRows = txData.values || [];
+    debug('Transaction rows: ' + txRows.length);
+
     allTx = parseTransactions(txRows, userRole, userCards);
+    debug('Parsed ' + allTx.length + ' transactions');
 
     // 4. Render
     renderSpendView();
@@ -1368,8 +1381,8 @@ async function loadUserAndData() {
     showView('spend');
 
   } catch (err) {
-    console.error(err);
-    showError('Failed to load data: ' + err.message);
+    debug('Error: ' + err.message);
+    throw err;
   }
 }
 
