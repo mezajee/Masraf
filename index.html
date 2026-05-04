@@ -905,6 +905,7 @@
       </svg>
       Sign in with Google
     </button>
+    <div id="debug-box" style="position:absolute; bottom:80px; left:20px; right:20px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:12px; font-size:11px; color:#999; font-family:monospace; max-height:200px; overflow-y:auto; word-break:break-all; display:none;"></div>
     <div class="login-footer">MASRAF · SPEND INTELLIGENCE</div>
   </div>
 
@@ -1165,8 +1166,20 @@ function initials(name) {
   return (words[0][0] + words[words.length - 1][0]).toUpperCase();
 }
 
+// ── DEBUG LOGGING ──
+function debug(msg) {
+  console.log('[Masraf]', msg);
+  const box = document.getElementById('debug-box');
+  if (box) {
+    box.style.display = 'block';
+    const time = new Date().toLocaleTimeString();
+    box.innerHTML += `<div>[${time}] ${msg}</div>`;
+    box.scrollTop = box.scrollHeight;
+  }
+}
+
 // ── AUTH — Redirect flow for iPhone Safari compatibility ──
-const REDIRECT_URI = window.location.origin + window.location.pathname;
+const REDIRECT_URI = 'https://masraf-psi.vercel.app/';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 
 function signIn() {
@@ -1182,6 +1195,7 @@ function signIn() {
     scope:         SCOPES,
     state:         state,
     prompt:        'select_account',
+    include_granted_scopes: 'true',
   });
 
   // Redirect to Google sign in
@@ -1205,9 +1219,15 @@ function signOut() {
 
 // ── Handle OAuth redirect on page load ──
 function handleOAuthRedirect() {
+  debug('Page loaded. URL: ' + window.location.href);
+  debug('Hash: ' + (window.location.hash || '(empty)'));
+
   // Check if we're returning from OAuth with a token in the URL hash
   const hash = window.location.hash.substring(1);
-  if (!hash) return false;
+  if (!hash) {
+    debug('No hash found in URL');
+    return false;
+  }
 
   const params = new URLSearchParams(hash);
   const token  = params.get('access_token');
@@ -1215,21 +1235,18 @@ function handleOAuthRedirect() {
   const error  = params.get('error');
 
   if (error) {
-    // Clear hash and show error
+    debug('OAuth error: ' + error);
     history.replaceState(null, '', window.location.pathname);
     showError('Sign in failed: ' + error);
     return true;
   }
 
-  if (!token) return false;
-
-  // Verify state to prevent CSRF
-  const savedState = sessionStorage.getItem('oauth_state');
-  if (state && savedState && state !== savedState) {
-    history.replaceState(null, '', window.location.pathname);
-    showError('Sign in failed: state mismatch. Please try again.');
-    return true;
+  if (!token) {
+    debug('No access_token in hash');
+    return false;
   }
+
+  debug('Got token, length: ' + token.length);
 
   // Clean the URL hash so token isn't visible
   history.replaceState(null, '', window.location.pathname);
@@ -1237,13 +1254,24 @@ function handleOAuthRedirect() {
   // Store and use the token
   accessToken = token;
   sessionStorage.setItem('access_token', token);
+  debug('Token stored in session');
 
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('loading-screen').style.display = 'flex';
 
-  loadUserAndData().then(() => {
-    document.getElementById('loading-screen').style.display = 'none';
-  });
+  loadUserAndData()
+    .then(() => {
+      document.getElementById('loading-screen').style.display = 'none';
+      debug('Load complete');
+    })
+    .catch(err => {
+      debug('Load failed: ' + err.message);
+      sessionStorage.removeItem('access_token');
+      accessToken = null;
+      document.getElementById('loading-screen').style.display = 'none';
+      document.getElementById('login-screen').style.display = 'flex';
+      showError('Load failed: ' + err.message);
+    });
 
   return true;
 }
@@ -1251,8 +1279,12 @@ function handleOAuthRedirect() {
 // ── Check for saved token on page load ──
 function checkSavedToken() {
   const saved = sessionStorage.getItem('access_token');
-  if (!saved) return false;
+  if (!saved) {
+    debug('No saved token');
+    return false;
+  }
 
+  debug('Found saved token, validating...');
   accessToken = saved;
   document.getElementById('login-screen').style.display  = 'none';
   document.getElementById('loading-screen').style.display = 'flex';
@@ -1260,9 +1292,10 @@ function checkSavedToken() {
   loadUserAndData()
     .then(() => {
       document.getElementById('loading-screen').style.display = 'none';
+      debug('Load complete from saved token');
     })
-    .catch(() => {
-      // Token expired — clear and show login
+    .catch(err => {
+      debug('Saved token failed: ' + err.message);
       sessionStorage.removeItem('access_token');
       accessToken = null;
       document.getElementById('loading-screen').style.display = 'none';
@@ -1274,11 +1307,13 @@ function checkSavedToken() {
 
 // ── Init on page load ──
 window.addEventListener('load', () => {
+  debug('Window loaded');
   // First check if returning from OAuth redirect
   if (handleOAuthRedirect()) return;
   // Then check for saved session token
   if (checkSavedToken()) return;
   // Otherwise show login screen
+  debug('Showing login screen');
   document.getElementById('login-screen').style.display = 'flex';
 });
 
