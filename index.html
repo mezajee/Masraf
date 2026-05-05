@@ -882,6 +882,109 @@
     .tx-card:nth-child(3) { animation-delay: 80ms; }
     .tx-card:nth-child(4) { animation-delay: 120ms; }
     .tx-card:nth-child(5) { animation-delay: 160ms; }
+
+    /* ── LOGO SELECTOR ── */
+    .logo-selector-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 200;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .logo-selector-overlay.open { display: flex; }
+    .logo-selector-sheet {
+      background: #141418;
+      border-radius: 28px 28px 0 0;
+      border: 1px solid rgba(255,255,255,0.07); border-bottom: none;
+      padding: 0 20px calc(40px + var(--safe-bot));
+      width: 100%; max-width: 430px; max-height: 80vh; overflow-y: auto;
+    }
+    .logo-selector-sheet::-webkit-scrollbar { display: none; }
+    .logo-sel-header { padding: 16px 0 10px; text-align: center; }
+    .logo-sel-merchant { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+    .logo-sel-hint { font-size: 12px; color: var(--text-dim); }
+    .logo-sel-grid {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      padding: 8px 0 16px; justify-content: flex-start;
+    }
+    .logo-sel-item {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 5px; cursor: pointer;
+    }
+    .logo-sel-box {
+      width: 72px; height: 72px; border-radius: 14px;
+      background: #fff; border: 2px solid rgba(255,255,255,0.07);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .logo-sel-box img { width: 60px; height: 60px; object-fit: contain; }
+    .logo-sel-box.selected {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(6,214,160,0.2);
+    }
+    .logo-sel-box.loading-img::after {
+      content: ''; position: absolute;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(0,0,0,0.1); border-top-color: #999;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    .logo-sel-check {
+      position: absolute; top: 3px; right: 3px;
+      width: 15px; height: 15px; background: var(--green);
+      border-radius: 50%; display: none;
+      align-items: center; justify-content: center;
+      font-size: 8px; color: #000; font-weight: 700;
+    }
+    .logo-sel-box.selected .logo-sel-check { display: flex; }
+    .logo-sel-label { font-size: 9px; color: var(--text-dim); text-align: center; max-width: 72px; }
+    .logo-sel-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 4px 0 14px; }
+    .logo-sel-actions { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+    .logo-sel-btn {
+      width: 100%; padding: 14px; border-radius: 14px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      font-family: inherit; border: none;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: opacity 0.15s; -webkit-tap-highlight-color: transparent;
+    }
+    .logo-sel-btn:active { opacity: 0.7; }
+    .logo-sel-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-confirm-logo  { background: var(--green); color: #000; }
+    .btn-take-photo    { background: #1C1C22; color: var(--text); border: 1px solid rgba(255,255,255,0.07); }
+    .btn-use-initials  { background: rgba(255,75,75,0.1); color: var(--red); border: 1px solid rgba(255,75,75,0.2); }
+    .btn-cancel-logo   { background: transparent; color: var(--text-dim); font-size: 13px; }
+    .logo-sel-empty { text-align: center; padding: 24px 0 8px; color: var(--text-dim); font-size: 13px; }
+    .logo-sel-loading {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 10px; padding: 32px 0; color: var(--text-dim); font-size: 13px;
+    }
+    .sheet-logo-img { width: 100%; height: 100%; object-fit: contain; }
+    .sheet-logo-tap { cursor: pointer; position: relative; }
+    .sheet-logo-tap .add-logo-badge {
+      position: absolute; bottom: -3px; right: -3px;
+      width: 17px; height: 17px; background: var(--gold);
+      border-radius: 50%; font-size: 11px; color: #000;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; line-height: 1;
+    }
+    .photo-badge {
+      position: absolute; top: -3px; right: -3px;
+      font-size: 10px; background: var(--surface);
+      border-radius: 50%; width: 16px; height: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #toast {
+      position: fixed;
+      bottom: calc(90px + var(--safe-bot)); left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1C1C22; border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 10px 20px;
+      font-size: 13px; font-weight: 500;
+      opacity: 0; transition: opacity 0.2s, transform 0.2s;
+      z-index: 300; white-space: nowrap; pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 
 </head>
@@ -1106,7 +1209,9 @@
   <div class="modal-sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
     <div class="sheet-merchant-header">
-      <div class="sheet-logo" id="modal-logo"></div>
+      <div class="sheet-logo sheet-logo-tap" id="modal-logo" onclick="openLogoSelector()">
+        <span class="add-logo-badge" id="modal-logo-badge">＋</span>
+      </div>
       <div>
         <div class="sheet-merchant-name" id="modal-merchant"></div>
         <div class="sheet-merchant-sub" id="modal-sub"></div>
@@ -1133,6 +1238,40 @@
     </div>
   </div>
 </div>
+
+<!-- Logo Selector Bottom Sheet -->
+
+<div class="logo-selector-overlay" id="logo-selector-overlay" onclick="closeLogoSelector()">
+  <div class="logo-selector-sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="logo-sel-header">
+      <div class="logo-sel-merchant" id="logo-sel-merchant-name"></div>
+      <div class="logo-sel-hint">Tap a logo to select it</div>
+    </div>
+    <div id="logo-sel-content">
+      <div class="logo-sel-loading" id="logo-sel-loading">
+        <div class="spinner"></div>
+        <div>Loading logo variants...</div>
+      </div>
+      <div id="logo-sel-grid" class="logo-sel-grid" style="display:none;"></div>
+    </div>
+    <div class="logo-sel-divider"></div>
+    <div class="logo-sel-actions">
+      <button class="logo-sel-btn btn-confirm-logo" id="btn-confirm-logo" onclick="confirmLogoSelection()" disabled>✓ Use Selected Logo</button>
+      <button class="logo-sel-btn btn-take-photo" onclick="takeLogoPhoto()">📷 Take Photo of Logo</button>
+      <button class="logo-sel-btn btn-use-initials" onclick="useInitials()">✕ Use Initials</button>
+      <button class="logo-sel-btn btn-cancel-logo" onclick="closeLogoSelector()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden camera input -->
+
+<input type="file" id="logo-camera-input" accept="image/*" capture="environment" style="display:none;" onchange="handleLogoPhoto(event)">
+
+<!-- Toast -->
+
+<div id="toast"></div>
 
 <script>
 // ── CONFIG ── Replace with your actual values
@@ -1818,13 +1957,31 @@ function openModal(txId) {
   const tx = allTx.find(t => t.id === txId);
   if (!tx) return;
 
+  currentLogoTx = tx; // store for logo selector
+
   const name  = tx.cleanName || tx.merchant;
   const color = personColour(tx.person);
 
-  document.getElementById('modal-logo').textContent        = initials(name);
-  document.getElementById('modal-logo').style.background  = color + '22';
-  document.getElementById('modal-logo').style.border      = `1px solid ${color}44`;
-  document.getElementById('modal-logo').style.color       = color;
+  // Reset logo to initials first
+  const logoEl  = document.getElementById('modal-logo');
+  const badgeEl = document.getElementById('modal-logo-badge');
+  logoEl.textContent       = initials(name);
+  logoEl.style.background  = color + '22';
+  logoEl.style.border      = `1px solid ${color}44`;
+  logoEl.style.color       = color;
+  if (badgeEl) badgeEl.style.display = 'flex';
+
+  // Async load confirmed logo from GitHub
+  getLogoUrl(tx.domain, tx.cleanName || tx.merchant).then(url => {
+    if (url) {
+      logoEl.innerHTML = `<img class="sheet-logo-img" src="${url}" onerror="this.parentElement.textContent='${initials(name)}'">`;
+      logoEl.style.background = '#fff';
+      logoEl.style.border     = '1px solid rgba(255,255,255,0.1)';
+      logoEl.style.color      = '';
+      if (badgeEl) badgeEl.style.display = 'none';
+    }
+  });
+
   document.getElementById('modal-merchant').textContent   = name;
 
   const sub = [tx.category, tx.subCat].filter(Boolean).join(' · ');
@@ -1898,6 +2055,296 @@ function showError(msg) {
   const el = document.getElementById('error-banner');
   el.textContent   = msg;
   el.style.display = 'block';
+}
+
+// ── LOGO SYSTEM ──
+const GITHUB_OWNER    = 'mezajee';
+const GITHUB_REPO     = 'masraf-logos';
+const LOGO_PICKER_URL = 'https://script.google.com/macros/s/AKfycbzHj35-Q4Y_Cpz9XZyRF10A0232cps8dQcDElza4zOH0Kdb1rmjqxMoxHXo6FRw86-g/exec'; // Update with your Logo Picker web app URL
+const GITHUB_RAW      = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/`;
+
+// Cache: domain → { status, url } loaded from logos.json
+let logoManifest    = null;
+let logoManifestTs  = 0;
+let currentLogoTx   = null;  // tx being edited in logo selector
+let selectedLogoId  = null;  // Drive file ID of selected variant
+let logoVariants    = [];     // current variants shown in selector
+
+// ── Load logos.json manifest from GitHub (cached 5 min) ──
+async function getLogoManifest() {
+  const now = Date.now();
+  if (logoManifest && (now - logoManifestTs) < 5 * 60 * 1000) return logoManifest;
+  try {
+    const resp = await fetch(`${GITHUB_RAW}logos.json?t=${now}`);
+    if (resp.ok) {
+      logoManifest   = await resp.json();
+      logoManifestTs = now;
+    } else {
+      logoManifest = {};
+    }
+  } catch(e) {
+    logoManifest = {};
+  }
+  return logoManifest;
+}
+
+// ── Get logo URL for a domain/merchant ──
+async function getLogoUrl(domain, cleanName) {
+  const manifest = await getLogoManifest();
+  const key = domain || cleanName?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  if (!key) return null;
+  const entry = manifest[key];
+  if (!entry) return null;
+  if (entry.status === 'initials') return null;
+  if (entry.githubUrl) return entry.githubUrl;
+  // Try to construct URL from file name
+  if (entry.file) return GITHUB_RAW + encodeURIComponent(entry.file);
+  return null;
+}
+
+// ── Render logo in transaction card ──
+async function renderTxLogoEl(el, tx) {
+  const url = await getLogoUrl(tx.domain, tx.cleanName || tx.merchant);
+  if (url) {
+    el.innerHTML = `<img src="${url}" style="width:34px;height:34px;object-fit:contain;border-radius:6px;" onerror="this.style.display='none'">`;
+    el.style.background = '#fff';
+    el.style.border = '1px solid rgba(255,255,255,0.1)';
+  }
+}
+
+// ── Open logo selector ──
+async function openLogoSelector() {
+  if (!currentLogoTx) return;
+  const tx = currentLogoTx;
+
+  selectedLogoId = null;
+  logoVariants   = [];
+
+  document.getElementById('logo-sel-merchant-name').textContent = tx.cleanName || tx.merchant;
+  document.getElementById('logo-sel-loading').style.display     = 'flex';
+  document.getElementById('logo-sel-grid').style.display        = 'none';
+  document.getElementById('btn-confirm-logo').disabled          = true;
+  document.getElementById('logo-selector-overlay').classList.add('open');
+
+  try {
+    // Call the Logo Picker web app to get pre-fetched variants from Drive
+    const domain = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const resp   = await fetch(LOGO_PICKER_URL + '?action=getVariantsForDomain&domain=' + encodeURIComponent(domain));
+    if (resp.ok) {
+      const data = await resp.json();
+      logoVariants = data.files || [];
+    }
+  } catch(e) {
+    logoVariants = [];
+  }
+
+  document.getElementById('logo-sel-loading').style.display = 'none';
+  renderLogoGrid();
+}
+
+// ── Render logo variant grid ──
+function renderLogoGrid() {
+  const grid = document.getElementById('logo-sel-grid');
+  grid.style.display = 'flex';
+
+  if (logoVariants.length === 0) {
+    grid.innerHTML = `<div class="logo-sel-empty">No logo variants found yet.<br>Run buildLogoRepo() in Apps Script<br>or take a photo below.</div>`;
+    return;
+  }
+
+  const sourceLabels = {
+    logodev: 'Logo.dev', logodev_name: 'Logo.dev', seeklogo: 'Seeklogo',
+    wikipedia: 'Wikipedia', worldvectorlogo: 'WorldVector', favicon: 'Favicon'
+  };
+
+  grid.innerHTML = logoVariants.map((f, i) => `
+    <div class="logo-sel-item" onclick="selectLogoVariant('${f.id}', ${i})">
+      <div class="logo-sel-box loading-img" id="lsbox-${f.id}">
+        <img id="lsimg-${f.id}" style="display:none;" alt="${f.source}">
+        <div class="logo-sel-check">✓</div>
+      </div>
+      <div class="logo-sel-label">${sourceLabels[f.source] || f.source}</div>
+    </div>
+  `).join('');
+
+  // Load images
+  logoVariants.forEach(f => loadLogoVariantImage(f.id));
+}
+
+// ── Load a single variant image via Logo Picker API ──
+async function loadLogoVariantImage(fileId) {
+  try {
+    const resp    = await fetch(LOGO_PICKER_URL + '?action=image&id=' + fileId);
+    const dataUrl = await resp.text();
+    const img = document.getElementById('lsimg-' + fileId);
+    const box = document.getElementById('lsbox-' + fileId);
+    if (img && dataUrl && dataUrl.startsWith('data:')) {
+      img.src = dataUrl;
+      img.style.display = 'block';
+      if (box) box.classList.remove('loading-img');
+    } else {
+      if (box) { box.classList.remove('loading-img'); box.innerHTML = '<span style="font-size:9px;color:#999;">No preview</span>'; }
+    }
+  } catch(e) {
+    const box = document.getElementById('lsbox-' + fileId);
+    if (box) { box.classList.remove('loading-img'); box.innerHTML = '<span style="font-size:9px;color:#999;">Error</span>'; }
+  }
+}
+
+// ── Select a logo variant ──
+function selectLogoVariant(fileId, index) {
+  selectedLogoId = fileId;
+
+  logoVariants.forEach(f => {
+    const box = document.getElementById('lsbox-' + f.id);
+    if (!box) return;
+    box.classList.remove('selected');
+  });
+
+  const selected = document.getElementById('lsbox-' + fileId);
+  if (selected) selected.classList.add('selected');
+  document.getElementById('btn-confirm-logo').disabled = false;
+}
+
+// ── Confirm logo selection — save to GitHub via Logo Picker ──
+async function confirmLogoSelection() {
+  if (!selectedLogoId || !currentLogoTx) return;
+  const btn = document.getElementById('btn-confirm-logo');
+  btn.textContent = 'Saving...';
+  btn.disabled    = true;
+
+  const tx       = currentLogoTx;
+  const domain   = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const allIds   = logoVariants.map(f => f.id);
+
+  try {
+    const resp = await fetch(LOGO_PICKER_URL + '?action=confirm&selectedId=' + selectedLogoId + '&fileKey=' + encodeURIComponent(domain) + '&allIds=' + encodeURIComponent(JSON.stringify(allIds)));
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+
+    // Invalidate cache so next load gets fresh logos.json
+    logoManifest   = null;
+    logoManifestTs = 0;
+
+    closeLogoSelector();
+    showToast('✓ Logo saved!');
+
+    // Update the modal logo immediately
+    if (data.githubUrl) updateModalLogo(data.githubUrl, 'official');
+
+  } catch(e) {
+    btn.textContent = '✓ Use Selected Logo';
+    btn.disabled    = false;
+    showToast('❌ Save failed: ' + e.message);
+  }
+}
+
+// ── Take a photo of the logo ──
+function takeLogoPhoto() {
+  document.getElementById('logo-camera-input').click();
+}
+
+// ── Handle the photo taken ──
+async function handleLogoPhoto(event) {
+  const file = event.target.files?.[0];
+  if (!file || !currentLogoTx) return;
+
+  showToast('Processing photo...');
+
+  try {
+    // Crop to square using canvas
+    const base64 = await cropImageToSquare(file);
+    const tx     = currentLogoTx;
+    const domain = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+    // Upload to GitHub via Logo Picker
+    const resp = await fetch(LOGO_PICKER_URL + '?action=uploadPhoto&fileKey=' + encodeURIComponent(domain) + '&base64=' + encodeURIComponent(base64));
+    const data = await resp.json();
+
+    if (data.error) throw new Error(data.error);
+
+    logoManifest   = null;
+    logoManifestTs = 0;
+
+    closeLogoSelector();
+    showToast('📸 Photo saved!');
+    if (data.githubUrl) updateModalLogo(data.githubUrl, 'photo');
+
+  } catch(e) {
+    showToast('❌ Photo failed: ' + e.message);
+  }
+
+  // Reset input
+  event.target.value = '';
+}
+
+// ── Crop image to square using canvas ──
+function cropImageToSquare(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const size   = Math.min(img.width, img.height);
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 400;
+        const ctx    = canvas.getContext('2d');
+        const sx     = (img.width  - size) / 2;
+        const sy     = (img.height - size) / 2;
+        ctx.drawImage(img, sx, sy, size, size, 0, 0, 400, 400);
+        resolve(canvas.toDataURL('image/png').split(',')[1]);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── Use initials — mark as confirmed initials in manifest ──
+async function useInitials() {
+  if (!currentLogoTx) return;
+  const tx     = currentLogoTx;
+  const domain = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const allIds = logoVariants.map(f => f.id);
+
+  try {
+    if (allIds.length > 0) {
+      await fetch(LOGO_PICKER_URL + '?action=useNone&allIds=' + encodeURIComponent(JSON.stringify(allIds)));
+    }
+    logoManifest   = null;
+    logoManifestTs = 0;
+  } catch(e) {}
+
+  closeLogoSelector();
+  showToast('✓ Using initials');
+}
+
+// ── Update modal logo after save ──
+function updateModalLogo(url, status) {
+  const logoEl  = document.getElementById('modal-logo');
+  const badgeEl = document.getElementById('modal-logo-badge');
+  logoEl.innerHTML = `<img class="sheet-logo-img" src="${url}" onerror="this.style.display='none'">`;
+  if (status === 'photo') {
+    logoEl.innerHTML += '<div class="photo-badge">📸</div>';
+  }
+  if (badgeEl) badgeEl.style.display = 'none';
+  logoEl.style.background = '#fff';
+  logoEl.style.border     = '1px solid rgba(255,255,255,0.1)';
+}
+
+// ── Close logo selector ──
+function closeLogoSelector() {
+  document.getElementById('logo-selector-overlay').classList.remove('open');
+}
+
+// ── Toast ──
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
 }
 
 // ── PWA MANIFEST ──
