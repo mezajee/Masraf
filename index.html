@@ -2155,16 +2155,41 @@ async function openLogoSelector() {
   document.getElementById('btn-confirm-logo').disabled          = true;
   document.getElementById('logo-selector-overlay').classList.add('open');
 
+  // Show debug info in the loading area
+  const loadingEl = document.getElementById('logo-sel-loading');
+  loadingEl.innerHTML = `<div class="spinner"></div><div style="font-size:11px;color:#aaa;margin-top:8px;text-align:center;">Fetching for domain:<br><b style="color:#C4A464;">${domain}</b></div>`;
+
+  let debugMsg = '';
+
   try {
     const url  = LOGO_PICKER_URL + '?action=getVariantsForDomain&domain=' + encodeURIComponent(domain);
+    debugMsg = 'Calling JSONP...\n' + url.substring(0, 80) + '...';
+    loadingEl.innerHTML += `<div style="font-size:10px;color:#666;margin-top:6px;word-break:break-all;padding:0 8px;">${debugMsg}</div>`;
+
     const data = await jsonpFetch(url);
     logoVariants = data.files || [];
+    debugMsg = `Got ${logoVariants.length} variants`;
   } catch(e) {
-    console.error('Logo fetch error:', e);
+    debugMsg = 'ERROR: ' + e.message;
     logoVariants = [];
   }
 
   document.getElementById('logo-sel-loading').style.display = 'none';
+
+  // Show debug in grid area if no variants
+  if (logoVariants.length === 0) {
+    document.getElementById('logo-sel-grid').style.display = 'flex';
+    document.getElementById('logo-sel-grid').innerHTML = `
+      <div style="width:100%;padding:12px;background:rgba(255,255,255,0.05);border-radius:10px;font-size:11px;color:#aaa;word-break:break-all;">
+        <div style="color:#C4A464;font-weight:700;margin-bottom:6px;">Debug Info</div>
+        <div>Domain: <b>${domain}</b></div>
+        <div>Tx domain field: <b>${tx.domain || '(empty)'}</b></div>
+        <div>Result: <b>${debugMsg}</b></div>
+        <div style="margin-top:6px;color:#666;">No variants found — try Take Photo or Use Initials</div>
+      </div>`;
+    return;
+  }
+
   renderLogoGrid();
 }
 
