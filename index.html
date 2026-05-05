@@ -2029,9 +2029,12 @@ function openModal(txId) {
 
     if (url) {
       logoEl.innerHTML = '';
+logoEl.style.display = 'flex';
+logoEl.style.alignItems = 'center';
+logoEl.style.justifyContent = 'center';
 const img1 = document.createElement('img');
 img1.src = url;
-img1.style.cssText = 'width:38px;height:38px;object-fit:contain;border-radius:9px;margin:auto;display:block;';
+img1.style.cssText = 'width:38px;height:38px;object-fit:contain;border-radius:9px;flex-shrink:0;';
 img1.onerror = function(){ logoEl.textContent = initials(name); };
 logoEl.appendChild(img1);
       logoEl.classList.add('has-logo');
@@ -2401,9 +2404,12 @@ function updateModalLogo(url, status) {
   const logoEl  = document.getElementById('modal-logo');
   const badgeEl = document.getElementById('modal-logo-badge');
   logoEl.innerHTML = '';
+logoEl.style.display = 'flex';
+logoEl.style.alignItems = 'center';
+logoEl.style.justifyContent = 'center';
 const img2 = document.createElement('img');
 img2.src = url;
-img2.style.cssText = 'width:38px;height:38px;object-fit:contain;border-radius:9px;margin:auto;display:block;';
+img2.style.cssText = 'width:38px;height:38px;object-fit:contain;border-radius:9px;flex-shrink:0;';
 img2.onerror = function(){ this.style.display='none'; };
 logoEl.appendChild(img2);
   if (status === 'photo') logoEl.innerHTML += '<div class="photo-badge">📸</div>';
