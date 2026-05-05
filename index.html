@@ -534,13 +534,13 @@
     }
 
     .sheet-logo {
-      width: 54px;
-      height: 54px;
-      border-radius: 15px;
+      width: 48px;
+      height: 48px;
+      border-radius: 13px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       flex-shrink: 0;
       overflow: hidden;
@@ -977,7 +977,7 @@
       display: flex; flex-direction: column; align-items: center;
       gap: 10px; padding: 32px 0; color: var(--text-dim); font-size: 13px;
     }
-    .sheet-logo-img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .sheet-logo-img { width: 100%; height: 100%; object-fit: contain; display: block; border-radius: 9px; }
     .sheet-logo-tap { cursor: pointer; position: relative; }
     .sheet-logo-tap .add-logo-badge {
       position: absolute; bottom: -3px; right: -3px;
@@ -2201,14 +2201,16 @@ async function renderTxLogoEl(el, tx) {
 
 // ── Apply logo URL to a card element ──
 function applyLogoToEl(el, url) {
-  // overflow:hidden on the container clips the image to the rounded corners
-  el.innerHTML        = `<img src="${url}" style="width:100%;height:100%;object-fit:contain;display:block;" onerror="this.style.display='none'">`;
+  el.innerHTML        = `<img src="${url}" style="width:36px;height:36px;object-fit:contain;border-radius:9px;display:block;" onerror="this.style.display='none'">`;
   el.style.background   = '#fff';
   el.style.border       = '1px solid rgba(0,0,0,0.08)';
   el.style.borderRadius = '12px';
   el.style.overflow     = 'hidden';
   el.style.padding      = '3px';
   el.style.color        = '';
+  el.style.display      = 'flex';
+  el.style.alignItems   = 'center';
+  el.style.justifyContent = 'center';
 }
 
 // ── Open logo selector ──
