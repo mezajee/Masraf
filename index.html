@@ -2060,15 +2060,42 @@ function showError(msg) {
 // ── LOGO SYSTEM ──
 const GITHUB_OWNER    = 'mezajee';
 const GITHUB_REPO     = 'masraf-logos';
-const LOGO_PICKER_URL = 'https://script.google.com/macros/s/AKfycbzHj35-Q4Y_Cpz9XZyRF10A0232cps8dQcDElza4zOH0Kdb1rmjqxMoxHXo6FRw86-g/exec'; // Update with your Logo Picker web app URL
+const LOGO_PICKER_URL = 'https://script.google.com/macros/s/AKfycbzHj35-Q4Y_Cpz9XZyRF10A0232cps8dQcDElza4zOH0Kdb1rmjqxMoxHXo6FRw86-g/exec';
 const GITHUB_RAW      = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/`;
 
-// Cache: domain → { status, url } loaded from logos.json
+// Cache
 let logoManifest    = null;
 let logoManifestTs  = 0;
-let currentLogoTx   = null;  // tx being edited in logo selector
-let selectedLogoId  = null;  // Drive file ID of selected variant
-let logoVariants    = [];     // current variants shown in selector
+let currentLogoTx   = null;
+let selectedLogoId  = null;
+let logoVariants    = [];
+
+// ── JSONP helper — Apps Script doesn't support CORS so we use JSONP ──
+function jsonpFetch(url) {
+  return new Promise((resolve, reject) => {
+    const cbName = 'masraf_cb_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+    const script  = document.createElement('script');
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error('JSONP timeout'));
+    }, 15000);
+
+    window[cbName] = function(data) {
+      cleanup();
+      resolve(data);
+    };
+
+    function cleanup() {
+      clearTimeout(timeout);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    script.onerror = () => { cleanup(); reject(new Error('JSONP script error')); };
+    script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName;
+    document.head.appendChild(script);
+  });
+}
 
 // ── Load logos.json manifest from GitHub (cached 5 min) ──
 async function getLogoManifest() {
@@ -2088,7 +2115,7 @@ async function getLogoManifest() {
   return logoManifest;
 }
 
-// ── Get logo URL for a domain/merchant ──
+// ── Get logo URL for a domain/merchant from GitHub manifest ──
 async function getLogoUrl(domain, cleanName) {
   const manifest = await getLogoManifest();
   const key = domain || cleanName?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -2097,7 +2124,6 @@ async function getLogoUrl(domain, cleanName) {
   if (!entry) return null;
   if (entry.status === 'initials') return null;
   if (entry.githubUrl) return entry.githubUrl;
-  // Try to construct URL from file name
   if (entry.file) return GITHUB_RAW + encodeURIComponent(entry.file);
   return null;
 }
@@ -2120,21 +2146,21 @@ async function openLogoSelector() {
   selectedLogoId = null;
   logoVariants   = [];
 
-  document.getElementById('logo-sel-merchant-name').textContent = tx.cleanName || tx.merchant;
+  const name   = tx.cleanName || tx.merchant;
+  const domain = tx.domain || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+  document.getElementById('logo-sel-merchant-name').textContent = name;
   document.getElementById('logo-sel-loading').style.display     = 'flex';
   document.getElementById('logo-sel-grid').style.display        = 'none';
   document.getElementById('btn-confirm-logo').disabled          = true;
   document.getElementById('logo-selector-overlay').classList.add('open');
 
   try {
-    // Call the Logo Picker web app to get pre-fetched variants from Drive
-    const domain = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    const resp   = await fetch(LOGO_PICKER_URL + '?action=getVariantsForDomain&domain=' + encodeURIComponent(domain));
-    if (resp.ok) {
-      const data = await resp.json();
-      logoVariants = data.files || [];
-    }
+    const url  = LOGO_PICKER_URL + '?action=getVariantsForDomain&domain=' + encodeURIComponent(domain);
+    const data = await jsonpFetch(url);
+    logoVariants = data.files || [];
   } catch(e) {
+    console.error('Logo fetch error:', e);
     logoVariants = [];
   }
 
@@ -2167,18 +2193,17 @@ function renderLogoGrid() {
     </div>
   `).join('');
 
-  // Load images
   logoVariants.forEach(f => loadLogoVariantImage(f.id));
 }
 
-// ── Load a single variant image via Logo Picker API ──
+// ── Load a single variant image via JSONP ──
 async function loadLogoVariantImage(fileId) {
   try {
-    const resp    = await fetch(LOGO_PICKER_URL + '?action=image&id=' + fileId);
-    const dataUrl = await resp.text();
+    const url     = LOGO_PICKER_URL + '?action=image&id=' + encodeURIComponent(fileId);
+    const dataUrl = await jsonpFetch(url);
     const img = document.getElementById('lsimg-' + fileId);
     const box = document.getElementById('lsbox-' + fileId);
-    if (img && dataUrl && dataUrl.startsWith('data:')) {
+    if (img && dataUrl && typeof dataUrl === 'string' && dataUrl.startsWith('data:')) {
       img.src = dataUrl;
       img.style.display = 'block';
       if (box) box.classList.remove('loading-img');
@@ -2189,6 +2214,30 @@ async function loadLogoVariantImage(fileId) {
     const box = document.getElementById('lsbox-' + fileId);
     if (box) { box.classList.remove('loading-img'); box.innerHTML = '<span style="font-size:9px;color:#999;">Error</span>'; }
   }
+}
+
+// ── Crop image to square using canvas ──
+function cropImageToSquare(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const size   = Math.min(img.width, img.height);
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 400;
+        const ctx    = canvas.getContext('2d');
+        const sx     = (img.width  - size) / 2;
+        const sy     = (img.height - size) / 2;
+        ctx.drawImage(img, sx, sy, size, size, 0, 0, 400, 400);
+        resolve(canvas.toDataURL('image/png').split(',')[1]);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 // ── Select a logo variant ──
@@ -2218,18 +2267,18 @@ async function confirmLogoSelection() {
   const allIds   = logoVariants.map(f => f.id);
 
   try {
-    const resp = await fetch(LOGO_PICKER_URL + '?action=confirm&selectedId=' + selectedLogoId + '&fileKey=' + encodeURIComponent(domain) + '&allIds=' + encodeURIComponent(JSON.stringify(allIds)));
-    const data = await resp.json();
+    const url  = LOGO_PICKER_URL + '?action=confirm&selectedId=' + encodeURIComponent(selectedLogoId) +
+                 '&fileKey=' + encodeURIComponent(domain) +
+                 '&allIds='  + encodeURIComponent(JSON.stringify(allIds));
+    const data = await jsonpFetch(url);
     if (data.error) throw new Error(data.error);
 
-    // Invalidate cache so next load gets fresh logos.json
     logoManifest   = null;
     logoManifestTs = 0;
 
     closeLogoSelector();
     showToast('✓ Logo saved!');
 
-    // Update the modal logo immediately
     if (data.githubUrl) updateModalLogo(data.githubUrl, 'official');
 
   } catch(e) {
@@ -2252,14 +2301,12 @@ async function handleLogoPhoto(event) {
   showToast('Processing photo...');
 
   try {
-    // Crop to square using canvas
     const base64 = await cropImageToSquare(file);
     const tx     = currentLogoTx;
     const domain = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-    // Upload to GitHub via Logo Picker
-    const resp = await fetch(LOGO_PICKER_URL + '?action=uploadPhoto&fileKey=' + encodeURIComponent(domain) + '&base64=' + encodeURIComponent(base64));
-    const data = await resp.json();
+    const url  = LOGO_PICKER_URL + '?action=uploadPhoto&fileKey=' + encodeURIComponent(domain) + '&base64=' + encodeURIComponent(base64);
+    const data = await jsonpFetch(url);
 
     if (data.error) throw new Error(data.error);
 
@@ -2274,35 +2321,10 @@ async function handleLogoPhoto(event) {
     showToast('❌ Photo failed: ' + e.message);
   }
 
-  // Reset input
   event.target.value = '';
 }
 
-// ── Crop image to square using canvas ──
-function cropImageToSquare(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const size   = Math.min(img.width, img.height);
-        const canvas = document.createElement('canvas');
-        canvas.width = canvas.height = 400;
-        const ctx    = canvas.getContext('2d');
-        const sx     = (img.width  - size) / 2;
-        const sy     = (img.height - size) / 2;
-        ctx.drawImage(img, sx, sy, size, size, 0, 0, 400, 400);
-        resolve(canvas.toDataURL('image/png').split(',')[1]);
-      };
-      img.onerror = reject;
-      img.src = e.target.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-// ── Use initials — mark as confirmed initials in manifest ──
+// ── Use initials ──
 async function useInitials() {
   if (!currentLogoTx) return;
   const tx     = currentLogoTx;
@@ -2311,7 +2333,8 @@ async function useInitials() {
 
   try {
     if (allIds.length > 0) {
-      await fetch(LOGO_PICKER_URL + '?action=useNone&allIds=' + encodeURIComponent(JSON.stringify(allIds)));
+      const url = LOGO_PICKER_URL + '?action=useNone&allIds=' + encodeURIComponent(JSON.stringify(allIds));
+      await jsonpFetch(url);
     }
     logoManifest   = null;
     logoManifestTs = 0;
