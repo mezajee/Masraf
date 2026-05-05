@@ -1209,8 +1209,8 @@
   <div class="modal-sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
     <div class="sheet-merchant-header">
-      <div class="sheet-logo sheet-logo-tap" id="modal-logo" onclick="openLogoSelector()">
-        <span class="add-logo-badge" id="modal-logo-badge">＋</span>
+      <div class="sheet-logo" id="modal-logo">
+        <span class="add-logo-badge" id="modal-logo-badge" style="display:none;">＋</span>
       </div>
       <div>
         <div class="sheet-merchant-name" id="modal-merchant"></div>
@@ -1975,17 +1975,46 @@ function openModal(txId) {
   logoEl.style.background  = color + '22';
   logoEl.style.border      = `1px solid ${color}44`;
   logoEl.style.color       = color;
-  if (badgeEl) badgeEl.style.display = 'flex';
+  // Async load best logo — confirmed or random variant
+  // Then decide if logo is tappable based on confirmation status + role
+  const key = tx.domain || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-  // Async load confirmed logo from GitHub
-  getLogoUrl(tx.domain, tx.cleanName || tx.merchant).then(url => {
-    if (url) {
-      logoEl.innerHTML = `<img class="sheet-logo-img" src="${url}" onerror="this.parentElement.textContent='${initials(name)}'">`;
-      logoEl.style.background = '#fff';
-      logoEl.style.border     = '1px solid rgba(255,255,255,0.1)';
-      logoEl.style.color      = '';
-      if (badgeEl) badgeEl.style.display = 'none';
+  getLogoManifest().then(manifest => {
+    const entry       = manifest[key];
+    const isConfirmed = entry && (entry.status === 'official' || entry.status === 'photo');
+
+    // Tappable if: admin always, or non-admin only when NOT yet confirmed
+    const canEdit = userRole === 'admin' || !isConfirmed;
+    logoEl.style.cursor = canEdit ? 'pointer' : 'default';
+    logoEl.onclick      = canEdit ? openLogoSelector : null;
+    if (badgeEl) badgeEl.style.display = canEdit ? 'flex' : 'none';
+
+    if (isConfirmed) {
+      const url = entry.githubUrl || (entry.file ? GITHUB_RAW + encodeURIComponent(entry.file) : null);
+      if (url) {
+        logoEl.innerHTML = `<img class="sheet-logo-img" src="${url}" onerror="this.parentElement.textContent='${initials(name)}'">`;
+        logoEl.style.background = '#fff';
+        logoEl.style.border     = '1px solid rgba(255,255,255,0.1)';
+        logoEl.style.color      = '';
+        if (badgeEl && canEdit) logoEl.appendChild(badgeEl);
+        return;
+      }
     }
+
+    // Not confirmed — try random variant (any user can tap to confirm)
+    getVariantsManifest().then(variants => {
+      const list = variants[key];
+      if (list && list.length > 0) {
+        const pick = list[Math.floor(Math.random() * list.length)];
+        if (pick.githubUrl) {
+          logoEl.innerHTML = `<img class="sheet-logo-img" src="${pick.githubUrl}" onerror="this.parentElement.textContent='${initials(name)}'">`;
+          logoEl.style.background = '#fff';
+          logoEl.style.border     = '1px solid rgba(255,255,255,0.1)';
+          logoEl.style.color      = '';
+          if (badgeEl && canEdit) logoEl.appendChild(badgeEl);
+        }
+      }
+    });
   });
 
   document.getElementById('modal-merchant').textContent   = name;
@@ -2077,6 +2106,7 @@ let variantsTs       = 0;
 let currentLogoTx    = null;
 let selectedVariant  = null;
 let logoVariants     = [];
+let confirmedFile    = null;  // currently confirmed file for open merchant
 
 // ── JSONP helper — used only for confirm/save/photo actions ──
 function jsonpFetch(url) {
@@ -2169,8 +2199,14 @@ async function openLogoSelector() {
   document.getElementById('logo-selector-overlay').classList.add('open');
 
   // Load variants directly from GitHub — no JSONP, no CORS issues
+  // Always show ALL variants regardless of confirmation status
   const variants = await getVariantsManifest();
   logoVariants   = variants[key] || [];
+
+  // Mark currently confirmed variant so it shows as selected by default
+  const manifest     = await getLogoManifest();
+  const confirmedEntry = manifest[key];
+  const confirmedFile  = confirmedEntry?.file || null;
 
   document.getElementById('logo-sel-loading').style.display = 'none';
   renderLogoGrid();
@@ -2191,18 +2227,25 @@ function renderLogoGrid() {
     wikipedia: 'Wikipedia', worldvectorlogo: 'WorldVector', favicon: 'Favicon'
   };
 
-  grid.innerHTML = logoVariants.map((v, i) => `
+  grid.innerHTML = logoVariants.map((v, i) => {
+    const isConfirmed = confirmedFile && v.file === confirmedFile;
+    return `
     <div class="logo-sel-item" onclick="selectLogoVariant(${i})">
-      <div class="logo-sel-box loading-img" id="lsbox-${i}">
+      <div class="logo-sel-box loading-img ${isConfirmed ? 'selected' : ''}" id="lsbox-${i}">
         <img src="${v.githubUrl}"
              style="width:60px;height:60px;object-fit:contain;"
              onload="this.parentElement.classList.remove('loading-img')"
              onerror="this.parentElement.innerHTML='<span style=\'font-size:9px;color:#999\'>Error</span>'">
         <div class="logo-sel-check">✓</div>
       </div>
-      <div class="logo-sel-label">${sourceLabels[v.source] || v.source}</div>
-    </div>
-  `).join('');
+      <div class="logo-sel-label">${isConfirmed ? '★ ' : ''}${sourceLabels[v.source] || v.source}</div>
+    </div>`;
+  }).join('');
+  // Pre-select confirmed variant
+  if (confirmedFile) {
+    const idx = logoVariants.findIndex(v => v.file === confirmedFile);
+    if (idx >= 0) { selectedVariant = logoVariants[idx]; document.getElementById('btn-confirm-logo').disabled = false; }
+  }
 }
 
 // ── Select a logo variant ──
