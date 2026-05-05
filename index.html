@@ -2029,17 +2029,24 @@ function openModal(txId) {
 
     if (url) {
       logoEl.innerHTML = '';
-logoEl.style.display = 'flex';
-logoEl.style.alignItems = 'center';
-logoEl.style.justifyContent = 'center';
-const img1 = document.createElement('img');
-img1.src = url;
-img1.style.cssText = 'width:38px;height:38px;object-fit:contain;border-radius:9px;flex-shrink:0;';
-img1.onerror = function(){ logoEl.textContent = initials(name); };
-logoEl.appendChild(img1);
+      logoEl.style.display = 'flex';
+      logoEl.style.alignItems = 'center';
+      logoEl.style.justifyContent = 'center';
+      logoEl.style.position = 'relative';
+      const img1 = document.createElement('img');
+      img1.src = url;
+      img1.style.cssText = 'width:38px;height:38px;object-fit:contain;border-radius:9px;flex-shrink:0;';
+      img1.onerror = function(){ logoEl.textContent = initials(name); };
+      logoEl.appendChild(img1);
+      // Badge is position:absolute so it does NOT affect flex layout
+      if (badgeEl && canEdit) {
+        badgeEl.style.position = 'absolute';
+        badgeEl.style.bottom   = '-3px';
+        badgeEl.style.right    = '-3px';
+        logoEl.appendChild(badgeEl);
+      }
       logoEl.classList.add('has-logo');
       logoEl.style.color = '';
-      if (badgeEl && canEdit) logoEl.appendChild(badgeEl);
     }
   }
 
