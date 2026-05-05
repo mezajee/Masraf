@@ -2070,125 +2070,82 @@ const LOGO_PICKER_URL = 'https://script.google.com/macros/s/AKfycbzHj35-Q4Y_Cpz9
 const GITHUB_RAW      = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/`;
 
 // Cache
-let logoManifest    = null;
-let logoManifestTs  = 0;
-let currentLogoTx   = null;
-let selectedLogoId  = null;
-let logoVariants    = [];
+let logoManifest     = null;  // logos.json — confirmed logos
+let logoManifestTs   = 0;
+let variantsManifest = null;  // variants.json — unconfirmed variants
+let variantsTs       = 0;
+let currentLogoTx    = null;
+let selectedVariant  = null;
+let logoVariants     = [];
 
-// ── JSONP helper — Apps Script doesn't support CORS so we use JSONP ──
+// ── JSONP helper — used only for confirm/save/photo actions ──
 function jsonpFetch(url) {
   return new Promise((resolve, reject) => {
     const cbName = 'masraf_cb_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
     const script  = document.createElement('script');
-    const timeout = setTimeout(() => {
-      cleanup();
-      reject(new Error('JSONP timeout'));
-    }, 15000);
-
-    window[cbName] = function(data) {
-      cleanup();
-      resolve(data);
-    };
-
+    const timeout = setTimeout(() => { cleanup(); reject(new Error('JSONP timeout')); }, 15000);
+    window[cbName] = function(data) { cleanup(); resolve(data); };
     function cleanup() {
       clearTimeout(timeout);
       delete window[cbName];
       if (script.parentNode) script.parentNode.removeChild(script);
     }
-
     script.onerror = () => { cleanup(); reject(new Error('JSONP script error')); };
     script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName;
     document.head.appendChild(script);
   });
 }
 
-// ── Load logos.json manifest from GitHub (cached 5 min) ──
+// ── Load logos.json from GitHub (confirmed logos, cached 5 min) ──
 async function getLogoManifest() {
   const now = Date.now();
   if (logoManifest && (now - logoManifestTs) < 5 * 60 * 1000) return logoManifest;
   try {
     const resp = await fetch(`${GITHUB_RAW}logos.json?t=${now}`);
-    if (resp.ok) {
-      logoManifest   = await resp.json();
-      logoManifestTs = now;
-    } else {
-      logoManifest = {};
-    }
-  } catch(e) {
-    logoManifest = {};
-  }
+    logoManifest   = resp.ok ? await resp.json() : {};
+    logoManifestTs = now;
+  } catch(e) { logoManifest = {}; }
   return logoManifest;
 }
 
-// ── Get logo URL for a domain/merchant from GitHub manifest ──
-// Falls back to a random Drive variant via Logo Picker API if not confirmed ──
-async function getLogoUrl(domain, cleanName) {
-  const manifest = await getLogoManifest();
-  const key = domain || cleanName?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  if (!key) return null;
-
-  // Check confirmed manifest first
-  const entry = manifest[key];
-  if (entry) {
-    if (entry.status === 'initials') return null;
-    if (entry.githubUrl) return entry.githubUrl;
-    if (entry.file) return GITHUB_RAW + encodeURIComponent(entry.file);
-  }
-
-  // Not confirmed — try to get a random variant from Drive via Logo Picker
+// ── Load variants.json from GitHub (unconfirmed variants, cached 5 min) ──
+async function getVariantsManifest() {
+  const now = Date.now();
+  if (variantsManifest && (now - variantsTs) < 5 * 60 * 1000) return variantsManifest;
   try {
-    const url  = LOGO_PICKER_URL + '?action=getVariantsForDomain&domain=' + encodeURIComponent(key);
-    const data = await jsonpFetch(url);
-    const files = data.files || [];
-    if (files.length > 0) {
-      // Pick a random variant
-      const pick = files[Math.floor(Math.random() * files.length)];
-      // Return as base64 data URL via Logo Picker image action
-      const imgUrl = LOGO_PICKER_URL + '?action=image&id=' + encodeURIComponent(pick.id);
-      return imgUrl; // Will be loaded via jsonpFetch in renderTxLogoEl
-    }
-  } catch(e) {}
-
-  return null;
+    const resp = await fetch(`${GITHUB_RAW}variants.json?t=${now}`);
+    variantsManifest = resp.ok ? await resp.json() : {};
+    variantsTs       = now;
+  } catch(e) { variantsManifest = {}; }
+  return variantsManifest;
 }
 
 // ── Render logo in transaction card ──
 async function renderTxLogoEl(el, tx) {
-  const manifest = await getLogoManifest();
   const key = tx.domain || (tx.cleanName || tx.merchant)?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   if (!key) return;
 
-  // Check confirmed manifest first
-  const entry = manifest[key];
+  // 1. Check confirmed logos.json first
+  const manifest = await getLogoManifest();
+  const entry    = manifest[key];
   if (entry) {
     if (entry.status === 'initials') return;
     const url = entry.githubUrl || (entry.file ? GITHUB_RAW + encodeURIComponent(entry.file) : null);
-    if (url) {
-      applyLogoToEl(el, url);
-      return;
-    }
+    if (url) { applyLogoToEl(el, url); return; }
   }
 
-  // Not confirmed — try a random Drive variant
-  try {
-    const url  = LOGO_PICKER_URL + '?action=getVariantsForDomain&domain=' + encodeURIComponent(key);
-    const data = await jsonpFetch(url);
-    const files = data.files || [];
-    if (files.length > 0) {
-      const pick = files[Math.floor(Math.random() * files.length)];
-      // Load the image via jsonpFetch
-      const dataUrl = await jsonpFetch(LOGO_PICKER_URL + '?action=image&id=' + encodeURIComponent(pick.id));
-      if (dataUrl && typeof dataUrl === 'string' && dataUrl.startsWith('data:')) {
-        applyLogoToEl(el, dataUrl);
-      }
-    }
-  } catch(e) {}
+  // 2. Fall back to random variant from variants.json
+  const variants = await getVariantsManifest();
+  const list     = variants[key];
+  if (list && list.length > 0) {
+    const pick = list[Math.floor(Math.random() * list.length)];
+    if (pick.githubUrl) applyLogoToEl(el, pick.githubUrl);
+  }
 }
 
-// ── Apply a logo URL to a card element ──
+// ── Apply logo URL to a card element ──
 function applyLogoToEl(el, url) {
-  el.innerHTML = `<img src="${url}" style="width:34px;height:34px;object-fit:contain;border-radius:8px;" onerror="this.style.display='none'">`;
+  el.innerHTML        = `<img src="${url}" style="width:34px;height:34px;object-fit:contain;border-radius:8px;" onerror="this.style.display='none'">`;
   el.style.background = '#fff';
   el.style.border     = '1px solid rgba(255,255,255,0.1)';
   el.style.color      = '';
@@ -2199,11 +2156,11 @@ async function openLogoSelector() {
   if (!currentLogoTx) return;
   const tx = currentLogoTx;
 
-  selectedLogoId = null;
-  logoVariants   = [];
+  selectedVariant = null;
+  logoVariants    = [];
 
-  const name   = tx.cleanName || tx.merchant;
-  const domain = tx.domain || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const name = tx.cleanName || tx.merchant;
+  const key  = tx.domain || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
   document.getElementById('logo-sel-merchant-name').textContent = name;
   document.getElementById('logo-sel-loading').style.display     = 'flex';
@@ -2211,13 +2168,9 @@ async function openLogoSelector() {
   document.getElementById('btn-confirm-logo').disabled          = true;
   document.getElementById('logo-selector-overlay').classList.add('open');
 
-  try {
-    const url  = LOGO_PICKER_URL + '?action=getVariantsForDomain&domain=' + encodeURIComponent(domain);
-    const data = await jsonpFetch(url);
-    logoVariants = data.files || [];
-  } catch(e) {
-    logoVariants = [];
-  }
+  // Load variants directly from GitHub — no JSONP, no CORS issues
+  const variants = await getVariantsManifest();
+  logoVariants   = variants[key] || [];
 
   document.getElementById('logo-sel-loading').style.display = 'none';
   renderLogoGrid();
@@ -2238,102 +2191,54 @@ function renderLogoGrid() {
     wikipedia: 'Wikipedia', worldvectorlogo: 'WorldVector', favicon: 'Favicon'
   };
 
-  grid.innerHTML = logoVariants.map((f, i) => `
-    <div class="logo-sel-item" onclick="selectLogoVariant('${f.id}', ${i})">
-      <div class="logo-sel-box loading-img" id="lsbox-${f.id}">
-        <img id="lsimg-${f.id}" style="display:none;" alt="${f.source}">
+  grid.innerHTML = logoVariants.map((v, i) => `
+    <div class="logo-sel-item" onclick="selectLogoVariant(${i})">
+      <div class="logo-sel-box loading-img" id="lsbox-${i}">
+        <img src="${v.githubUrl}"
+             style="width:60px;height:60px;object-fit:contain;"
+             onload="this.parentElement.classList.remove('loading-img')"
+             onerror="this.parentElement.innerHTML='<span style=\'font-size:9px;color:#999\'>Error</span>'">
         <div class="logo-sel-check">✓</div>
       </div>
-      <div class="logo-sel-label">${sourceLabels[f.source] || f.source}</div>
+      <div class="logo-sel-label">${sourceLabels[v.source] || v.source}</div>
     </div>
   `).join('');
-
-  logoVariants.forEach(f => loadLogoVariantImage(f.id));
-}
-
-// ── Load a single variant image via JSONP ──
-async function loadLogoVariantImage(fileId) {
-  try {
-    const url     = LOGO_PICKER_URL + '?action=image&id=' + encodeURIComponent(fileId);
-    const dataUrl = await jsonpFetch(url);
-    const img = document.getElementById('lsimg-' + fileId);
-    const box = document.getElementById('lsbox-' + fileId);
-    if (img && dataUrl && typeof dataUrl === 'string' && dataUrl.startsWith('data:')) {
-      img.src = dataUrl;
-      img.style.display = 'block';
-      if (box) box.classList.remove('loading-img');
-    } else {
-      if (box) { box.classList.remove('loading-img'); box.innerHTML = '<span style="font-size:9px;color:#999;">No preview</span>'; }
-    }
-  } catch(e) {
-    const box = document.getElementById('lsbox-' + fileId);
-    if (box) { box.classList.remove('loading-img'); box.innerHTML = '<span style="font-size:9px;color:#999;">Error</span>'; }
-  }
-}
-
-// ── Crop image to square using canvas ──
-function cropImageToSquare(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const size   = Math.min(img.width, img.height);
-        const canvas = document.createElement('canvas');
-        canvas.width = canvas.height = 400;
-        const ctx    = canvas.getContext('2d');
-        const sx     = (img.width  - size) / 2;
-        const sy     = (img.height - size) / 2;
-        ctx.drawImage(img, sx, sy, size, size, 0, 0, 400, 400);
-        resolve(canvas.toDataURL('image/png').split(',')[1]);
-      };
-      img.onerror = reject;
-      img.src = e.target.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
 }
 
 // ── Select a logo variant ──
-function selectLogoVariant(fileId, index) {
-  selectedLogoId = fileId;
-
-  logoVariants.forEach(f => {
-    const box = document.getElementById('lsbox-' + f.id);
-    if (!box) return;
-    box.classList.remove('selected');
-  });
-
-  const selected = document.getElementById('lsbox-' + fileId);
-  if (selected) selected.classList.add('selected');
+function selectLogoVariant(index) {
+  selectedVariant = logoVariants[index];
+  logoVariants.forEach((_, i) => document.getElementById('lsbox-' + i)?.classList.remove('selected'));
+  document.getElementById('lsbox-' + index)?.classList.add('selected');
   document.getElementById('btn-confirm-logo').disabled = false;
 }
 
-// ── Confirm logo selection — save to GitHub via Logo Picker ──
+// ── Confirm logo selection ──
 async function confirmLogoSelection() {
-  if (!selectedLogoId || !currentLogoTx) return;
+  if (!selectedVariant || !currentLogoTx) return;
   const btn = document.getElementById('btn-confirm-logo');
   btn.textContent = 'Saving...';
   btn.disabled    = true;
 
-  const tx       = currentLogoTx;
-  const domain   = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const allIds   = logoVariants.map(f => f.id);
+  const tx  = currentLogoTx;
+  const key = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
   try {
-    const url  = LOGO_PICKER_URL + '?action=confirm&selectedId=' + encodeURIComponent(selectedLogoId) +
-                 '&fileKey=' + encodeURIComponent(domain) +
-                 '&allIds='  + encodeURIComponent(JSON.stringify(allIds));
+    const url = LOGO_PICKER_URL +
+      '?action=confirmVariant' +
+      '&fileKey='     + encodeURIComponent(key) +
+      '&variantFile=' + encodeURIComponent(selectedVariant.file) +
+      '&variantUrl='  + encodeURIComponent(selectedVariant.githubUrl);
+
     const data = await jsonpFetch(url);
     if (data.error) throw new Error(data.error);
 
-    logoManifest   = null;
-    logoManifestTs = 0;
+    // Invalidate both caches
+    logoManifest     = null; logoManifestTs   = 0;
+    variantsManifest = null; variantsTs       = 0;
 
     closeLogoSelector();
     showToast('✓ Logo saved!');
-
     if (data.githubUrl) updateModalLogo(data.githubUrl, 'official');
 
   } catch(e) {
@@ -2352,49 +2257,56 @@ function takeLogoPhoto() {
 async function handleLogoPhoto(event) {
   const file = event.target.files?.[0];
   if (!file || !currentLogoTx) return;
-
   showToast('Processing photo...');
-
   try {
     const base64 = await cropImageToSquare(file);
     const tx     = currentLogoTx;
-    const domain = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-
-    const url  = LOGO_PICKER_URL + '?action=uploadPhoto&fileKey=' + encodeURIComponent(domain) + '&base64=' + encodeURIComponent(base64);
-    const data = await jsonpFetch(url);
-
+    const key    = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const url    = LOGO_PICKER_URL + '?action=uploadPhoto&fileKey=' + encodeURIComponent(key) + '&base64=' + encodeURIComponent(base64);
+    const data   = await jsonpFetch(url);
     if (data.error) throw new Error(data.error);
-
-    logoManifest   = null;
-    logoManifestTs = 0;
-
+    logoManifest = null; logoManifestTs = 0;
+    variantsManifest = null; variantsTs = 0;
     closeLogoSelector();
     showToast('📸 Photo saved!');
     if (data.githubUrl) updateModalLogo(data.githubUrl, 'photo');
-
   } catch(e) {
     showToast('❌ Photo failed: ' + e.message);
   }
-
   event.target.value = '';
+}
+
+// ── Crop image to square ──
+function cropImageToSquare(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const size   = Math.min(img.width, img.height);
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 400;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, 400, 400);
+        resolve(canvas.toDataURL('image/png').split(',')[1]);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 // ── Use initials ──
 async function useInitials() {
   if (!currentLogoTx) return;
-  const tx     = currentLogoTx;
-  const domain = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const allIds = logoVariants.map(f => f.id);
-
+  const tx  = currentLogoTx;
+  const key = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   try {
-    if (allIds.length > 0) {
-      const url = LOGO_PICKER_URL + '?action=useNone&allIds=' + encodeURIComponent(JSON.stringify(allIds));
-      await jsonpFetch(url);
-    }
-    logoManifest   = null;
-    logoManifestTs = 0;
+    await jsonpFetch(LOGO_PICKER_URL + '?action=useNone&fileKey=' + encodeURIComponent(key));
+    logoManifest = null; logoManifestTs = 0;
   } catch(e) {}
-
   closeLogoSelector();
   showToast('✓ Using initials');
 }
@@ -2403,22 +2315,16 @@ async function useInitials() {
 function updateModalLogo(url, status) {
   const logoEl  = document.getElementById('modal-logo');
   const badgeEl = document.getElementById('modal-logo-badge');
-  logoEl.innerHTML = `<img class="sheet-logo-img" src="${url}" onerror="this.style.display='none'">`;
+  logoEl.innerHTML    = `<img class="sheet-logo-img" src="${url}" onerror="this.style.display='none'">`;
   if (status === 'photo') logoEl.innerHTML += '<div class="photo-badge">📸</div>';
   if (badgeEl) badgeEl.style.display = 'none';
   logoEl.style.background = '#fff';
   logoEl.style.border     = '1px solid rgba(255,255,255,0.1)';
   logoEl.style.color      = '';
-
-  // Also update the transaction card immediately without waiting for re-render
+  // Also update the card immediately
   if (currentLogoTx) {
     const cardEl = document.getElementById('txlogo-' + currentLogoTx.id);
-    if (cardEl) {
-      cardEl.innerHTML = `<img src="${url}" style="width:34px;height:34px;object-fit:contain;border-radius:6px;" onerror="this.style.display='none'">`;
-      cardEl.style.background = '#fff';
-      cardEl.style.border     = '1px solid rgba(255,255,255,0.1)';
-      cardEl.style.color      = '';
-    }
+    if (cardEl) applyLogoToEl(cardEl, url);
   }
 }
 
