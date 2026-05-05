@@ -1900,7 +1900,7 @@ function buildMeta(tx) {
   const parts = [];
   if (userRole === 'admin' && tx.person) parts.push(tx.person);
   if (tx.category) parts.push(tx.category);
-  const flag = tx.isIntl ? ` <span style="font-size:18px;vertical-align:bottom;">${countryFlag(tx.country)}</span>` : '';
+  const flag = tx.isIntl ? ` <span style="font-size:18px;line-height:1;position:relative;top:3px;">${countryFlag(tx.country)}</span>` : '';
   if (tx.area) parts.push(tx.area + flag);
   else if (tx.city && tx.city !== 'Dubai') parts.push(tx.city + flag);
   else if (tx.isIntl && tx.country) parts.push(tx.country + flag);
