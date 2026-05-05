@@ -529,6 +529,7 @@
       align-items: center;
       gap: 16px;
       margin-bottom: 24px;
+      min-height: 64px;
     }
 
     .sheet-logo {
@@ -547,7 +548,7 @@
     .sheet-logo.has-logo {
       background: #fff !important;
       border: 1px solid rgba(0,0,0,0.08) !important;
-      padding: 6px;
+      padding: 4px;
     }
 
     .sheet-merchant-name {
@@ -2190,11 +2191,11 @@ async function renderTxLogoEl(el, tx) {
 
 // ── Apply logo URL to a card element ──
 function applyLogoToEl(el, url) {
-  el.innerHTML        = `<img src="${url}" style="width:26px;height:26px;object-fit:contain;" onerror="this.style.display='none'">`;
+  el.innerHTML        = `<img src="${url}" style="width:36px;height:36px;object-fit:contain;" onerror="this.style.display='none'">`;
   el.style.background = '#fff';
   el.style.border     = '1px solid rgba(0,0,0,0.08)';
   el.style.color      = '';
-  el.style.padding    = '4px';
+  el.style.padding    = '3px';
 }
 
 // ── Open logo selector ──
