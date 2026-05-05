@@ -2217,7 +2217,7 @@ async function renderTxLogoEl(el, tx) {
 
 // ── Apply logo URL to a card element ──
 function applyLogoToEl(el, url) {
-  el.innerHTML        = `<img src="${url}" style="width:38px;height:38px;object-fit:contain;" onerror="this.style.display='none'">`;
+  el.innerHTML        = `<img src="${url}" style="width:38px;height:38px;object-fit:contain;border-radius:9px;" onerror="this.style.display='none'">`;
   el.style.background = '#fff';
   el.style.border     = '1px solid rgba(0,0,0,0.08)';
   el.style.color      = '';
