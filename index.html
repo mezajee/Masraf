@@ -972,6 +972,7 @@
     .btn-confirm-logo  { background: var(--green); color: #000; }
     .btn-take-photo    { background: #1C1C22; color: var(--text); border: 1px solid rgba(255,255,255,0.07); }
     .btn-use-initials  { background: rgba(255,75,75,0.1); color: var(--red); border: 1px solid rgba(255,75,75,0.2); }
+    .btn-search-again  { background: rgba(196,164,100,0.12); color: var(--gold); border: 1px solid rgba(196,164,100,0.3); }
     .btn-cancel-logo   { background: transparent; color: var(--text-dim); font-size: 13px; }
     .logo-sel-empty { text-align: center; padding: 24px 0 8px; color: var(--text-dim); font-size: 13px; }
     .logo-sel-loading {
@@ -1277,6 +1278,7 @@
     <div class="logo-sel-divider"></div>
     <div class="logo-sel-actions">
       <button class="logo-sel-btn btn-confirm-logo" id="btn-confirm-logo" onclick="confirmLogoSelection()" disabled>✓ Use Selected Logo</button>
+      <button class="logo-sel-btn btn-search-again" id="btn-search-again" onclick="searchAgain()">🔍 None of these — Search Again</button>
       <button class="logo-sel-btn btn-take-photo" onclick="takeLogoPhoto()">📷 Take Photo of Logo</button>
       <button class="logo-sel-btn btn-use-initials" onclick="useInitials()">✕ Use Initials</button>
       <button class="logo-sel-btn btn-cancel-logo" onclick="closeLogoSelector()">Cancel</button>
@@ -1900,7 +1902,7 @@ function buildMeta(tx) {
   const parts = [];
   if (userRole === 'admin' && tx.person) parts.push(tx.person);
   if (tx.category) parts.push(tx.category);
-  const flag = tx.isIntl ? ` <span style="font-size:18px;line-height:1;position:relative;top:3px;">${countryFlag(tx.country)}</span>` : '';
+  const flag = tx.isIntl ? ` <span style="font-size:18px;line-height:1;position:relative;top:-5px;">${countryFlag(tx.country)}</span>` : '';
   if (tx.area) parts.push(tx.area + flag);
   else if (tx.city && tx.city !== 'Dubai') parts.push(tx.city + flag);
   else if (tx.isIntl && tx.country) parts.push(tx.country + flag);
@@ -2456,6 +2458,47 @@ logoEl.appendChild(img2);
     const cardEl = document.getElementById('txlogo-' + currentLogoTx.id);
     if (cardEl) applyLogoToEl(cardEl, url);
   }
+}
+
+// ── Search Again — ask Claude to re-search with a more targeted prompt ──
+async function searchAgain() {
+  if (!currentLogoTx) return;
+  const btn = document.getElementById('btn-search-again');
+  btn.textContent = '🔍 Searching...';
+  btn.disabled    = true;
+
+  const tx  = currentLogoTx;
+  const key = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+  try {
+    const url = LOGO_PICKER_URL +
+      '?action=searchAgain' +
+      '&fileKey='    + encodeURIComponent(key) +
+      '&brandName='  + encodeURIComponent(tx.cleanName || tx.merchant) +
+      '&domain='     + encodeURIComponent(tx.domain || '');
+
+    const data = await jsonpFetch(url);
+    if (data.error) throw new Error(data.error);
+
+    // Invalidate variants cache so new results load
+    variantsManifest = null;
+    variantsTs       = 0;
+
+    // Reload variants in the selector
+    const variants   = await getVariantsManifest();
+    logoVariants     = variants[key] || [];
+    selectedVariant  = null;
+
+    document.getElementById('btn-confirm-logo').disabled = true;
+    renderLogoGrid();
+    showToast(data.found > 0 ? `✓ Found ${data.found} new logo(s)!` : '😕 No new logos found');
+
+  } catch(e) {
+    showToast('❌ Search failed: ' + e.message);
+  }
+
+  btn.textContent = '🔍 None of these — Search Again';
+  btn.disabled    = false;
 }
 
 // ── Close logo selector ──
