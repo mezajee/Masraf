@@ -2107,6 +2107,7 @@ let currentLogoTx    = null;
 let selectedVariant  = null;
 let logoVariants     = [];
 let confirmedFile    = null;  // currently confirmed file for open merchant
+const logoPickCache  = {};    // domain → url, so same merchant always shows same logo
 
 // ── JSONP helper — used only for confirm/save/photo actions ──
 function jsonpFetch(url) {
@@ -2155,21 +2156,27 @@ async function renderTxLogoEl(el, tx) {
   const key = tx.domain || (tx.cleanName || tx.merchant)?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   if (!key) return;
 
+  // Return cached result immediately — same merchant always shows same logo
+  if (logoPickCache[key]) { applyLogoToEl(el, logoPickCache[key]); return; }
+
   // 1. Check confirmed logos.json first
   const manifest = await getLogoManifest();
   const entry    = manifest[key];
   if (entry) {
     if (entry.status === 'initials') return;
     const url = entry.githubUrl || (entry.file ? GITHUB_RAW + encodeURIComponent(entry.file) : null);
-    if (url) { applyLogoToEl(el, url); return; }
+    if (url) { logoPickCache[key] = url; applyLogoToEl(el, url); return; }
   }
 
-  // 2. Fall back to random variant from variants.json
+  // 2. Fall back to a consistent variant pick from variants.json
+  // Use index 0 (not random) so same merchant always shows the same variant
   const variants = await getVariantsManifest();
   const list     = variants[key];
   if (list && list.length > 0) {
-    const pick = list[Math.floor(Math.random() * list.length)];
-    if (pick.githubUrl) applyLogoToEl(el, pick.githubUrl);
+    // Pick consistently based on key hash so it's stable across renders
+    const idx = Math.abs(key.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % list.length;
+    const url = list[idx].githubUrl;
+    if (url) { logoPickCache[key] = url; applyLogoToEl(el, url); }
   }
 }
 
@@ -2276,9 +2283,13 @@ async function confirmLogoSelection() {
     const data = await jsonpFetch(url);
     if (data.error) throw new Error(data.error);
 
-    // Invalidate both caches
+    // Invalidate both caches and pick cache so updated logo shows immediately
     logoManifest     = null; logoManifestTs   = 0;
     variantsManifest = null; variantsTs       = 0;
+    if (currentLogoTx) {
+      const k = currentLogoTx.domain || (currentLogoTx.cleanName || currentLogoTx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      delete logoPickCache[k];
+    }
 
     closeLogoSelector();
     showToast('✓ Logo saved!');
