@@ -1820,7 +1820,7 @@ function renderTxList() {
 
       html += `
         <div class="tx-card" onclick="openModal('${tx.id}')">
-          <div class="tx-logo" style="background:${color}22; border:1px solid ${color}44; color:${color};">
+          <div class="tx-logo" id="txlogo-${tx.id}" style="background:${color}22; border:1px solid ${color}44; color:${color};">
             ${initials(name)}
           </div>
           <div class="tx-info">
@@ -1843,6 +1843,12 @@ function renderTxList() {
   });
 
   container.innerHTML = html;
+
+  // Async load logos onto transaction cards from GitHub manifest
+  filteredTx.forEach(tx => {
+    const el = document.getElementById('txlogo-' + tx.id);
+    if (el) renderTxLogoEl(el, tx);
+  });
 }
 
 function buildMeta(tx) {
@@ -2155,41 +2161,15 @@ async function openLogoSelector() {
   document.getElementById('btn-confirm-logo').disabled          = true;
   document.getElementById('logo-selector-overlay').classList.add('open');
 
-  // Show debug info in the loading area
-  const loadingEl = document.getElementById('logo-sel-loading');
-  loadingEl.innerHTML = `<div class="spinner"></div><div style="font-size:11px;color:#aaa;margin-top:8px;text-align:center;">Fetching for domain:<br><b style="color:#C4A464;">${domain}</b></div>`;
-
-  let debugMsg = '';
-
   try {
     const url  = LOGO_PICKER_URL + '?action=getVariantsForDomain&domain=' + encodeURIComponent(domain);
-    debugMsg = 'Calling JSONP...\n' + url.substring(0, 80) + '...';
-    loadingEl.innerHTML += `<div style="font-size:10px;color:#666;margin-top:6px;word-break:break-all;padding:0 8px;">${debugMsg}</div>`;
-
     const data = await jsonpFetch(url);
     logoVariants = data.files || [];
-    debugMsg = `Got ${logoVariants.length} variants`;
   } catch(e) {
-    debugMsg = 'ERROR: ' + e.message;
     logoVariants = [];
   }
 
   document.getElementById('logo-sel-loading').style.display = 'none';
-
-  // Show debug in grid area if no variants
-  if (logoVariants.length === 0) {
-    document.getElementById('logo-sel-grid').style.display = 'flex';
-    document.getElementById('logo-sel-grid').innerHTML = `
-      <div style="width:100%;padding:12px;background:rgba(255,255,255,0.05);border-radius:10px;font-size:11px;color:#aaa;word-break:break-all;">
-        <div style="color:#C4A464;font-weight:700;margin-bottom:6px;">Debug Info</div>
-        <div>Domain: <b>${domain}</b></div>
-        <div>Tx domain field: <b>${tx.domain || '(empty)'}</b></div>
-        <div>Result: <b>${debugMsg}</b></div>
-        <div style="margin-top:6px;color:#666;">No variants found — try Take Photo or Use Initials</div>
-      </div>`;
-    return;
-  }
-
   renderLogoGrid();
 }
 
@@ -2374,12 +2354,22 @@ function updateModalLogo(url, status) {
   const logoEl  = document.getElementById('modal-logo');
   const badgeEl = document.getElementById('modal-logo-badge');
   logoEl.innerHTML = `<img class="sheet-logo-img" src="${url}" onerror="this.style.display='none'">`;
-  if (status === 'photo') {
-    logoEl.innerHTML += '<div class="photo-badge">📸</div>';
-  }
+  if (status === 'photo') logoEl.innerHTML += '<div class="photo-badge">📸</div>';
   if (badgeEl) badgeEl.style.display = 'none';
   logoEl.style.background = '#fff';
   logoEl.style.border     = '1px solid rgba(255,255,255,0.1)';
+  logoEl.style.color      = '';
+
+  // Also update the transaction card immediately without waiting for re-render
+  if (currentLogoTx) {
+    const cardEl = document.getElementById('txlogo-' + currentLogoTx.id);
+    if (cardEl) {
+      cardEl.innerHTML = `<img src="${url}" style="width:34px;height:34px;object-fit:contain;border-radius:6px;" onerror="this.style.display='none'">`;
+      cardEl.style.background = '#fff';
+      cardEl.style.border     = '1px solid rgba(255,255,255,0.1)';
+      cardEl.style.color      = '';
+    }
+  }
 }
 
 // ── Close logo selector ──
