@@ -1975,11 +1975,11 @@ function openModal(txId) {
   logoEl.style.background  = color + '22';
   logoEl.style.border      = `1px solid ${color}44`;
   logoEl.style.color       = color;
-  // Async load best logo — confirmed or random variant
-  // Then decide if logo is tappable based on confirmation status + role
+  // Async load best logo — always uses same URL as the transaction card (logoPickCache)
   const key = tx.domain || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-  getLogoManifest().then(manifest => {
+  async function loadModalLogo() {
+    const manifest    = await getLogoManifest();
     const entry       = manifest[key];
     const isConfirmed = entry && (entry.status === 'official' || entry.status === 'photo');
 
@@ -1989,33 +1989,35 @@ function openModal(txId) {
     logoEl.onclick      = canEdit ? openLogoSelector : null;
     if (badgeEl) badgeEl.style.display = canEdit ? 'flex' : 'none';
 
-    if (isConfirmed) {
-      const url = entry.githubUrl || (entry.file ? GITHUB_RAW + encodeURIComponent(entry.file) : null);
-      if (url) {
-        logoEl.innerHTML = `<img class="sheet-logo-img" src="${url}" onerror="this.parentElement.textContent='${initials(name)}'">`;
-        logoEl.style.background = '#fff';
-        logoEl.style.border     = '1px solid rgba(255,255,255,0.1)';
-        logoEl.style.color      = '';
-        if (badgeEl && canEdit) logoEl.appendChild(badgeEl);
-        return;
-      }
-    }
+    // Use cached URL if available — same as what the card shows
+    let url = logoPickCache[key] || null;
 
-    // Not confirmed — try random variant (any user can tap to confirm)
-    getVariantsManifest().then(variants => {
-      const list = variants[key];
-      if (list && list.length > 0) {
-        const pick = list[Math.floor(Math.random() * list.length)];
-        if (pick.githubUrl) {
-          logoEl.innerHTML = `<img class="sheet-logo-img" src="${pick.githubUrl}" onerror="this.parentElement.textContent='${initials(name)}'">`;
-          logoEl.style.background = '#fff';
-          logoEl.style.border     = '1px solid rgba(255,255,255,0.1)';
-          logoEl.style.color      = '';
-          if (badgeEl && canEdit) logoEl.appendChild(badgeEl);
+    // If not cached yet, resolve it the same way renderTxLogoEl does
+    if (!url) {
+      if (isConfirmed) {
+        url = entry.githubUrl || (entry.file ? GITHUB_RAW + encodeURIComponent(entry.file) : null);
+      }
+      if (!url) {
+        const variants = await getVariantsManifest();
+        const list     = variants[key];
+        if (list && list.length > 0) {
+          const idx = Math.abs(key.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % list.length;
+          url = list[idx].githubUrl || null;
         }
       }
-    });
-  });
+      if (url) logoPickCache[key] = url; // cache it for consistency
+    }
+
+    if (url) {
+      logoEl.innerHTML = `<img class="sheet-logo-img" src="${url}" onerror="this.parentElement.textContent='${initials(name)}'">`;
+      logoEl.style.background = '#fff';
+      logoEl.style.border     = '1px solid rgba(255,255,255,0.1)';
+      logoEl.style.color      = '';
+      if (badgeEl && canEdit) logoEl.appendChild(badgeEl);
+    }
+  }
+
+  loadModalLogo();
 
   document.getElementById('modal-merchant').textContent   = name;
 
