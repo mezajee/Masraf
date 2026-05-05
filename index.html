@@ -346,15 +346,16 @@
 
     .tx-date-label {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.8px;
-      color: var(--text-faint);
+      color: rgba(255,255,255,0.75);
     }
 
     .tx-date-total {
-      font-size: 11px;
-      color: var(--text-faint);
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.75);
     }
 
     .tx-card {
@@ -412,9 +413,9 @@
     }
 
     .tx-currency-badge {
-      font-size: 10px;
-      font-weight: 400;
-      color: var(--text-dim);
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.65);
       margin-left: 2px;
     }
 
@@ -427,15 +428,16 @@
 
     .tx-meta {
       font-size: 12px;
-      color: var(--text-dim);
+      color: rgba(255,255,255,0.65);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .tx-time {
-      font-size: 11px;
-      color: var(--text-faint);
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.65);
       flex-shrink: 0;
     }
 
@@ -2188,11 +2190,12 @@ async function getVariantsManifest() {
 
 // ── Render logo in transaction card ──
 async function renderTxLogoEl(el, tx) {
-  const key = tx.domain || (tx.cleanName || tx.merchant)?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const key   = tx.domain || (tx.cleanName || tx.merchant)?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const color = personColour(tx.person);
   if (!key) return;
 
   // Return cached result immediately — same merchant always shows same logo
-  if (logoPickCache[key]) { applyLogoToEl(el, logoPickCache[key]); return; }
+  if (logoPickCache[key]) { applyLogoToEl(el, logoPickCache[key], color); return; }
 
   // 1. Check confirmed logos.json first
   const manifest = await getLogoManifest();
@@ -2200,27 +2203,25 @@ async function renderTxLogoEl(el, tx) {
   if (entry) {
     if (entry.status === 'initials') return;
     const url = entry.githubUrl || (entry.file ? GITHUB_RAW + encodeURIComponent(entry.file) : null);
-    if (url) { logoPickCache[key] = url; applyLogoToEl(el, url); return; }
+    if (url) { logoPickCache[key] = url; applyLogoToEl(el, url, color); return; }
   }
 
   // 2. Fall back to a consistent variant pick from variants.json
-  // Use index 0 (not random) so same merchant always shows the same variant
   const variants = await getVariantsManifest();
   const list     = variants[key];
   if (list && list.length > 0) {
-    // Pick consistently based on key hash so it's stable across renders
     const idx = Math.abs(key.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % list.length;
     const url = list[idx].githubUrl;
-    if (url) { logoPickCache[key] = url; applyLogoToEl(el, url); }
+    if (url) { logoPickCache[key] = url; applyLogoToEl(el, url, color); }
   }
 }
 
 // ── Apply logo URL to a card element ──
-function applyLogoToEl(el, url) {
-  // Preserve person colour as a bottom border accent
-  const personColor = el.style.borderColor || 'rgba(255,255,255,0.1)';
+function applyLogoToEl(el, url, personColor) {
+  const border = personColor ? `2px solid ${personColor}88` : '1px solid rgba(0,0,0,0.08)';
   el.innerHTML          = `<img src="${url}" style="width:36px;height:36px;object-fit:contain;border-radius:9px;" onerror="this.style.display='none'">`;
   el.style.background   = '#fff';
+  el.style.border       = border;
   el.style.borderRadius = '12px';
   el.style.overflow     = 'hidden';
   el.style.padding      = '3px';
@@ -2228,7 +2229,6 @@ function applyLogoToEl(el, url) {
   el.style.display      = 'flex';
   el.style.alignItems   = 'center';
   el.style.justifyContent = 'center';
-  el.style.border       = `2px solid ${personColor}`;
 }
 
 // ── Open logo selector ──
