@@ -2027,7 +2027,7 @@ function openModal(txId) {
     }
 
     if (url) {
-      logoEl.innerHTML = `<img class="sheet-logo-img" src="${url}" onerror="this.parentElement.textContent='${initials(name)}'">`;
+      logoEl.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><img src="${url}" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:9px;" onerror="this.parentElement.parentElement.textContent='${initials(name)}'"></div>`;
       logoEl.classList.add('has-logo');
       logoEl.style.color = '';
       if (badgeEl && canEdit) logoEl.appendChild(badgeEl);
@@ -2394,7 +2394,7 @@ async function useInitials() {
 function updateModalLogo(url, status) {
   const logoEl  = document.getElementById('modal-logo');
   const badgeEl = document.getElementById('modal-logo-badge');
-  logoEl.innerHTML = `<img class="sheet-logo-img" src="${url}" onerror="this.style.display='none'">`;
+  logoEl.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><img src="${url}" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:9px;" onerror="this.parentElement.style.display='none'"></div>`;
   if (status === 'photo') logoEl.innerHTML += '<div class="photo-badge">📸</div>';
   if (badgeEl) badgeEl.style.display = 'none';
   logoEl.classList.add('has-logo');
