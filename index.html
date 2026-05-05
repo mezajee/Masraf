@@ -526,9 +526,22 @@
 
     .sheet-merchant-header {
       display: flex;
+      flex-direction: row;
       align-items: center;
       gap: 14px;
       margin-bottom: 24px;
+    }
+    .sheet-merchant-header > .sheet-logo {
+      flex-shrink: 0;
+      align-self: center;
+    }
+    .sheet-merchant-header > .sheet-merchant-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-self: center;
     }
 
     .sheet-logo {
@@ -548,7 +561,10 @@
     .sheet-logo.has-logo {
       background: #fff !important;
       border: 1px solid rgba(0,0,0,0.08) !important;
-      padding: 3px;
+      padding: 6px;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
     }
 
     .sheet-merchant-info {
@@ -977,7 +993,7 @@
       display: flex; flex-direction: column; align-items: center;
       gap: 10px; padding: 32px 0; color: var(--text-dim); font-size: 13px;
     }
-    .sheet-logo-img { width: 100%; height: 100%; object-fit: contain; border-radius: 4px; }
+    .sheet-logo-img { width: 100%; height: 100%; object-fit: contain; border-radius: 4px; display: block; margin: auto; }
     .sheet-logo-tap { cursor: pointer; position: relative; }
     .sheet-logo-tap .add-logo-badge {
       position: absolute; bottom: -3px; right: -3px;
@@ -2201,11 +2217,11 @@ async function renderTxLogoEl(el, tx) {
 
 // ── Apply logo URL to a card element ──
 function applyLogoToEl(el, url) {
-  el.innerHTML        = `<img src="${url}" style="width:36px;height:36px;object-fit:contain;" onerror="this.style.display='none'">`;
+  el.innerHTML        = `<img src="${url}" style="width:38px;height:38px;object-fit:contain;" onerror="this.style.display='none'">`;
   el.style.background = '#fff';
   el.style.border     = '1px solid rgba(0,0,0,0.08)';
   el.style.color      = '';
-  el.style.padding    = '3px';
+  el.style.padding    = '2px';
 }
 
 // ── Open logo selector ──
