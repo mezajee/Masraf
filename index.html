@@ -1847,7 +1847,7 @@ function renderTxList() {
               <div class="tx-merchant">${name}</div>
               <div class="tx-amount" style="color:${amtColor}">
                 ${amtStr}<span class="tx-currency-badge">${tx.currency}</span>
-                ${tx.isIntl ? '<span class="intl-badge">🌍</span>' : ''}
+                
               </div>
             </div>
             <div class="tx-row2">
@@ -1874,8 +1874,9 @@ function buildMeta(tx) {
   const parts = [];
   if (userRole === 'admin' && tx.person) parts.push(tx.person);
   if (tx.category) parts.push(tx.category);
-  if (tx.area) parts.push(tx.area);
-  else if (tx.city && tx.city !== 'Dubai') parts.push(tx.city);
+  if (tx.area) parts.push(tx.isIntl ? '🌍 ' + tx.area : tx.area);
+  else if (tx.city && tx.city !== 'Dubai') parts.push(tx.isIntl ? '🌍 ' + tx.city : tx.city);
+  else if (tx.isIntl && tx.country) parts.push('🌍 ' + tx.country);
   return parts.join(' · ') || tx.merchant;
 }
 
@@ -2219,7 +2220,7 @@ function applyLogoToEl(el, url, personColor) {
   const border = personColor ? `2px solid ${personColor}88` : '1px solid rgba(0,0,0,0.08)';
   el.innerHTML          = `<img src="${url}" style="width:36px;height:36px;object-fit:contain;border-radius:9px;" onerror="this.style.display='none'">`;
   el.style.background   = '#fff';
-  el.style.border       = border;
+  el.style.border       = 'none';
   el.style.borderRadius = '12px';
   el.style.overflow     = 'hidden';
   el.style.padding      = '3px';
