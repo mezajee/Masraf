@@ -1874,9 +1874,9 @@ function buildMeta(tx) {
   const parts = [];
   if (userRole === 'admin' && tx.person) parts.push(tx.person);
   if (tx.category) parts.push(tx.category);
-  if (tx.area) parts.push(tx.isIntl ? '🌍 ' + tx.area : tx.area);
-  else if (tx.city && tx.city !== 'Dubai') parts.push(tx.isIntl ? '🌍 ' + tx.city : tx.city);
-  else if (tx.isIntl && tx.country) parts.push('🌍 ' + tx.country);
+  if (tx.area) parts.push(tx.isIntl ? tx.area + ' 🌍' : tx.area);
+  else if (tx.city && tx.city !== 'Dubai') parts.push(tx.isIntl ? tx.city + ' 🌍' : tx.city);
+  else if (tx.isIntl && tx.country) parts.push(tx.country + ' 🌍');
   return parts.join(' · ') || tx.merchant;
 }
 
