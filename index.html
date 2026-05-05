@@ -383,6 +383,7 @@
       font-size: 12px;
       font-weight: 800;
       flex-shrink: 0;
+      overflow: hidden;
     }
 
     .tx-info { flex: 1; min-width: 0; }
@@ -531,18 +532,6 @@
       gap: 14px;
       margin-bottom: 24px;
     }
-    .sheet-merchant-header > .sheet-logo {
-      flex-shrink: 0;
-      align-self: center;
-    }
-    .sheet-merchant-header > .sheet-merchant-info {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-self: center;
-    }
 
     .sheet-logo {
       width: 54px;
@@ -555,8 +544,6 @@
       font-weight: 800;
       flex-shrink: 0;
       overflow: hidden;
-      position: relative;
-      align-self: center;
     }
     .sheet-logo.has-logo {
       background: #fff !important;
@@ -565,13 +552,9 @@
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      align-self: center !important;
     }
 
     .sheet-merchant-info {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
       flex: 1;
       min-width: 0;
     }
