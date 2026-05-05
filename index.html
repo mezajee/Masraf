@@ -1870,13 +1870,39 @@ function renderTxList() {
   });
 }
 
+function countryFlag(country) {
+  if (!country) return '🌍';
+  const map = {
+    'united states': '🇺🇸', 'usa': '🇺🇸', 'us': '🇺🇸',
+    'united kingdom': '🇬🇧', 'uk': '🇬🇧', 'england': '🇬🇧', 'britain': '🇬🇧',
+    'france': '🇫🇷', 'germany': '🇩🇪', 'italy': '🇮🇹', 'spain': '🇪🇸',
+    'switzerland': '🇨🇭', 'netherlands': '🇳🇱', 'belgium': '🇧🇪',
+    'austria': '🇦🇹', 'portugal': '🇵🇹', 'greece': '🇬🇷',
+    'sweden': '🇸🇪', 'norway': '🇳🇴', 'denmark': '🇩🇰', 'finland': '🇫🇮',
+    'japan': '🇯🇵', 'china': '🇨🇳', 'south korea': '🇰🇷', 'korea': '🇰🇷',
+    'hong kong': '🇭🇰', 'singapore': '🇸🇬', 'thailand': '🇹🇭',
+    'malaysia': '🇲🇾', 'indonesia': '🇮🇩', 'philippines': '🇵🇭',
+    'vietnam': '🇻🇳', 'india': '🇮🇳', 'pakistan': '🇵🇰',
+    'turkey': '🇹🇷', 'egypt': '🇪🇬', 'jordan': '🇯🇴',
+    'saudi arabia': '🇸🇦', 'kuwait': '🇰🇼', 'bahrain': '🇧🇭',
+    'qatar': '🇶🇦', 'oman': '🇴🇲', 'lebanon': '🇱🇧',
+    'australia': '🇦🇺', 'new zealand': '🇳🇿',
+    'canada': '🇨🇦', 'mexico': '🇲🇽', 'brazil': '🇧🇷',
+    'south africa': '🇿🇦', 'kenya': '🇰🇪', 'nigeria': '🇳🇬',
+    'russia': '🇷🇺', 'ukraine': '🇺🇦', 'poland': '🇵🇱',
+    'czech republic': '🇨🇿', 'hungary': '🇭🇺', 'romania': '🇷🇴',
+    'uae': '🇦🇪', 'united arab emirates': '🇦🇪',
+  };
+  return map[country.toLowerCase().trim()] || '🌍';
+}
+
 function buildMeta(tx) {
   const parts = [];
   if (userRole === 'admin' && tx.person) parts.push(tx.person);
   if (tx.category) parts.push(tx.category);
-  if (tx.area) parts.push(tx.isIntl ? tx.area + ' 🌍' : tx.area);
-  else if (tx.city && tx.city !== 'Dubai') parts.push(tx.isIntl ? tx.city + ' 🌍' : tx.city);
-  else if (tx.isIntl && tx.country) parts.push(tx.country + ' 🌍');
+  if (tx.area) parts.push(tx.isIntl ? tx.area + ' ' + countryFlag(tx.country) : tx.area);
+  else if (tx.city && tx.city !== 'Dubai') parts.push(tx.isIntl ? tx.city + ' ' + countryFlag(tx.country) : tx.city);
+  else if (tx.isIntl && tx.country) parts.push(tx.country + ' ' + countryFlag(tx.country));
   return parts.join(' · ') || tx.merchant;
 }
 
