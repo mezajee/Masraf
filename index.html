@@ -10,8 +10,6 @@
   <meta name="theme-color" content="#0A0A0F">
   <title>Masraf</title>
 
-  <!-- No external auth scripts needed - using redirect flow -->
-
   <style>
     /* ── RESET & BASE ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -52,7 +50,6 @@
       overflow: hidden;
     }
 
-    /* ── SCROLLABLE CONTENT ── */
     .scroll-area {
       flex: 1;
       overflow-y: auto;
@@ -133,10 +130,7 @@
 
     .google-btn:active { transform: scale(0.97); opacity: 0.8; }
 
-    .google-icon {
-      width: 20px;
-      height: 20px;
-    }
+    .google-icon { width: 20px; height: 20px; }
 
     .login-footer {
       position: absolute;
@@ -279,14 +273,8 @@
       padding-top: 14px;
     }
 
-    .stat-item {
-      flex: 1;
-      text-align: center;
-    }
-
-    .stat-item + .stat-item {
-      border-left: 1px solid rgba(255,255,255,0.06);
-    }
+    .stat-item { flex: 1; text-align: center; }
+    .stat-item + .stat-item { border-left: 1px solid rgba(255,255,255,0.06); }
 
     .stat-label {
       font-size: 9px;
@@ -297,10 +285,7 @@
       margin-bottom: 4px;
     }
 
-    .stat-value {
-      font-size: 15px;
-      font-weight: 700;
-    }
+    .stat-value { font-size: 15px; font-weight: 700; }
 
     /* ── FILTER PILLS ── */
     .filters {
@@ -326,16 +311,10 @@
       color: var(--text-dim);
     }
 
-    .pill.active {
-      background: var(--gold);
-      color: #0A0A0F;
-    }
+    .pill.active { background: var(--gold); color: #0A0A0F; }
 
     /* ── TRANSACTION LIST ── */
-    .tx-section {
-      padding: 0 24px;
-      margin-bottom: 24px;
-    }
+    .tx-section { padding: 0 24px; margin-bottom: 24px; }
 
     .tx-date-header {
       display: flex;
@@ -439,12 +418,6 @@
       flex-shrink: 0;
     }
 
-    .intl-badge {
-      font-size: 9px;
-      color: var(--green);
-      margin-left: 4px;
-    }
-
     /* ── BOTTOM NAV ── */
     .bottom-nav {
       position: fixed;
@@ -479,14 +452,8 @@
     }
 
     .nav-btn.active { color: var(--gold); }
-
     .nav-icon { font-size: 22px; line-height: 1; }
-
-    .nav-label {
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.3px;
-    }
+    .nav-label { font-size: 10px; font-weight: 500; letter-spacing: 0.3px; }
 
     /* ── MODAL / DETAIL SHEET ── */
     .modal-overlay {
@@ -546,6 +513,7 @@
       overflow: hidden;
       box-sizing: border-box;
     }
+
     .sheet-logo.has-logo {
       background: #fff !important;
       border: 1px solid rgba(0,0,0,0.08) !important;
@@ -555,10 +523,7 @@
       justify-content: center !important;
     }
 
-    .sheet-merchant-info {
-      flex: 1;
-      min-width: 0;
-    }
+    .sheet-merchant-info { flex: 1; min-width: 0; }
 
     .sheet-merchant-name {
       font-size: 20px;
@@ -648,10 +613,7 @@
     .action-icon { font-size: 22px; }
 
     /* ── ANALYTICS VIEW ── */
-    .analytics-section {
-      padding: 0 24px;
-      margin-bottom: 20px;
-    }
+    .analytics-section { padding: 0 24px; margin-bottom: 20px; }
 
     .analytics-card {
       background: var(--surface);
@@ -670,9 +632,7 @@
       margin-bottom: 16px;
     }
 
-    .category-row {
-      margin-bottom: 13px;
-    }
+    .category-row { margin-bottom: 13px; }
 
     .category-row-top {
       display: flex;
@@ -695,11 +655,7 @@
       transition: width 0.8s ease;
     }
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
     .stat-card {
       background: var(--surface);
@@ -717,16 +673,8 @@
       margin-bottom: 8px;
     }
 
-    .stat-card-value {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 2px;
-    }
-
-    .stat-card-sub {
-      font-size: 11px;
-      color: var(--text-faint);
-    }
+    .stat-card-value { font-size: 20px; font-weight: 700; margin-bottom: 2px; }
+    .stat-card-sub { font-size: 11px; color: var(--text-faint); }
 
     /* ── CARDS VIEW ── */
     .cardholder-card {
@@ -753,32 +701,11 @@
     }
 
     .cardholder-info { flex: 1; }
-
-    .cardholder-name {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 3px;
-    }
-
-    .cardholder-sub {
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-
-    .cardholder-spend {
-      text-align: right;
-    }
-
-    .cardholder-amount {
-      font-size: 17px;
-      font-weight: 700;
-    }
-
-    .cardholder-label {
-      font-size: 10px;
-      color: var(--text-faint);
-      margin-top: 2px;
-    }
+    .cardholder-name { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+    .cardholder-sub { font-size: 12px; color: var(--text-dim); }
+    .cardholder-spend { text-align: right; }
+    .cardholder-amount { font-size: 17px; font-weight: 700; }
+    .cardholder-label { font-size: 10px; color: var(--text-faint); margin-top: 2px; }
 
     /* ── PROFILE VIEW ── */
     .profile-avatar-large {
@@ -795,10 +722,7 @@
       margin-bottom: 14px;
     }
 
-    .profile-header {
-      padding: 0 24px;
-      margin-bottom: 28px;
-    }
+    .profile-header { padding: 0 24px; margin-bottom: 28px; }
 
     .profile-name {
       font-size: 24px;
@@ -807,10 +731,7 @@
       margin-bottom: 4px;
     }
 
-    .profile-role {
-      font-size: 12px;
-      color: var(--text-dim);
-    }
+    .profile-role { font-size: 12px; color: var(--text-dim); }
 
     .profile-badge {
       display: inline-block;
@@ -835,11 +756,7 @@
       cursor: pointer;
     }
 
-    .settings-item-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
+    .settings-item-left { display: flex; align-items: center; gap: 14px; }
 
     .settings-icon {
       width: 36px;
@@ -852,25 +769,12 @@
       font-size: 17px;
     }
 
-    .settings-label {
-      font-size: 15px;
-      font-weight: 500;
-    }
-
-    .settings-arrow {
-      color: var(--text-faint);
-      font-size: 18px;
-    }
-
+    .settings-label { font-size: 15px; font-weight: 500; }
+    .settings-arrow { color: var(--text-faint); font-size: 18px; }
     .signout-item .settings-label { color: var(--red); }
 
     /* ── EMPTY STATE ── */
-    .empty-state {
-      text-align: center;
-      padding: 60px 24px;
-      color: var(--text-dim);
-    }
-
+    .empty-state { text-align: center; padding: 60px 24px; color: var(--text-dim); }
     .empty-icon { font-size: 40px; margin-bottom: 16px; }
     .empty-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
     .empty-sub { font-size: 14px; line-height: 1.5; }
@@ -894,7 +798,6 @@
     }
 
     .fade-up { animation: fadeUp 0.4s ease forwards; }
-
     .tx-card { animation: fadeUp 0.3s ease forwards; }
     .tx-card:nth-child(1) { animation-delay: 0ms; }
     .tx-card:nth-child(2) { animation-delay: 40ms; }
@@ -929,7 +832,7 @@
     }
     .logo-sel-item {
       display: flex; flex-direction: column;
-      align-items: center; gap: 5px; cursor: pointer;
+      align-items: center; gap: 5px;
     }
     .logo-sel-box {
       width: 72px; height: 72px; border-radius: 14px;
@@ -939,24 +842,12 @@
       transition: border-color 0.15s, box-shadow 0.15s;
     }
     .logo-sel-box img { width: 60px; height: 60px; object-fit: contain; }
-    .logo-sel-box.selected {
-      border-color: var(--green);
-      box-shadow: 0 0 0 3px rgba(6,214,160,0.2);
-    }
     .logo-sel-box.loading-img::after {
       content: ''; position: absolute;
       width: 18px; height: 18px;
       border: 2px solid rgba(0,0,0,0.1); border-top-color: #999;
       border-radius: 50%; animation: spin 0.8s linear infinite;
     }
-    .logo-sel-check {
-      position: absolute; top: 3px; right: 3px;
-      width: 15px; height: 15px; background: var(--green);
-      border-radius: 50%; display: none;
-      align-items: center; justify-content: center;
-      font-size: 8px; color: #000; font-weight: 700;
-    }
-    .logo-sel-box.selected .logo-sel-check { display: flex; }
     .logo-sel-label { font-size: 9px; color: var(--text-dim); text-align: center; max-width: 72px; }
     .logo-sel-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 4px 0 14px; }
     .logo-sel-actions { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
@@ -969,7 +860,6 @@
     }
     .logo-sel-btn:active { opacity: 0.7; }
     .logo-sel-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-    .btn-confirm-logo  { background: var(--green); color: #000; }
     .btn-take-photo    { background: #1C1C22; color: var(--text); border: 1px solid rgba(255,255,255,0.07); }
     .btn-use-initials  { background: rgba(255,75,75,0.1); color: var(--red); border: 1px solid rgba(255,75,75,0.2); }
     .btn-search-again  { background: rgba(196,164,100,0.12); color: var(--gold); border: 1px solid rgba(196,164,100,0.3); }
@@ -977,9 +867,7 @@
     .logo-sel-empty { text-align: center; padding: 24px 0 8px; color: var(--text-dim); font-size: 13px; }
 
     /* ── PER-VARIANT ACTION BUTTONS ── */
-    .logo-var-btns {
-      display: flex; gap: 5px; margin-top: 7px; justify-content: center;
-    }
+    .logo-var-btns { display: flex; gap: 5px; margin-top: 7px; justify-content: center; }
     .logo-var-btn {
       width: 30px; height: 28px; border-radius: 8px; border: none;
       cursor: pointer; font-size: 13px; line-height: 1;
@@ -999,6 +887,33 @@
       position: absolute; top: 3px; right: 3px; font-size: 10px; line-height: 1; pointer-events: none;
     }
 
+    /* ── LOGO ZOOM OVERLAY ── */
+    .logo-zoom-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 500;
+      display: none; align-items: center; justify-content: center;
+      cursor: zoom-out;
+    }
+    .logo-zoom-overlay.open { display: flex; }
+    .logo-zoom-img {
+      width: 260px; height: 260px;
+      object-fit: contain;
+      border-radius: 24px;
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    }
+    .logo-zoom-label {
+      position: absolute;
+      bottom: calc(60px + var(--safe-bot));
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 1px;
+    }
+
     /* ── REJECTION REASON SHEET ── */
     .rejection-overlay {
       position: fixed; inset: 0;
@@ -1016,9 +931,7 @@
       padding: 0 20px calc(40px + var(--safe-bot));
       width: 100%; max-width: 430px;
     }
-    .rejection-title {
-      font-size: 16px; font-weight: 700; text-align: center; padding: 20px 0 4px;
-    }
+    .rejection-title { font-size: 16px; font-weight: 700; text-align: center; padding: 20px 0 4px; }
     .rejection-hint { font-size: 12px; color: var(--text-dim); text-align: center; margin-bottom: 14px; }
     .rejection-reason {
       display: flex; align-items: center; gap: 14px; padding: 13px 0;
@@ -1031,7 +944,7 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 11px; transition: all 0.15s;
     }
-    .rejection-reason.sel .rejection-check { background: var(--red); border-color: var(--red); color: #fff; content: '✓'; }
+    .rejection-reason.sel .rejection-check { background: var(--red); border-color: var(--red); color: #fff; }
     .rejection-reason-label { font-size: 14px; font-weight: 500; }
     .rejection-reason-sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
     .btn-flag-confirm {
@@ -1083,8 +996,7 @@
 
 <div id="app">
 
-  <!-- ── LOGIN SCREEN ── -->
-
+  <!-- LOGIN SCREEN -->
   <div id="login-screen">
     <div class="login-glow"></div>
     <div class="login-logo">Your Spend</div>
@@ -1099,209 +1011,166 @@
       </svg>
       Sign in with Google
     </button>
-    <div id="debug-box" style="position:absolute; bottom:80px; left:20px; right:20px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:12px; font-size:11px; color:#999; font-family:monospace; max-height:200px; overflow-y:auto; word-break:break-all; display:none;"></div>
+    <div id="debug-box" style="position:absolute;bottom:80px;left:20px;right:20px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;font-size:11px;color:#999;font-family:monospace;max-height:200px;overflow-y:auto;word-break:break-all;display:none;"></div>
     <div class="login-footer">MASRAF · SPEND INTELLIGENCE</div>
   </div>
 
-  <!-- ── LOADING SCREEN ── -->
-
+  <!-- LOADING SCREEN -->
   <div id="loading-screen">
     <div class="spinner"></div>
     <div class="loading-text">Loading your data</div>
   </div>
 
-  <!-- ── MAIN APP ── -->
+  <!-- MAIN APP -->
+  <div id="main-app" style="display:none;flex-direction:column;height:100%;">
 
-  <div id="main-app" style="display:none; flex-direction:column; height:100%;">
-
-```
-<!-- Spend View -->
-<div id="view-spend" class="scroll-area" style="display:none;">
-  <div class="header">
-    <div class="header-top">
-      <div>
-        <div class="header-label">Masraf</div>
-        <div class="header-title" id="spend-month-title">May 2026</div>
-      </div>
-      <div class="avatar" id="avatar-btn" onclick="showView('profile')">R</div>
-    </div>
-  </div>
-
-  <div class="error-banner" id="error-banner">Unable to load data. Check your connection.</div>
-
-  <!-- Summary card -->
-  <div class="summary-card fade-up">
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
-      <!-- Left: month total -->
-      <div style="flex:1; min-width:0;">
-        <div class="summary-label">Month to date</div>
-        <div class="summary-amount">
-          <span id="total-month">0</span>
-          <span class="summary-currency">AED</span>
+    <!-- Spend View -->
+    <div id="view-spend" class="scroll-area" style="display:none;">
+      <div class="header">
+        <div class="header-top">
+          <div>
+            <div class="header-label">Masraf</div>
+            <div class="header-title" id="spend-month-title">May 2026</div>
+          </div>
+          <div class="avatar" id="avatar-btn" onclick="showView('profile')">R</div>
         </div>
       </div>
-      <!-- Right: stats column -->
-      <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end; flex-shrink:0;">
-        <div style="text-align:right;">
-          <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); font-weight:400; margin-bottom:2px;">Today</div>
-          <div style="font-size:15px; font-weight:700;"><span id="total-today">0</span> <span style="font-size:10px; font-weight:400; color:rgba(255,255,255,0.4);">AED</span></div>
+      <div class="error-banner" id="error-banner">Unable to load data. Check your connection.</div>
+      <div class="summary-card fade-up">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+          <div style="flex:1;min-width:0;">
+            <div class="summary-label">Month to date</div>
+            <div class="summary-amount">
+              <span id="total-month">0</span>
+              <span class="summary-currency">AED</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0;">
+            <div style="text-align:right;">
+              <div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);font-weight:400;margin-bottom:2px;">Today</div>
+              <div style="font-size:15px;font-weight:700;"><span id="total-today">0</span> <span style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.4);">AED</span></div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);font-weight:400;margin-bottom:2px;">Transactions</div>
+              <div style="font-size:15px;font-weight:700;"><span id="total-txns">0</span> <span style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.4);">Local</span> · <span id="total-intl" style="color:var(--green);font-size:15px;font-weight:700;">0</span> <span style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.4);">Intl</span></div>
+            </div>
+          </div>
         </div>
-        <div style="text-align:right;">
-          <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); font-weight:400; margin-bottom:2px;">Transactions</div>
-          <div style="font-size:15px; font-weight:700;"><span id="total-txns">0</span> <span style="font-size:10px; font-weight:400; color:rgba(255,255,255,0.4);">Local</span> · <span id="total-intl" style="color:var(--green); font-size:15px; font-weight:700;">0</span> <span style="font-size:10px; font-weight:400; color:rgba(255,255,255,0.4);">Intl</span></div>
+        <div id="person-breakdown" style="margin-top:16px;display:none;">
+          <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:14px;"></div>
+          <div id="person-breakdown-rows" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+      </div>
+      <div class="filters" id="filter-pills"></div>
+      <div id="tx-list"></div>
+    </div>
+
+    <!-- Analytics View -->
+    <div id="view-analytics" class="scroll-area" style="display:none;">
+      <div class="header">
+        <div class="header-top">
+          <div>
+            <div class="header-label">Masraf</div>
+            <div class="header-title">Analytics</div>
+          </div>
+          <div class="avatar" id="avatar-analytics" onclick="showView('profile')">R</div>
+        </div>
+      </div>
+      <div class="analytics-section">
+        <div class="analytics-card">
+          <div class="analytics-card-title">Spend by Category</div>
+          <div id="category-chart"></div>
+        </div>
+      </div>
+      <div class="analytics-section">
+        <div class="stats-grid" id="stats-grid"></div>
+      </div>
+    </div>
+
+    <!-- Cards View -->
+    <div id="view-cards" class="scroll-area" style="display:none;">
+      <div class="header">
+        <div class="header-top">
+          <div>
+            <div class="header-label">Masraf</div>
+            <div class="header-title">Cardholders</div>
+          </div>
+          <div class="avatar" onclick="showView('profile')">R</div>
+        </div>
+      </div>
+      <div style="padding:0 24px;" id="cardholders-list"></div>
+    </div>
+
+    <!-- Profile View -->
+    <div id="view-profile" class="scroll-area" style="display:none;">
+      <div class="header">
+        <div class="header-top">
+          <div>
+            <div class="header-label">Masraf</div>
+            <div class="header-title">Profile</div>
+          </div>
+        </div>
+      </div>
+      <div class="profile-header">
+        <div class="profile-avatar-large" id="profile-avatar">R</div>
+        <div class="profile-name" id="profile-name">Rashed</div>
+        <div class="profile-role" id="profile-role">Administrator</div>
+        <div class="profile-badge" id="profile-badge">Full Access</div>
+      </div>
+      <div class="settings-list">
+        <div class="settings-item">
+          <div class="settings-item-left"><div class="settings-icon">🔔</div><div class="settings-label">Notifications</div></div>
+          <div class="settings-arrow">›</div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-item-left"><div class="settings-icon">💳</div><div class="settings-label">Connected Cards</div></div>
+          <div class="settings-arrow">›</div>
+        </div>
+        <div class="settings-item" id="app-users-item" style="display:none;">
+          <div class="settings-item-left"><div class="settings-icon">👥</div><div class="settings-label">App Users</div></div>
+          <div class="settings-arrow">›</div>
+        </div>
+        <div class="settings-item" id="merchant-overrides-item" style="display:none;">
+          <div class="settings-item-left"><div class="settings-icon">🏪</div><div class="settings-label">Merchant Overrides</div></div>
+          <div class="settings-arrow">›</div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-item-left"><div class="settings-icon">🔒</div><div class="settings-label">Data & Privacy</div></div>
+          <div class="settings-arrow">›</div>
+        </div>
+        <div class="settings-item signout-item" onclick="signOut()">
+          <div class="settings-item-left"><div class="settings-icon">↩️</div><div class="settings-label">Sign Out</div></div>
+          <div class="settings-arrow">›</div>
         </div>
       </div>
     </div>
 
-    <!-- Per person breakdown -->
-    <div id="person-breakdown" style="margin-top:16px; display:none;">
-      <div style="height:1px; background:rgba(255,255,255,0.06); margin-bottom:14px;"></div>
-      <div id="person-breakdown-rows" style="display:flex; flex-direction:column; gap:10px;"></div>
-    </div>
-  </div>
-
-  <!-- Filters -->
-  <div class="filters" id="filter-pills"></div>
-
-  <!-- Transaction list -->
-  <div id="tx-list"></div>
-</div>
-
-<!-- Analytics View -->
-<div id="view-analytics" class="scroll-area" style="display:none;">
-  <div class="header">
-    <div class="header-top">
-      <div>
-        <div class="header-label">Masraf</div>
-        <div class="header-title">Analytics</div>
-      </div>
-      <div class="avatar" id="avatar-analytics" onclick="showView('profile')">R</div>
-    </div>
-  </div>
-
-  <div class="analytics-section">
-    <div class="analytics-card">
-      <div class="analytics-card-title">Spend by Category</div>
-      <div id="category-chart"></div>
-    </div>
-  </div>
-
-  <div class="analytics-section">
-    <div class="stats-grid" id="stats-grid"></div>
-  </div>
-</div>
-
-<!-- Cards View -->
-<div id="view-cards" class="scroll-area" style="display:none;">
-  <div class="header">
-    <div class="header-top">
-      <div>
-        <div class="header-label">Masraf</div>
-        <div class="header-title">Cardholders</div>
-      </div>
-      <div class="avatar" onclick="showView('profile')">R</div>
-    </div>
-  </div>
-  <div style="padding: 0 24px;" id="cardholders-list"></div>
-</div>
-
-<!-- Profile View -->
-<div id="view-profile" class="scroll-area" style="display:none;">
-  <div class="header">
-    <div class="header-top">
-      <div>
-        <div class="header-label">Masraf</div>
-        <div class="header-title">Profile</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="profile-header">
-    <div class="profile-avatar-large" id="profile-avatar">R</div>
-    <div class="profile-name" id="profile-name">Rashed</div>
-    <div class="profile-role" id="profile-role">Administrator</div>
-    <div class="profile-badge" id="profile-badge">Full Access</div>
-  </div>
-
-  <div class="settings-list">
-    <div class="settings-item">
-      <div class="settings-item-left">
-        <div class="settings-icon">🔔</div>
-        <div class="settings-label">Notifications</div>
-      </div>
-      <div class="settings-arrow">›</div>
-    </div>
-    <div class="settings-item">
-      <div class="settings-item-left">
-        <div class="settings-icon">💳</div>
-        <div class="settings-label">Connected Cards</div>
-      </div>
-      <div class="settings-arrow">›</div>
-    </div>
-    <div class="settings-item" id="app-users-item" style="display:none;">
-      <div class="settings-item-left">
-        <div class="settings-icon">👥</div>
-        <div class="settings-label">App Users</div>
-      </div>
-      <div class="settings-arrow">›</div>
-    </div>
-    <div class="settings-item" id="merchant-overrides-item" style="display:none;">
-      <div class="settings-item-left">
-        <div class="settings-icon">🏪</div>
-        <div class="settings-label">Merchant Overrides</div>
-      </div>
-      <div class="settings-arrow">›</div>
-    </div>
-    <div class="settings-item">
-      <div class="settings-item-left">
-        <div class="settings-icon">🔒</div>
-        <div class="settings-label">Data & Privacy</div>
-      </div>
-      <div class="settings-arrow">›</div>
-    </div>
-    <div class="settings-item signout-item" onclick="signOut()">
-      <div class="settings-item-left">
-        <div class="settings-icon">↩️</div>
-        <div class="settings-label">Sign Out</div>
-      </div>
-      <div class="settings-arrow">›</div>
-    </div>
-  </div>
-</div>
-
-<!-- Bottom Nav -->
-<nav class="bottom-nav">
-  <button class="nav-btn active" id="nav-spend" onclick="showView('spend')">
-    <span class="nav-icon">⊟</span>
-    <span class="nav-label">Spend</span>
-  </button>
-  <button class="nav-btn" id="nav-analytics" onclick="showView('analytics')">
-    <span class="nav-icon">◈</span>
-    <span class="nav-label">Analytics</span>
-  </button>
-  <button class="nav-btn" id="nav-cards" onclick="showView('cards')" style="display:none;">
-    <span class="nav-icon">◻</span>
-    <span class="nav-label">Cards</span>
-  </button>
-  <button class="nav-btn" id="nav-profile" onclick="showView('profile')">
-    <span class="nav-icon">○</span>
-    <span class="nav-label">Profile</span>
-  </button>
-</nav>
-```
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" id="nav-spend" onclick="showView('spend')">
+        <span class="nav-icon">⊟</span><span class="nav-label">Spend</span>
+      </button>
+      <button class="nav-btn" id="nav-analytics" onclick="showView('analytics')">
+        <span class="nav-icon">◈</span><span class="nav-label">Analytics</span>
+      </button>
+      <button class="nav-btn" id="nav-cards" onclick="showView('cards')" style="display:none;">
+        <span class="nav-icon">◻</span><span class="nav-label">Cards</span>
+      </button>
+      <button class="nav-btn" id="nav-profile" onclick="showView('profile')">
+        <span class="nav-icon">○</span><span class="nav-label">Profile</span>
+      </button>
+    </nav>
 
   </div>
-
 </div>
 
 <!-- Transaction Detail Modal -->
-
 <div class="modal-overlay" id="tx-modal" onclick="closeModal()">
   <div class="modal-sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
     <div class="sheet-merchant-header">
       <div class="sheet-logo" id="modal-logo">
-        <span class="add-logo-badge" id="modal-logo-badge" style="display:none;">＋</span>
+        <span class="add-logo-badge" id="modal-logo-badge" style="display:none;">+</span>
       </div>
       <div class="sheet-merchant-info">
         <div class="sheet-merchant-name" id="modal-merchant"></div>
@@ -1314,30 +1183,20 @@
     </div>
     <div id="modal-rows"></div>
     <div class="sheet-actions">
-      <button class="action-btn">
-        <span class="action-icon">📷</span>
-        Add Receipt
-      </button>
-      <button class="action-btn">
-        <span class="action-icon">📍</span>
-        Add Location
-      </button>
-      <button class="action-btn">
-        <span class="action-icon">🖼️</span>
-        Add Photo
-      </button>
+      <button class="action-btn"><span class="action-icon">📷</span>Add Receipt</button>
+      <button class="action-btn"><span class="action-icon">📍</span>Add Location</button>
+      <button class="action-btn"><span class="action-icon">🖼️</span>Add Photo</button>
     </div>
   </div>
 </div>
 
 <!-- Logo Selector Bottom Sheet -->
-
 <div class="logo-selector-overlay" id="logo-selector-overlay" onclick="closeLogoSelector()">
   <div class="logo-selector-sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
     <div class="logo-sel-header">
       <div class="logo-sel-merchant" id="logo-sel-merchant-name"></div>
-      <div class="logo-sel-hint">✅ Confirm good &nbsp;·&nbsp; ⭐ Set active &nbsp;·&nbsp; ✗ Flag bad</div>
+      <div class="logo-sel-hint">✅ Confirm · ⭐ Set active · ✗ Flag bad · Tap to zoom</div>
     </div>
     <div id="logo-sel-content">
       <div class="logo-sel-loading" id="logo-sel-loading">
@@ -1357,7 +1216,6 @@
 </div>
 
 <!-- Rejection Reason Sheet -->
-
 <div class="rejection-overlay" id="rejection-overlay" onclick="closeRejectionSheet()">
   <div class="rejection-sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
@@ -1369,16 +1227,20 @@
   </div>
 </div>
 
-<!-- Hidden camera input -->
+<!-- Logo Zoom Overlay -->
+<div class="logo-zoom-overlay" id="logo-zoom-overlay" onclick="closeLogoZoom()">
+  <img class="logo-zoom-img" id="logo-zoom-img" src="" alt="">
+  <div class="logo-zoom-label">Tap anywhere to close</div>
+</div>
 
+<!-- Hidden camera input -->
 <input type="file" id="logo-camera-input" accept="image/*" capture="environment" style="display:none;" onchange="handleLogoPhoto(event)">
 
 <!-- Toast -->
-
 <div id="toast"></div>
 
 <script>
-// ── CONFIG ── Replace with your actual values
+// ── CONFIG ──
 const CLIENT_ID  = '946422288101-vf0sde7084c5rc28n61nkgo68bi97jg8.apps.googleusercontent.com';
 const SHEET_ID   = '1d39F8kq55LEMRlrNKQkyLqaVHjGFb0whzITBeqDKWgw';
 const SCOPES = [
@@ -1396,14 +1258,13 @@ let filteredTx   = [];
 let activeFilter = 'All';
 let accessToken  = null;
 
-// ── PERSON COLOUR MAP — fixed colours per cardholder ──
 const PERSON_COLOURS = {
-  'abdulla': '#06D6A0', // Green
-  'salama':  '#E9C46A', // Yellow
-  'driver':  '#457B9D', // Blue
-  'me':      '#C4A464', // Gold
-  'rashed':  '#C4A464', // Gold (same as Me)
-  'default': '#888888', // Grey fallback
+  'abdulla': '#06D6A0',
+  'salama':  '#E9C46A',
+  'driver':  '#457B9D',
+  'me':      '#C4A464',
+  'rashed':  '#C4A464',
+  'default': '#888888',
 };
 
 function personColour(person) {
@@ -1411,12 +1272,8 @@ function personColour(person) {
   return PERSON_COLOURS[person.toLowerCase()] || PERSON_COLOURS['default'];
 }
 
-// Keep merchant colour for non-person contexts if needed
 function merchantColour(name) {
-  const COLOURS = [
-    '#C4A464', '#06D6A0', '#457B9D', '#E63946',
-    '#6A0572', '#E9C46A', '#F4A261', '#264653',
-  ];
+  const COLOURS = ['#C4A464','#06D6A0','#457B9D','#E63946','#6A0572','#E9C46A','#F4A261','#264653'];
   let h = 0;
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
   return COLOURS[h % COLOURS.length];
@@ -1429,7 +1286,6 @@ function initials(name) {
   return (words[0][0] + words[words.length - 1][0]).toUpperCase();
 }
 
-// ── DEBUG LOGGING ──
 function debug(msg) {
   console.log('[Masraf]', msg);
   const box = document.getElementById('debug-box');
@@ -1441,106 +1297,54 @@ function debug(msg) {
   }
 }
 
-// ── AUTH — Redirect flow for iPhone Safari compatibility ──
+// ── AUTH ──
 const REDIRECT_URI = 'https://masraf-psi.vercel.app/';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 
 function signIn() {
-  // Store a random state value to verify on return
   const state = Math.random().toString(36).substring(2);
   sessionStorage.setItem('oauth_state', state);
-
-  // Build the OAuth URL
   const params = new URLSearchParams({
-    client_id:     CLIENT_ID,
-    redirect_uri:  REDIRECT_URI,
-    response_type: 'token',
-    scope:         SCOPES,
-    state:         state,
-    prompt:        'consent',
-    access_type:   'online',
-    include_granted_scopes: 'false',
+    client_id: CLIENT_ID, redirect_uri: REDIRECT_URI,
+    response_type: 'token', scope: SCOPES, state: state,
+    prompt: 'consent', access_type: 'online', include_granted_scopes: 'false',
   });
-
-  // Redirect to Google sign in
   window.location.href = AUTH_URL + '?' + params.toString();
 }
 
 function signOut() {
-  if (accessToken) {
-    fetch(`https://oauth2.googleapis.com/revoke?token=${accessToken}`, { method: 'POST' });
-  }
-  accessToken   = null;
-  currentUser   = null;
-  userRole      = 'user';
-  userCards     = [];
-  allTx         = [];
+  if (accessToken) fetch(`https://oauth2.googleapis.com/revoke?token=${accessToken}`, { method: 'POST' });
+  accessToken = null; currentUser = null; userRole = 'user'; userCards = []; allTx = [];
   sessionStorage.removeItem('oauth_state');
   sessionStorage.removeItem('access_token');
   sessionStorage.removeItem('has_sheets_scope');
   document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('main-app').style.display     = 'none';
+  document.getElementById('main-app').style.display = 'none';
 }
 
-// ── Handle OAuth redirect on page load ──
 function handleOAuthRedirect() {
   debug('Page loaded. URL: ' + window.location.href);
-  debug('Hash: ' + (window.location.hash || '(empty)'));
-
-  // Check if we're returning from OAuth with a token in the URL hash
   const hash = window.location.hash.substring(1);
-  if (!hash) {
-    debug('No hash found in URL');
-    return false;
-  }
-
+  if (!hash) { debug('No hash found in URL'); return false; }
   const params = new URLSearchParams(hash);
   const token  = params.get('access_token');
-  const state  = params.get('state');
   const error  = params.get('error');
-
-  if (error) {
-    debug('OAuth error: ' + error);
-    history.replaceState(null, '', window.location.pathname);
-    showError('Sign in failed: ' + error);
-    return true;
-  }
-
-  if (!token) {
-    debug('No access_token in hash');
-    return false;
-  }
-
+  if (error) { debug('OAuth error: ' + error); history.replaceState(null, '', window.location.pathname); showError('Sign in failed: ' + error); return true; }
+  if (!token) { debug('No access_token in hash'); return false; }
   debug('Got token, length: ' + token.length);
-
-  // Check if spreadsheets scope was granted
   const scopeStr = params.get('scope') || '';
   const hasSheets = scopeStr.includes('spreadsheets');
   debug('Has sheets scope: ' + hasSheets);
-
-  if (!hasSheets) {
-    history.replaceState(null, '', window.location.pathname);
-    showError('Sign in failed: Spreadsheets permission not granted. Please sign in again and approve all permissions.');
-    return true;
-  }
-
-  // Clean the URL hash so token isn't visible
+  if (!hasSheets) { history.replaceState(null, '', window.location.pathname); showError('Sign in failed: Spreadsheets permission not granted. Please sign in again and approve all permissions.'); return true; }
   history.replaceState(null, '', window.location.pathname);
-
-  // Store and use the token
   accessToken = token;
   sessionStorage.setItem('access_token', token);
   sessionStorage.setItem('has_sheets_scope', 'true');
   debug('Token stored in session');
-
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('loading-screen').style.display = 'flex';
-
   loadUserAndData()
-    .then(() => {
-      document.getElementById('loading-screen').style.display = 'none';
-      debug('Load complete');
-    })
+    .then(() => { document.getElementById('loading-screen').style.display = 'none'; debug('Load complete'); })
     .catch(err => {
       debug('Load failed: ' + err.message);
       sessionStorage.removeItem('access_token');
@@ -1549,36 +1353,20 @@ function handleOAuthRedirect() {
       document.getElementById('login-screen').style.display = 'flex';
       showError('Load failed: ' + err.message);
     });
-
   return true;
 }
 
-// ── Check for saved token on page load ──
 function checkSavedToken() {
   const saved = sessionStorage.getItem('access_token');
-  if (!saved) {
-    debug('No saved token');
-    return false;
-  }
-
-  // Verify saved token has spreadsheets scope by checking a flag we set
+  if (!saved) { debug('No saved token'); return false; }
   const hasSheets = sessionStorage.getItem('has_sheets_scope');
-  if (!hasSheets) {
-    debug('Saved token missing sheets scope, clearing...');
-    sessionStorage.removeItem('access_token');
-    return false;
-  }
-
+  if (!hasSheets) { debug('Saved token missing sheets scope, clearing...'); sessionStorage.removeItem('access_token'); return false; }
   debug('Found saved token with correct scopes, validating...');
   accessToken = saved;
   document.getElementById('login-screen').style.display  = 'none';
   document.getElementById('loading-screen').style.display = 'flex';
-
   loadUserAndData()
-    .then(() => {
-      document.getElementById('loading-screen').style.display = 'none';
-      debug('Load complete from saved token');
-    })
+    .then(() => { document.getElementById('loading-screen').style.display = 'none'; debug('Load complete from saved token'); })
     .catch(err => {
       debug('Saved token failed: ' + err.message);
       sessionStorage.removeItem('access_token');
@@ -1586,18 +1374,13 @@ function checkSavedToken() {
       document.getElementById('loading-screen').style.display = 'none';
       document.getElementById('login-screen').style.display   = 'flex';
     });
-
   return true;
 }
 
-// ── Init on page load ──
 window.addEventListener('load', () => {
   debug('Window loaded');
-  // First check if returning from OAuth redirect
   if (handleOAuthRedirect()) return;
-  // Then check for saved session token
   if (checkSavedToken()) return;
-  // Otherwise show login screen
   debug('Showing login screen');
   document.getElementById('login-screen').style.display = 'flex';
 });
@@ -1606,18 +1389,12 @@ window.addEventListener('load', () => {
 async function loadUserAndData() {
   try {
     debug('Loading user info...');
-    // 1. Get signed-in user info
-    const infoResp = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
-    if (!infoResp.ok) {
-      throw new Error('Userinfo failed: ' + infoResp.status);
-    }
+    const infoResp = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', { headers: { Authorization: `Bearer ${accessToken}` } });
+    if (!infoResp.ok) throw new Error('Userinfo failed: ' + infoResp.status);
     const info = await infoResp.json();
     currentUser = info;
     debug('User: ' + info.email);
 
-    // 2. Check App_Users tab
     debug('Loading App_Users...');
     const usersData = await sheetsGet('App_User!A:D');
     const rows = usersData.values || [];
@@ -1625,28 +1402,18 @@ async function loadUserAndData() {
 
     let matched = null;
     for (let i = 1; i < rows.length; i++) {
-      if (rows[i][0] && rows[i][0].toLowerCase() === info.email.toLowerCase()) {
-        matched = rows[i];
-        break;
-      }
+      if (rows[i][0] && rows[i][0].toLowerCase() === info.email.toLowerCase()) { matched = rows[i]; break; }
     }
 
-    if (!matched) {
-      debug('No match for: ' + info.email);
-      throw new Error('Access denied. Email not registered: ' + info.email);
-    }
-
+    if (!matched) throw new Error('Access denied. Email not registered: ' + info.email);
     debug('Matched: ' + matched.join(' | '));
 
     userRole  = (matched[2] || '').toLowerCase();
-    userCards = (matched[3] || '').toLowerCase() === 'all'
-      ? ['all']
-      : (matched[3] || '').split(',').map(s => s.trim());
+    userCards = (matched[3] || '').toLowerCase() === 'all' ? ['all'] : (matched[3] || '').split(',').map(s => s.trim());
 
     const displayName = matched[1] || info.name || info.email.split('@')[0];
     setupProfileUI(displayName, info.email);
 
-    // 3. Load transactions
     debug('Loading transactions...');
     const txData = await sheetsGet('Transactions_Raw!A:X');
     const txRows = txData.values || [];
@@ -1655,106 +1422,52 @@ async function loadUserAndData() {
     allTx = parseTransactions(txRows, userRole, userCards);
     debug('Parsed ' + allTx.length + ' transactions');
 
-    // 4. Render
     renderSpendView();
     renderAnalyticsView();
     if (userRole === 'admin') renderCardsView();
 
-    // Show app
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('main-app').style.display = 'flex';
     showView('spend');
 
-  } catch (err) {
-    debug('Error: ' + err.message);
-    throw err;
-  }
+  } catch (err) { debug('Error: ' + err.message); throw err; }
 }
 
 async function sheetsGet(range) {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}`;
   debug('Fetching: ' + url.substring(0, 80));
   const resp = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-  if (!resp.ok) {
-    const body = await resp.text();
-    debug('API error body: ' + body.substring(0, 200));
-    throw new Error(`Sheets API error: ${resp.status}`);
-  }
+  if (!resp.ok) { const body = await resp.text(); debug('API error body: ' + body.substring(0, 200)); throw new Error(`Sheets API error: ${resp.status}`); }
   return resp.json();
 }
 
 // ── PARSE TRANSACTIONS ──
-// Columns: A=GmailID, B=DateTime, C=Bank, D=Person, E=Last4,
-//          F=Merchant, G=Amount, H=Currency, I=ExchRate, J=AmountAED,
-//          K=CardNickname, L=CleanName, M=Category, N=Domain,
-//          O=City, P=Country, Q=Area, R=Platform, S=SubCat,
-//          T=IsIntl, U=PriceRange, V=Cuisine, W=Mall, X=BrandOrigin
 function parseTransactions(rows, role, cards) {
   if (rows.length < 2) return [];
   const result = [];
   for (let i = rows.length - 1; i >= 1; i--) {
     const r = rows[i];
     if (!r[0]) continue;
-
     const last4 = (r[4] || '').toString().trim();
-
-    // Filter by card for non-admin
-    if (role !== 'admin' && !cards.includes('all')) {
-      if (!cards.includes(last4)) continue;
-    }
-
+    if (role !== 'admin' && !cards.includes('all')) { if (!cards.includes(last4)) continue; }
     const amountAed = parseFloat(r[9]) || 0;
     const amount    = parseFloat(r[6]) || 0;
-
-    // Parse date — Google Sheets stores as DD/MM/YYYY HH:MM
     let dateObj = null;
     const rawDate = (r[1] || '').toString().trim();
-
-    // Try DD/MM/YYYY HH:MM format first (primary format from our sheet)
     const ddmm = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})/);
     if (ddmm) {
-      const day   = parseInt(ddmm[1]);
-      const month = parseInt(ddmm[2]) - 1; // 0-based
-      const year  = parseInt(ddmm[3]);
-      const hours = parseInt(ddmm[4]);
-      const mins  = parseInt(ddmm[5]);
-      dateObj = new Date(year, month, day, hours, mins, 0);
+      dateObj = new Date(parseInt(ddmm[3]), parseInt(ddmm[2]) - 1, parseInt(ddmm[1]), parseInt(ddmm[4]), parseInt(ddmm[5]), 0);
     }
-
-    // Fallback: try native Date parsing (for proper Date objects from new emails)
     if (!dateObj || isNaN(dateObj.getTime())) {
-      try {
-        const d = new Date(rawDate);
-        if (!isNaN(d.getTime())) dateObj = d;
-      } catch(e) {}
+      try { const d = new Date(rawDate); if (!isNaN(d.getTime())) dateObj = d; } catch(e) {}
     }
-
     result.push({
-      id:          r[0],
-      dateObj:     dateObj,
-      dateStr:     r[1] || '',
-      bank:        r[2] || '',
-      person:      r[3] || '',
-      last4:       last4,
-      merchant:    r[5] || '',
-      amount:      amount,
-      currency:    r[7] || 'AED',
-      exchRate:    parseFloat(r[8]) || 1,
-      amountAed:   amountAed,
-      cardNick:    r[10] || '',
-      cleanName:   r[11] || r[5] || '',
-      category:    r[12] || '',
-      domain:      r[13] || '',
-      city:        r[14] || '',
-      country:     r[15] || '',
-      area:        r[16] || '',
-      platform:    r[17] || '',
-      subCat:      r[18] || '',
-      isIntl:      (r[19] || '').toLowerCase() === 'yes',
-      priceRange:  r[20] || '',
-      cuisine:     r[21] || '',
-      mall:        r[22] || '',
-      brandOrigin: r[23] || '',
+      id: r[0], dateObj, dateStr: r[1]||'', bank: r[2]||'', person: r[3]||'', last4,
+      merchant: r[5]||'', amount, currency: r[7]||'AED', exchRate: parseFloat(r[8])||1,
+      amountAed, cardNick: r[10]||'', cleanName: r[11]||r[5]||'', category: r[12]||'',
+      domain: r[13]||'', city: r[14]||'', country: r[15]||'', area: r[16]||'',
+      platform: r[17]||'', subCat: r[18]||'', isIntl: (r[19]||'').toLowerCase()==='yes',
+      priceRange: r[20]||'', cuisine: r[21]||'', mall: r[22]||'', brandOrigin: r[23]||'',
     });
   }
   return result;
@@ -1763,10 +1476,10 @@ function parseTransactions(rows, role, cards) {
 // ── DATE HELPERS ──
 function formatDateLabel(dateObj) {
   if (!dateObj) return 'Unknown';
-  const now   = new Date();
+  const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const d     = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
-  const diff  = (today - d) / (1000 * 60 * 60 * 24);
+  const d = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+  const diff = (today - d) / (1000 * 60 * 60 * 24);
   if (diff === 0) return 'Today';
   if (diff === 1) return 'Yesterday';
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -1785,47 +1498,37 @@ function isThisMonth(dateObj) {
 
 function isToday(dateObj) {
   if (!dateObj) return false;
-  const now = new Date();
-  return dateObj.toDateString() === now.toDateString();
+  return dateObj.toDateString() === new Date().toDateString();
 }
 
 // ── RENDER SPEND VIEW ──
 function renderSpendView() {
-  const now     = new Date();
-  const month   = now.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
-  document.getElementById('spend-month-title').textContent = month;
-
+  const now = new Date();
+  document.getElementById('spend-month-title').textContent = now.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
   applyFilter(activeFilter);
 }
 
 function applyFilter(filter) {
   activeFilter = filter;
-
-  // Build filter pills based on role
   const pills = ['All', 'Today'];
   if (userRole === 'admin') {
     const persons = [...new Set(allTx.map(t => t.person).filter(Boolean))];
     persons.forEach(p => { if (!pills.includes(p)) pills.push(p); });
   }
-
-  const pillsEl = document.getElementById('filter-pills');
-  pillsEl.innerHTML = pills.map(p =>
+  document.getElementById('filter-pills').innerHTML = pills.map(p =>
     `<button class="pill ${p === activeFilter ? 'active' : ''}" onclick="applyFilter('${p}')">${p}</button>`
   ).join('');
 
-  // Filter transactions
   filteredTx = allTx.filter(tx => {
     if (filter === 'All')   return true;
     if (filter === 'Today') return isToday(tx.dateObj);
     return tx.person === filter;
   });
 
-  // Compute summary — always from current month
   const monthTx    = allTx.filter(t => isThisMonth(t.dateObj));
   const totalMonth = monthTx.reduce((s, t) => s + t.amountAed, 0);
   const totalToday = allTx.filter(t => isToday(t.dateObj)).reduce((s, t) => s + t.amountAed, 0);
   const totalIntl  = monthTx.filter(t => t.isIntl).length;
-
   const totalLocal = monthTx.filter(t => !t.isIntl).length;
 
   document.getElementById('total-month').textContent = totalMonth.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
@@ -1833,45 +1536,32 @@ function applyFilter(filter) {
   document.getElementById('total-txns').textContent  = totalLocal;
   document.getElementById('total-intl').textContent  = totalIntl;
 
-  // Per person breakdown — admin only
-  const breakdownEl = document.getElementById('person-breakdown');
+  const breakdownEl   = document.getElementById('person-breakdown');
   const breakdownRows = document.getElementById('person-breakdown-rows');
 
   if (userRole === 'admin') {
-    // Build per-person totals from month transactions
     const personTotals = {};
-    monthTx.forEach(t => {
-      if (!t.person) return;
-      personTotals[t.person] = (personTotals[t.person] || 0) + t.amountAed;
-    });
-
-    const sorted = Object.entries(personTotals).sort((a, b) => b[1] - a[1]);
+    monthTx.forEach(t => { if (!t.person) return; personTotals[t.person] = (personTotals[t.person] || 0) + t.amountAed; });
+    const sorted   = Object.entries(personTotals).sort((a, b) => b[1] - a[1]);
     const maxSpend = sorted[0]?.[1] || 1;
-
     breakdownRows.innerHTML = sorted.map(([person, spend]) => {
       const color = personColour(person);
       const pct   = Math.round((spend / totalMonth) * 100);
       const barW  = Math.round((spend / maxSpend) * 100);
       return `
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div style="
-            width:28px; height:28px; border-radius:8px; flex-shrink:0;
-            background:${color}22; border:1px solid ${color}44;
-            display:flex; align-items:center; justify-content:center;
-            font-size:10px; font-weight:700; color:${color};
-          ">${person[0].toUpperCase()}</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:28px;height:28px;border-radius:8px;flex-shrink:0;background:${color}22;border:1px solid ${color}44;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${color};">${person[0].toUpperCase()}</div>
           <div style="flex:1;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-              <span style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.8);">${person}</span>
-              <span style="font-size:12px; font-weight:700; color:${color};">${spend.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} <span style="font-size:10px; font-weight:400; color:rgba(255,255,255,0.3);">AED · ${pct}%</span></span>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.8);">${person}</span>
+              <span style="font-size:12px;font-weight:700;color:${color};">${spend.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0})} <span style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.3);">AED · ${pct}%</span></span>
             </div>
-            <div style="background:rgba(255,255,255,0.06); border-radius:3px; height:4px; overflow:hidden;">
-              <div style="height:100%; width:${barW}%; background:${color}; border-radius:3px; transition:width 0.6s ease;"></div>
+            <div style="background:rgba(255,255,255,0.06);border-radius:3px;height:4px;overflow:hidden;">
+              <div style="height:100%;width:${barW}%;background:${color};border-radius:3px;transition:width 0.6s ease;"></div>
             </div>
           </div>
         </div>`;
     }).join('');
-
     breakdownEl.style.display = 'block';
   } else {
     breakdownEl.style.display = 'none';
@@ -1882,58 +1572,34 @@ function applyFilter(filter) {
 
 function renderTxList() {
   const container = document.getElementById('tx-list');
-
   if (!filteredTx.length) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">📭</div>
-        <div class="empty-title">No transactions</div>
-        <div class="empty-sub">No transactions found for this filter.</div>
-      </div>`;
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No transactions</div><div class="empty-sub">No transactions found for this filter.</div></div>`;
     return;
   }
-
-  // Group by date label
   const groups = {};
   filteredTx.forEach(tx => {
     const label = formatDateLabel(tx.dateObj);
     if (!groups[label]) groups[label] = [];
     groups[label].push(tx);
   });
-
   let html = '';
   Object.keys(groups).forEach(dateLabel => {
     const txs      = groups[dateLabel];
     const dayTotal = txs.reduce((s, t) => s + t.amountAed, 0);
-
-    html += `
-      <div class="tx-section">
-        <div class="tx-date-header">
-          <span class="tx-date-label">${dateLabel}</span>
-          <span class="tx-date-total">${dayTotal.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} AED</span>
-        </div>`;
-
+    html += `<div class="tx-section"><div class="tx-date-header"><span class="tx-date-label">${dateLabel}</span><span class="tx-date-total">${dayTotal.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0})} AED</span></div>`;
     txs.forEach(tx => {
-      const color    = personColour(tx.person);
-      const name     = tx.cleanName || tx.merchant;
-      const meta     = buildMeta(tx);
+      const color   = personColour(tx.person);
+      const name    = tx.cleanName || tx.merchant;
+      const meta    = buildMeta(tx);
       const amtColor = tx.isIntl ? 'var(--green)' : 'var(--text)';
-      const amtStr   = tx.amount % 1 === 0
-        ? tx.amount.toLocaleString()
-        : tx.amount.toFixed(2);
-
+      const amtStr  = tx.amount % 1 === 0 ? tx.amount.toLocaleString() : tx.amount.toFixed(2);
       html += `
-        <div class="tx-card" onclick="openModal('${tx.id}')" style="background:${color}4D; border:1px solid ${color}E6;">
-          <div class="tx-logo" id="txlogo-${tx.id}" style="background:${color}22; border:1px solid ${color}44; color:${color};">
-            ${initials(name)}
-          </div>
+        <div class="tx-card" onclick="openModal('${tx.id}')" style="background:${color}4D;border:1px solid ${color}E6;">
+          <div class="tx-logo" id="txlogo-${tx.id}" style="background:${color}22;border:1px solid ${color}44;color:${color};">${initials(name)}</div>
           <div class="tx-info">
             <div class="tx-row1">
               <div class="tx-merchant">${name}</div>
-              <div class="tx-amount" style="color:${amtColor}">
-                ${amtStr}<span class="tx-currency-badge">${tx.currency}</span>
-                
-              </div>
+              <div class="tx-amount" style="color:${amtColor}">${amtStr}<span class="tx-currency-badge">${tx.currency}</span></div>
             </div>
             <div class="tx-row2">
               <div class="tx-meta">${meta}</div>
@@ -1942,13 +1608,9 @@ function renderTxList() {
           </div>
         </div>`;
     });
-
     html += '</div>';
   });
-
   container.innerHTML = html;
-
-  // Async load logos onto transaction cards from GitHub manifest
   filteredTx.forEach(tx => {
     const el = document.getElementById('txlogo-' + tx.id);
     if (el) renderTxLogoEl(el, tx);
@@ -1958,25 +1620,12 @@ function renderTxList() {
 function countryFlag(country) {
   if (!country) return '🌍';
   const map = {
-    'united states': '🇺🇸', 'usa': '🇺🇸', 'us': '🇺🇸',
-    'united kingdom': '🇬🇧', 'uk': '🇬🇧', 'england': '🇬🇧', 'britain': '🇬🇧',
-    'france': '🇫🇷', 'germany': '🇩🇪', 'italy': '🇮🇹', 'spain': '🇪🇸',
-    'switzerland': '🇨🇭', 'netherlands': '🇳🇱', 'belgium': '🇧🇪',
-    'austria': '🇦🇹', 'portugal': '🇵🇹', 'greece': '🇬🇷',
-    'sweden': '🇸🇪', 'norway': '🇳🇴', 'denmark': '🇩🇰', 'finland': '🇫🇮',
-    'japan': '🇯🇵', 'china': '🇨🇳', 'south korea': '🇰🇷', 'korea': '🇰🇷',
-    'hong kong': '🇭🇰', 'singapore': '🇸🇬', 'thailand': '🇹🇭',
-    'malaysia': '🇲🇾', 'indonesia': '🇮🇩', 'philippines': '🇵🇭',
-    'vietnam': '🇻🇳', 'india': '🇮🇳', 'pakistan': '🇵🇰',
-    'turkey': '🇹🇷', 'egypt': '🇪🇬', 'jordan': '🇯🇴',
-    'saudi arabia': '🇸🇦', 'kuwait': '🇰🇼', 'bahrain': '🇧🇭',
-    'qatar': '🇶🇦', 'oman': '🇴🇲', 'lebanon': '🇱🇧',
-    'australia': '🇦🇺', 'new zealand': '🇳🇿',
-    'canada': '🇨🇦', 'mexico': '🇲🇽', 'brazil': '🇧🇷',
-    'south africa': '🇿🇦', 'kenya': '🇰🇪', 'nigeria': '🇳🇬',
-    'russia': '🇷🇺', 'ukraine': '🇺🇦', 'poland': '🇵🇱',
-    'czech republic': '🇨🇿', 'hungary': '🇭🇺', 'romania': '🇷🇴',
-    'uae': '🇦🇪', 'united arab emirates': '🇦🇪',
+    'united states':'🇺🇸','usa':'🇺🇸','us':'🇺🇸','united kingdom':'🇬🇧','uk':'🇬🇧',
+    'france':'🇫🇷','germany':'🇩🇪','italy':'🇮🇹','spain':'🇪🇸','japan':'🇯🇵',
+    'china':'🇨🇳','south korea':'🇰🇷','hong kong':'🇭🇰','singapore':'🇸🇬',
+    'india':'🇮🇳','turkey':'🇹🇷','saudi arabia':'🇸🇦','kuwait':'🇰🇼',
+    'qatar':'🇶🇦','oman':'🇴🇲','bahrain':'🇧🇭','egypt':'🇪🇬',
+    'uae':'🇦🇪','united arab emirates':'🇦🇪','australia':'🇦🇺','canada':'🇨🇦',
   };
   return map[country.toLowerCase().trim()] || '🌍';
 }
@@ -1996,53 +1645,31 @@ function buildMeta(tx) {
 function renderAnalyticsView() {
   const monthTx = allTx.filter(t => isThisMonth(t.dateObj));
   const total   = monthTx.reduce((s, t) => s + t.amountAed, 0);
-
-  // Category breakdown
   const cats = {};
-  monthTx.forEach(t => {
-    const c = t.category || 'Other';
-    cats[c] = (cats[c] || 0) + t.amountAed;
-  });
+  monthTx.forEach(t => { const c = t.category || 'Other'; cats[c] = (cats[c] || 0) + t.amountAed; });
   const sorted = Object.entries(cats).sort((a, b) => b[1] - a[1]).slice(0, 8);
   const max    = sorted[0]?.[1] || 1;
-
   document.getElementById('category-chart').innerHTML = sorted.map(([cat, amt]) => `
     <div class="category-row">
-      <div class="category-row-top">
-        <span>${cat}</span>
-        <span style="color:var(--text-dim)">${amt.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} AED</span>
-      </div>
-      <div class="category-bar-bg">
-        <div class="category-bar-fill" style="width:${(amt/max*100).toFixed(1)}%"></div>
-      </div>
+      <div class="category-row-top"><span>${cat}</span><span style="color:var(--text-dim)">${amt.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0})} AED</span></div>
+      <div class="category-bar-bg"><div class="category-bar-fill" style="width:${(amt/max*100).toFixed(1)}%"></div></div>
     </div>`).join('');
-
-  // Merchant frequency
   const merch = {};
   monthTx.forEach(t => { const n = t.cleanName || t.merchant; merch[n] = (merch[n] || 0) + 1; });
   const topMerch = Object.entries(merch).sort((a, b) => b[1] - a[1])[0];
-
-  // Person breakdown (admin only)
   const persons = {};
   monthTx.forEach(t => { if (t.person) persons[t.person] = (persons[t.person] || 0) + t.amountAed; });
   const topPerson = Object.entries(persons).sort((a, b) => b[1] - a[1])[0];
-
   const avgDaily = total / new Date().getDate();
-
   document.getElementById('stats-grid').innerHTML = [
     { label: 'Top Merchant',  value: topMerch?.[0] || '—',  sub: topMerch ? `${topMerch[1]} visits` : '' },
     { label: 'Avg Daily',     value: `${avgDaily.toFixed(0)} AED`, sub: 'This month' },
     { label: 'International', value: `${monthTx.filter(t => t.isIntl).length}`, sub: 'Foreign transactions' },
     { label: 'Most Active',   value: topPerson?.[0] || '—', sub: topPerson ? `${topPerson[1].toFixed(0)} AED` : '' },
-  ].map(s => `
-    <div class="stat-card">
-      <div class="stat-card-label">${s.label}</div>
-      <div class="stat-card-value">${s.value}</div>
-      <div class="stat-card-sub">${s.sub}</div>
-    </div>`).join('');
+  ].map(s => `<div class="stat-card"><div class="stat-card-label">${s.label}</div><div class="stat-card-value">${s.value}</div><div class="stat-card-sub">${s.sub}</div></div>`).join('');
 }
 
-// ── RENDER CARDS VIEW (admin only) ──
+// ── RENDER CARDS VIEW ──
 function renderCardsView() {
   const monthTx = allTx.filter(t => isThisMonth(t.dateObj));
   const persons = {};
@@ -2051,38 +1678,30 @@ function renderCardsView() {
     if (!persons[t.person]) persons[t.person] = { spend: 0, card: t.cardNick, last4: t.last4, bank: t.bank };
     persons[t.person].spend += t.amountAed;
   });
-
   document.getElementById('cardholders-list').innerHTML = Object.entries(persons)
     .sort((a, b) => b[1].spend - a[1].spend)
     .map(([name, data]) => {
       const color = personColour(name);
-      return `
-        <div class="cardholder-card">
-          <div class="cardholder-avatar" style="background:${color}22; border:1px solid ${color}44; color:${color};">
-            ${initials(name)}
-          </div>
-          <div class="cardholder-info">
-            <div class="cardholder-name">${name}</div>
-            <div class="cardholder-sub">${data.card} · ···· ${data.last4} · ${data.bank}</div>
-          </div>
-          <div class="cardholder-spend">
-            <div class="cardholder-amount" style="color:${color}">${data.spend.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
-            <div class="cardholder-label">AED this month</div>
-          </div>
-        </div>`;
+      return `<div class="cardholder-card">
+        <div class="cardholder-avatar" style="background:${color}22;border:1px solid ${color}44;color:${color};">${initials(name)}</div>
+        <div class="cardholder-info"><div class="cardholder-name">${name}</div><div class="cardholder-sub">${data.card} · ···· ${data.last4} · ${data.bank}</div></div>
+        <div class="cardholder-spend">
+          <div class="cardholder-amount" style="color:${color}">${data.spend.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
+          <div class="cardholder-label">AED this month</div>
+        </div>
+      </div>`;
     }).join('');
 }
 
 // ── SETUP PROFILE UI ──
 function setupProfileUI(name, email) {
   const initial = name ? name[0].toUpperCase() : '?';
-  document.getElementById('avatar-btn').textContent         = initial;
-  document.getElementById('avatar-analytics').textContent   = initial;
-  document.getElementById('profile-avatar').textContent     = initial;
-  document.getElementById('profile-name').textContent       = name;
-  document.getElementById('profile-role').textContent       = userRole === 'admin' ? 'Administrator' : 'Cardholder';
-  document.getElementById('profile-badge').textContent      = userRole === 'admin' ? 'Full Access' : 'Personal View';
-
+  document.getElementById('avatar-btn').textContent       = initial;
+  document.getElementById('avatar-analytics').textContent = initial;
+  document.getElementById('profile-avatar').textContent   = initial;
+  document.getElementById('profile-name').textContent     = name;
+  document.getElementById('profile-role').textContent     = userRole === 'admin' ? 'Administrator' : 'Cardholder';
+  document.getElementById('profile-badge').textContent    = userRole === 'admin' ? 'Full Access' : 'Personal View';
   if (userRole === 'admin') {
     document.getElementById('app-users-item').style.display      = 'flex';
     document.getElementById('merchant-overrides-item').style.display = 'flex';
@@ -2094,90 +1713,66 @@ function setupProfileUI(name, email) {
 function openModal(txId) {
   const tx = allTx.find(t => t.id === txId);
   if (!tx) return;
-
-  currentLogoTx = tx; // store for logo selector
-
+  currentLogoTx = tx;
   const name  = tx.cleanName || tx.merchant;
   const color = personColour(tx.person);
-
-  // Reset logo to initials first
   const logoEl  = document.getElementById('modal-logo');
   const badgeEl = document.getElementById('modal-logo-badge');
-  logoEl.textContent       = initials(name);
-  logoEl.style.background  = color + '22';
-  logoEl.style.border      = `1px solid ${color}44`;
-  logoEl.style.color       = color;
-  // Async load best logo — always uses same URL as the transaction card (logoPickCache)
+  logoEl.textContent      = initials(name);
+  logoEl.style.background = color + '22';
+  logoEl.style.border     = `1px solid ${color}44`;
+  logoEl.style.color      = color;
   const key = tx.domain || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
   async function loadModalLogo() {
     const manifest    = await getLogoManifest();
     const entry       = manifest[key];
     const isConfirmed = entry && (entry.status === 'official' || entry.status === 'photo');
-
-    // Tappable if: admin always, or non-admin only when NOT yet confirmed
     const canEdit = userRole === 'admin' || !isConfirmed;
     logoEl.style.cursor = canEdit ? 'pointer' : 'default';
     logoEl.onclick      = canEdit ? openLogoSelector : null;
     if (badgeEl) badgeEl.style.display = canEdit ? 'flex' : 'none';
-
-    // Use cached URL if available — same as what the card shows
     let url = logoPickCache[key] || null;
-
-    // If not cached yet, resolve it the same way renderTxLogoEl does
     if (!url) {
-      if (isConfirmed) {
-        url = entry.githubUrl || (entry.file ? GITHUB_RAW + encodeURIComponent(entry.file) : null);
-      }
+      if (isConfirmed) url = entry.githubUrl || (entry.file ? GITHUB_RAW + encodeURIComponent(entry.file) : null);
       if (!url) {
         const variants = await getVariantsManifest();
-        const list     = variants[key];
+        const list = variants[key];
         if (list && list.length > 0) {
-          const idx = Math.abs(key.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % list.length;
-          url = list[idx].githubUrl || null;
+          const nonFlagged = list.filter(v => !v.flagged);
+          if (nonFlagged.length > 0) {
+            const idx = Math.abs(key.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % nonFlagged.length;
+            url = nonFlagged[idx].githubUrl || null;
+          }
         }
       }
-      if (url) logoPickCache[key] = url; // cache it for consistency
+      if (url) logoPickCache[key] = url;
     }
-
     if (url) {
       logoEl.innerHTML = '';
-      logoEl.style.display = 'flex';
-      logoEl.style.alignItems = 'center';
-      logoEl.style.justifyContent = 'center';
-      logoEl.style.position = 'relative';
+      logoEl.style.cssText = 'display:flex;align-items:center;justify-content:center;position:relative;width:56px;height:56px;border-radius:14px;overflow:hidden;flex-shrink:0;box-sizing:border-box;cursor:' + (canEdit ? 'pointer' : 'default') + ';';
       const img1 = document.createElement('img');
       img1.src = url;
       img1.style.cssText = 'width:46px;height:46px;object-fit:contain;border-radius:10px;flex-shrink:0;';
       img1.onerror = function(){ logoEl.textContent = initials(name); };
       logoEl.appendChild(img1);
-      // Badge is position:absolute so it does NOT affect flex layout
       if (badgeEl && canEdit) {
-        badgeEl.style.position = 'absolute';
-        badgeEl.style.bottom   = '-3px';
-        badgeEl.style.right    = '-3px';
+        badgeEl.style.position = 'absolute'; badgeEl.style.bottom = '-3px'; badgeEl.style.right = '-3px';
         logoEl.appendChild(badgeEl);
       }
       logoEl.classList.add('has-logo');
       logoEl.style.color = '';
     }
   }
-
   loadModalLogo();
 
-  document.getElementById('modal-merchant').textContent   = name;
-
-  const sub = [tx.category, tx.subCat].filter(Boolean).join(' · ');
-  document.getElementById('modal-sub').textContent = sub || tx.merchant;
-
+  document.getElementById('modal-merchant').textContent = name;
+  document.getElementById('modal-sub').textContent = [tx.category, tx.subCat].filter(Boolean).join(' · ') || tx.merchant;
   const amtStr = tx.amount % 1 === 0 ? tx.amount.toLocaleString() : tx.amount.toFixed(2);
-  document.getElementById('modal-amount').textContent     = `${tx.currency} ${amtStr}`;
-  document.getElementById('modal-amount').style.color     = tx.isIntl ? 'var(--green)' : 'var(--text)';
+  document.getElementById('modal-amount').textContent = `${tx.currency} ${amtStr}`;
+  document.getElementById('modal-amount').style.color = tx.isIntl ? 'var(--green)' : 'var(--text)';
+  document.getElementById('modal-intl').style.display = tx.isIntl ? 'block' : 'none';
 
-  const intlEl = document.getElementById('modal-intl');
-  intlEl.style.display = tx.isIntl ? 'block' : 'none';
-
-  // Detail rows
   const rows = [
     ['Card',        tx.cardNick ? `${tx.cardNick} · ···· ${tx.last4}` : `···· ${tx.last4}`],
     ['Amount AED',  tx.amountAed !== tx.amount ? `${tx.amountAed.toFixed(2)} AED (rate: ${tx.exchRate})` : null],
@@ -2196,10 +1791,7 @@ function openModal(txId) {
   ].filter(([, v]) => v);
 
   document.getElementById('modal-rows').innerHTML = rows.map(([k, v]) => `
-    <div class="sheet-row">
-      <span class="sheet-row-label">${k}</span>
-      <span class="sheet-row-value">${v}</span>
-    </div>`).join('');
+    <div class="sheet-row"><span class="sheet-row-label">${k}</span><span class="sheet-row-value">${v}</span></div>`).join('');
 
   document.getElementById('tx-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -2212,24 +1804,18 @@ function closeModal() {
 
 // ── VIEW SWITCHING ──
 function showView(view) {
-  ['spend', 'analytics', 'cards', 'profile'].forEach(v => {
-    document.getElementById(`view-${v}`).style.display      = 'none';
+  ['spend','analytics','cards','profile'].forEach(v => {
+    document.getElementById(`view-${v}`).style.display = 'none';
     const btn = document.getElementById(`nav-${v}`);
     if (btn) btn.classList.remove('active');
   });
-
   document.getElementById(`view-${view}`).style.display = 'block';
   const btn = document.getElementById(`nav-${view}`);
   if (btn) btn.classList.add('active');
-
-  // Refresh analytics on open
   if (view === 'analytics' && allTx.length) renderAnalyticsView();
 }
 
-// ── HELPERS ──
-function showLoading(show) {
-  document.getElementById('loading-screen').style.display = show ? 'flex' : 'none';
-}
+function showLoading(show) { document.getElementById('loading-screen').style.display = show ? 'flex' : 'none'; }
 
 function showError(msg) {
   document.getElementById('loading-screen').style.display = 'none';
@@ -2246,47 +1832,41 @@ const GITHUB_REPO     = 'masraf-logos';
 const LOGO_PICKER_URL = 'https://script.google.com/macros/s/AKfycbzHj35-Q4Y_Cpz9XZyRF10A0232cps8dQcDElza4zOH0Kdb1rmjqxMoxHXo6FRw86-g/exec';
 const GITHUB_RAW      = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/`;
 
-// Cache
-let logoManifest     = null;  // logos.json — active logos
+let logoManifest     = null;
 let logoManifestTs   = 0;
-let variantsManifest = null;  // variants.json — all variants with confirmed/active/flagged
+let variantsManifest = null;
 let variantsTs       = 0;
 let currentLogoTx    = null;
-let logoVariants     = [];    // non-flagged variants for current merchant
-let variantStates    = {};    // file → { confirmed, active, flagged } — local session state
-const logoPickCache  = {};    // domain → url, so same merchant always shows same logo
+let logoVariants     = [];
+let variantStates    = {};
+const logoPickCache  = {};
 
-// Rejection sheet state
-let pendingFlagIndex        = null;
+let pendingFlagIndex         = null;
 let selectedRejectionReasons = new Set();
 
 const REJECTION_REASONS = [
-  { id: 'wrong_brand',        label: 'Wrong brand',               sub: 'Logo belongs to a different company' },
-  { id: 'not_logo_unrelated', label: 'Not a logo — Unrelated',    sub: 'Wrong content with no connection to this merchant' },
-  { id: 'not_logo_related',   label: 'Not a logo — Related',      sub: 'Correct merchant, but it\'s a photo, product, or storefront' },
-  { id: 'low_quality',        label: 'Low quality',               sub: 'Blurry, pixelated, watermarked, or too small' },
-  { id: 'generic',            label: 'Generic / placeholder',     sub: 'Too generic, not brand-specific (e.g. a fork or star icon)' },
+  { id: 'wrong_brand',        label: 'Wrong brand',             sub: 'Logo belongs to a different company' },
+  { id: 'not_logo_unrelated', label: 'Not a logo — Unrelated',  sub: 'Wrong content with no connection to this merchant' },
+  { id: 'not_logo_related',   label: 'Not a logo — Related',    sub: 'Correct merchant but it is a photo, product, or storefront' },
+  { id: 'low_quality',        label: 'Low quality',             sub: 'Blurry, pixelated, watermarked, or too small' },
+  { id: 'generic',            label: 'Generic / placeholder',   sub: 'Too generic, not brand-specific (e.g. a fork or star icon)' },
 ];
 
-// ── JSONP helper — used only for confirm/save/photo actions ──
+// ── JSONP helper ──
 function jsonpFetch(url) {
   return new Promise((resolve, reject) => {
     const cbName = 'masraf_cb_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
     const script  = document.createElement('script');
     const timeout = setTimeout(() => { cleanup(); reject(new Error('JSONP timeout')); }, 15000);
     window[cbName] = function(data) { cleanup(); resolve(data); };
-    function cleanup() {
-      clearTimeout(timeout);
-      delete window[cbName];
-      if (script.parentNode) script.parentNode.removeChild(script);
-    }
+    function cleanup() { clearTimeout(timeout); delete window[cbName]; if (script.parentNode) script.parentNode.removeChild(script); }
     script.onerror = () => { cleanup(); reject(new Error('JSONP script error')); };
     script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName;
     document.head.appendChild(script);
   });
 }
 
-// ── Load logos.json from GitHub (confirmed logos, cached 5 min) ──
+// ── Load logos.json ──
 async function getLogoManifest() {
   const now = Date.now();
   if (logoManifest && (now - logoManifestTs) < 5 * 60 * 1000) return logoManifest;
@@ -2298,7 +1878,7 @@ async function getLogoManifest() {
   return logoManifest;
 }
 
-// ── Load variants.json from GitHub (unconfirmed variants, cached 5 min) ──
+// ── Load variants.json ──
 async function getVariantsManifest() {
   const now = Date.now();
   if (variantsManifest && (now - variantsTs) < 5 * 60 * 1000) return variantsManifest;
@@ -2315,11 +1895,7 @@ async function renderTxLogoEl(el, tx) {
   const key   = tx.domain || (tx.cleanName || tx.merchant)?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const color = personColour(tx.person);
   if (!key) return;
-
-  // Return cached result immediately — same merchant always shows same logo
   if (logoPickCache[key]) { applyLogoToEl(el, logoPickCache[key], color); return; }
-
-  // 1. Check confirmed logos.json first
   const manifest = await getLogoManifest();
   const entry    = manifest[key];
   if (entry) {
@@ -2327,65 +1903,48 @@ async function renderTxLogoEl(el, tx) {
     const url = entry.githubUrl || (entry.file ? GITHUB_RAW + encodeURIComponent(entry.file) : null);
     if (url) { logoPickCache[key] = url; applyLogoToEl(el, url, color); return; }
   }
-
-  // 2. Fall back to a consistent variant pick from variants.json
   const variants = await getVariantsManifest();
   const list     = variants[key];
   if (list && list.length > 0) {
-    const idx = Math.abs(key.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % list.length;
-    const url = list[idx].githubUrl;
-    if (url) { logoPickCache[key] = url; applyLogoToEl(el, url, color); }
+    const nonFlagged = list.filter(v => !v.flagged);
+    if (nonFlagged.length > 0) {
+      const idx = Math.abs(key.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % nonFlagged.length;
+      const url = nonFlagged[idx].githubUrl;
+      if (url) { logoPickCache[key] = url; applyLogoToEl(el, url, color); }
+    }
   }
 }
 
-// ── Apply logo URL to a card element ──
 function applyLogoToEl(el, url, personColor) {
-  const border = personColor ? `2px solid ${personColor}88` : '1px solid rgba(0,0,0,0.08)';
-  el.innerHTML          = `<img src="${url}" style="width:36px;height:36px;object-fit:contain;border-radius:9px;" onerror="this.style.display='none'">`;
-  el.style.background   = '#fff';
-  el.style.border       = 'none';
-  el.style.borderRadius = '12px';
-  el.style.overflow     = 'hidden';
-  el.style.padding      = '3px';
-  el.style.color        = '';
-  el.style.display      = 'flex';
-  el.style.alignItems   = 'center';
-  el.style.justifyContent = 'center';
+  el.innerHTML = `<img src="${url}" style="width:36px;height:36px;object-fit:contain;border-radius:9px;" onerror="this.style.display='none'">`;
+  el.style.background      = '#fff';
+  el.style.border          = 'none';
+  el.style.borderRadius    = '12px';
+  el.style.overflow        = 'hidden';
+  el.style.padding         = '3px';
+  el.style.color           = '';
+  el.style.display         = 'flex';
+  el.style.alignItems      = 'center';
+  el.style.justifyContent  = 'center';
 }
 
 // ── Open logo selector ──
 async function openLogoSelector() {
   if (!currentLogoTx) return;
   const tx = currentLogoTx;
-
-  logoVariants = [];
-  variantStates = {};
-  pendingFlagIndex = null;
-  selectedRejectionReasons = new Set();
-
+  logoVariants = []; variantStates = {}; pendingFlagIndex = null; selectedRejectionReasons = new Set();
   const name = tx.cleanName || tx.merchant;
   const key  = tx.domain || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-
   document.getElementById('logo-sel-merchant-name').textContent = name;
   document.getElementById('logo-sel-loading').style.display     = 'flex';
   document.getElementById('logo-sel-grid').style.display        = 'none';
   document.getElementById('logo-selector-overlay').classList.add('open');
-
-  // Load both manifests in parallel
   const [variants, manifest] = await Promise.all([getVariantsManifest(), getLogoManifest()]);
-
   const allVariants = variants[key] || [];
-
-  // Initialize local state from manifests — exclude flagged from display list
   allVariants.forEach(v => {
-    variantStates[v.file] = {
-      confirmed: v.confirmed || false,
-      active:    v.active    || false,
-      flagged:   v.flagged   || false,
-    };
+    variantStates[v.file] = { confirmed: v.confirmed || false, active: v.active || false, flagged: v.flagged || false };
   });
   logoVariants = allVariants.filter(v => !v.flagged);
-
   document.getElementById('logo-sel-loading').style.display = 'none';
   renderLogoGrid();
 }
@@ -2394,17 +1953,14 @@ async function openLogoSelector() {
 function renderLogoGrid() {
   const grid = document.getElementById('logo-sel-grid');
   grid.style.display = 'flex';
-
   if (logoVariants.length === 0) {
     grid.innerHTML = `<div class="logo-sel-empty">No logo variants found yet.<br>Use Search Again or take a photo below.</div>`;
     return;
   }
-
   const sourceLabels = {
     logodev: 'Logo.dev', logodev_name: 'Logo.dev', seeklogo: 'Seeklogo',
     wikipedia: 'Wikipedia', worldvectorlogo: 'WorldVector', favicon: 'Favicon'
   };
-
   grid.innerHTML = logoVariants.map((v, i) => {
     const s = variantStates[v.file] || {};
     const boxClass = s.active ? 'is-active' : s.confirmed ? 'is-confirmed' : '';
@@ -2412,7 +1968,8 @@ function renderLogoGrid() {
     <div class="logo-sel-item" id="lsitem-${i}">
       <div class="logo-sel-box loading-img ${boxClass}" id="lsbox-${i}" style="position:relative;">
         <img src="${v.githubUrl}"
-             style="width:60px;height:60px;object-fit:contain;"
+             style="width:60px;height:60px;object-fit:contain;cursor:zoom-in;"
+             onclick="event.stopPropagation();openLogoZoom('${v.githubUrl}')"
              onload="this.parentElement.classList.remove('loading-img')"
              onerror="this.parentElement.innerHTML='<span style=\'font-size:9px;color:#999\'>Error</span>'">
         ${s.active ? '<div class="logo-active-star">⭐</div>' : ''}
@@ -2432,86 +1989,45 @@ function renderLogoGrid() {
   }).join('');
 }
 
-// ── Toggle confirm on a variant ──
+// ── Toggle confirm ──
 async function toggleConfirm(index) {
   const v     = logoVariants[index];
   const state = variantStates[v.file] || {};
-
-  // Can't unconfirm the active one directly — must star another first
-  if (state.active) { showToast('Set another logo as ⭐ active first'); return; }
-
+  if (state.active) { showToast('Set another logo as active first'); return; }
   const newConfirmed = !state.confirmed;
   variantStates[v.file] = { ...state, confirmed: newConfirmed };
-
-  // If this is the first confirmed and nothing is active yet, auto-set as active
   const anyActive = logoVariants.some(lv => variantStates[lv.file]?.active);
-  if (newConfirmed && !anyActive) {
-    await setActive(index, true);
-    return;
-  }
-
+  if (newConfirmed && !anyActive) { await setActive(index, true); return; }
   renderLogoGrid();
-
-  // Sync to Apps Script
   try {
-    const key = _key();
-    await jsonpFetch(LOGO_PICKER_URL +
-      '?action=setConfirmed' +
-      '&fileKey='     + encodeURIComponent(key) +
-      '&variantFile=' + encodeURIComponent(v.file) +
-      '&confirmed='   + newConfirmed);
-  } catch(e) { showToast('⚠️ Sync error: ' + e.message); }
+    await jsonpFetch(LOGO_PICKER_URL + '?action=setConfirmed&fileKey=' + encodeURIComponent(_key()) + '&variantFile=' + encodeURIComponent(v.file) + '&confirmed=' + newConfirmed);
+  } catch(e) { showToast('Sync error: ' + e.message); }
 }
 
-// ── Set a variant as the active logo ──
+// ── Set active ──
 async function setActive(index, silent = false) {
   const v     = logoVariants[index];
   const state = variantStates[v.file] || {};
-
-  // Auto-confirm when starring
   variantStates[v.file] = { ...state, confirmed: true, active: true };
-
-  // Clear active on all others
-  logoVariants.forEach((lv, i) => {
-    if (i !== index && variantStates[lv.file]) variantStates[lv.file].active = false;
-  });
-
+  logoVariants.forEach((lv, i) => { if (i !== index && variantStates[lv.file]) variantStates[lv.file].active = false; });
   renderLogoGrid();
-
-  // Update modal and card immediately
   const url = v.githubUrl;
-  if (url && currentLogoTx) {
-    logoPickCache[_key()] = url;
-    updateModalLogo(url, 'official');
-  }
-
-  // Sync to Apps Script
+  if (url && currentLogoTx) { logoPickCache[_key()] = url; updateModalLogo(url, 'official'); }
   try {
-    const key = _key();
-    await jsonpFetch(LOGO_PICKER_URL +
-      '?action=setActive' +
-      '&fileKey='     + encodeURIComponent(key) +
-      '&variantFile=' + encodeURIComponent(v.file));
-    logoManifest = null; logoManifestTs = 0;
-    variantsManifest = null; variantsTs = 0;
-    if (!silent) showToast('⭐ Active logo updated');
-  } catch(e) { if (!silent) showToast('⚠️ Sync error: ' + e.message); }
+    await jsonpFetch(LOGO_PICKER_URL + '?action=setActive&fileKey=' + encodeURIComponent(_key()) + '&variantFile=' + encodeURIComponent(v.file));
+    logoManifest = null; logoManifestTs = 0; variantsManifest = null; variantsTs = 0;
+    if (!silent) showToast('Active logo updated');
+  } catch(e) { if (!silent) showToast('Sync error: ' + e.message); }
 }
 
-// ── Open rejection reason sheet ──
+// ── Open rejection sheet ──
 function openRejectionSheet(index) {
-  pendingFlagIndex         = index;
-  selectedRejectionReasons = new Set();
-
+  pendingFlagIndex = index; selectedRejectionReasons = new Set();
   document.getElementById('rejection-reasons-list').innerHTML = REJECTION_REASONS.map(r => `
     <div class="rejection-reason" id="rr-${r.id}" onclick="toggleRejectionReason('${r.id}')">
       <div class="rejection-check" id="rc-${r.id}"></div>
-      <div>
-        <div class="rejection-reason-label">${r.label}</div>
-        <div class="rejection-reason-sub">${r.sub}</div>
-      </div>
+      <div><div class="rejection-reason-label">${r.label}</div><div class="rejection-reason-sub">${r.sub}</div></div>
     </div>`).join('');
-
   document.getElementById('btn-flag-confirm').disabled = true;
   document.getElementById('rejection-overlay').classList.add('open');
 }
@@ -2520,38 +2036,27 @@ function toggleRejectionReason(id) {
   const el = document.getElementById('rr-' + id);
   const ck = document.getElementById('rc-' + id);
   if (selectedRejectionReasons.has(id)) {
-    selectedRejectionReasons.delete(id);
-    el.classList.remove('sel');
-    ck.textContent = '';
+    selectedRejectionReasons.delete(id); el.classList.remove('sel'); ck.textContent = '';
   } else {
-    selectedRejectionReasons.add(id);
-    el.classList.add('sel');
-    ck.textContent = '✓';
+    selectedRejectionReasons.add(id); el.classList.add('sel'); ck.textContent = '✓';
   }
   document.getElementById('btn-flag-confirm').disabled = selectedRejectionReasons.size === 0;
 }
 
 function closeRejectionSheet() {
   document.getElementById('rejection-overlay').classList.remove('open');
-  pendingFlagIndex = null;
-  selectedRejectionReasons = new Set();
+  pendingFlagIndex = null; selectedRejectionReasons = new Set();
 }
 
 async function confirmRejection() {
   if (pendingFlagIndex === null || selectedRejectionReasons.size === 0) return;
-
   const btn = document.getElementById('btn-flag-confirm');
-  btn.textContent = 'Flagging...';
-  btn.disabled    = true;
-
+  btn.textContent = 'Flagging...'; btn.disabled = true;
   const v       = logoVariants[pendingFlagIndex];
   const tx      = currentLogoTx;
   const key     = _key();
   const reasons = [...selectedRejectionReasons];
-
-  // Record which logo is currently active (for training data)
   const activeV = logoVariants.find(lv => variantStates[lv.file]?.active);
-
   try {
     await jsonpFetch(LOGO_PICKER_URL +
       '?action=flagVariant' +
@@ -2564,69 +2069,63 @@ async function confirmRejection() {
       '&activeUrl='   + encodeURIComponent(activeV?.githubUrl || '') +
       '&brandName='   + encodeURIComponent(tx.cleanName || tx.merchant) +
       '&domain='      + encodeURIComponent(tx.domain || ''));
-
-    // Remove from local display list
     variantStates[v.file] = { confirmed: false, active: false, flagged: true };
     logoVariants.splice(pendingFlagIndex, 1);
     variantsManifest = null; variantsTs = 0;
-
-    closeRejectionSheet();
-    renderLogoGrid();
-    showToast('✗ Logo flagged');
+    closeRejectionSheet(); renderLogoGrid(); showToast('Logo flagged');
   } catch(e) {
-    btn.textContent = '✗ Flag This Logo';
-    btn.disabled    = false;
-    showToast('❌ Flag failed: ' + e.message);
+    btn.textContent = '✗ Flag This Logo'; btn.disabled = false;
+    showToast('Flag failed: ' + e.message);
   }
 }
 
-// ── Helper: derive key from currentLogoTx ──
 function _key() {
   if (!currentLogoTx) return '';
   const tx = currentLogoTx;
   return tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
-// ── Take a photo of the logo ──
-function takeLogoPhoto() {
-  document.getElementById('logo-camera-input').click();
+// ── Close logo selector ──
+function closeLogoSelector() { document.getElementById('logo-selector-overlay').classList.remove('open'); }
+
+// ── Logo zoom ──
+function openLogoZoom(url) {
+  document.getElementById('logo-zoom-img').src = url;
+  document.getElementById('logo-zoom-overlay').classList.add('open');
 }
 
-// ── Handle the photo taken ──
+function closeLogoZoom() { document.getElementById('logo-zoom-overlay').classList.remove('open'); }
+
+// ── Take photo ──
+function takeLogoPhoto() { document.getElementById('logo-camera-input').click(); }
+
 async function handleLogoPhoto(event) {
   const file = event.target.files?.[0];
   if (!file || !currentLogoTx) return;
   showToast('Processing photo...');
   try {
     const base64 = await cropImageToSquare(file);
-    const tx     = currentLogoTx;
-    const key    = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const key    = _key();
     const url    = LOGO_PICKER_URL + '?action=uploadPhoto&fileKey=' + encodeURIComponent(key) + '&base64=' + encodeURIComponent(base64);
     const data   = await jsonpFetch(url);
     if (data.error) throw new Error(data.error);
-    logoManifest = null; logoManifestTs = 0;
-    variantsManifest = null; variantsTs = 0;
-    closeLogoSelector();
-    showToast('📸 Photo saved!');
+    logoManifest = null; logoManifestTs = 0; variantsManifest = null; variantsTs = 0;
+    closeLogoSelector(); showToast('Photo saved!');
     if (data.githubUrl) updateModalLogo(data.githubUrl, 'photo');
-  } catch(e) {
-    showToast('❌ Photo failed: ' + e.message);
-  }
+  } catch(e) { showToast('Photo failed: ' + e.message); }
   event.target.value = '';
 }
 
-// ── Crop image to square ──
 function cropImageToSquare(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
       img.onload = () => {
-        const size   = Math.min(img.width, img.height);
+        const size = Math.min(img.width, img.height);
         const canvas = document.createElement('canvas');
         canvas.width = canvas.height = 400;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, 400, 400);
+        canvas.getContext('2d').drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, 400, 400);
         resolve(canvas.toDataURL('image/png').split(',')[1]);
       };
       img.onerror = reject;
@@ -2643,11 +2142,9 @@ async function useInitials() {
   const key = _key();
   try {
     await jsonpFetch(LOGO_PICKER_URL + '?action=useNone&fileKey=' + encodeURIComponent(key));
-    logoManifest = null; logoManifestTs = 0;
-    delete logoPickCache[key];
+    logoManifest = null; logoManifestTs = 0; delete logoPickCache[key];
   } catch(e) {}
-  closeLogoSelector();
-  showToast('✓ Using initials');
+  closeLogoSelector(); showToast('Using initials');
 }
 
 // ── Update modal logo after save ──
@@ -2655,49 +2152,37 @@ function updateModalLogo(url, status) {
   const logoEl  = document.getElementById('modal-logo');
   const badgeEl = document.getElementById('modal-logo-badge');
   logoEl.innerHTML = '';
-logoEl.style.display = 'flex';
-logoEl.style.alignItems = 'center';
-logoEl.style.justifyContent = 'center';
-const img2 = document.createElement('img');
-img2.src = url;
-img2.style.cssText = 'width:46px;height:46px;object-fit:contain;border-radius:10px;flex-shrink:0;';
-img2.onerror = function(){ this.style.display='none'; };
-logoEl.appendChild(img2);
+  logoEl.style.display = 'flex'; logoEl.style.alignItems = 'center'; logoEl.style.justifyContent = 'center';
+  const img2 = document.createElement('img');
+  img2.src = url;
+  img2.style.cssText = 'width:46px;height:46px;object-fit:contain;border-radius:10px;flex-shrink:0;';
+  img2.onerror = function(){ this.style.display='none'; };
+  logoEl.appendChild(img2);
   if (status === 'photo') logoEl.innerHTML += '<div class="photo-badge">📸</div>';
   if (badgeEl) badgeEl.style.display = 'none';
-  logoEl.classList.add('has-logo');
-  logoEl.style.color = '';
-  // Also update the card immediately
+  logoEl.classList.add('has-logo'); logoEl.style.color = '';
   if (currentLogoTx) {
     const cardEl = document.getElementById('txlogo-' + currentLogoTx.id);
     if (cardEl) applyLogoToEl(cardEl, url);
   }
 }
 
-// ── Search Again — re-search with a more targeted prompt ──
+// ── Search Again ──
 async function searchAgain() {
   if (!currentLogoTx) return;
   const btn = document.getElementById('btn-search-again');
-  btn.textContent = '🔍 Searching...';
-  btn.disabled    = true;
-
+  btn.textContent = 'Searching...'; btn.disabled = true;
   const tx  = currentLogoTx;
   const key = _key();
-
   try {
     const url = LOGO_PICKER_URL +
       '?action=searchAgain' +
       '&fileKey='   + encodeURIComponent(key) +
       '&brandName=' + encodeURIComponent(tx.cleanName || tx.merchant) +
       '&domain='    + encodeURIComponent(tx.domain || '');
-
     const data = await jsonpFetch(url);
     if (data.error) throw new Error(data.error);
-
-    // Invalidate variants cache so new results load
     variantsManifest = null; variantsTs = 0;
-
-    // Reload non-flagged variants
     const variants = await getVariantsManifest();
     const allVars  = variants[key] || [];
     allVars.forEach(v => {
@@ -2706,53 +2191,30 @@ async function searchAgain() {
       }
     });
     logoVariants = allVars.filter(v => !variantStates[v.file]?.flagged);
-
     renderLogoGrid();
-    showToast(data.found > 0 ? `✓ Found ${data.found} new logo(s)!` : '😕 No new logos found');
-
-  } catch(e) {
-    showToast('❌ Search failed: ' + e.message);
-  }
-
-  btn.textContent = '🔍 Search Again for More Logos';
-  btn.disabled    = false;
-}
-
-// ── Close logo selector ──
-function closeLogoSelector() {
-  document.getElementById('logo-selector-overlay').classList.remove('open');
+    showToast(data.found > 0 ? `Found ${data.found} new logo(s)!` : 'No new logos found');
+  } catch(e) { showToast('Search failed: ' + e.message); }
+  btn.textContent = 'Search Again for More Logos'; btn.disabled = false;
 }
 
 // ── Toast ──
 function showToast(msg) {
   const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
+  el.textContent = msg; el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2500);
 }
 
 // ── PWA MANIFEST ──
 const manifest = {
-  name: 'Masraf',
-  short_name: 'Masraf',
-  description: 'Personal spend intelligence',
-  start_url: '/',
-  display: 'standalone',
-  background_color: '#0A0A0F',
-  theme_color: '#0A0A0F',
-  orientation: 'portrait',
-  icons: [{
-    src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230A0A0F'/%3E%3Ctext y='.9em' font-size='80' x='10'%3E💰%3C/text%3E%3C/svg%3E",
-    sizes: '192x192',
-    type: 'image/svg+xml',
-  }]
+  name: 'Masraf', short_name: 'Masraf', description: 'Personal spend intelligence',
+  start_url: '/', display: 'standalone', background_color: '#0A0A0F',
+  theme_color: '#0A0A0F', orientation: 'portrait',
+  icons: [{ src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230A0A0F'/%3E%3Ctext y='.9em' font-size='80' x='10'%3E💰%3C/text%3E%3C/svg%3E", sizes: '192x192', type: 'image/svg+xml' }]
 };
-
 const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
 const manifestURL = URL.createObjectURL(blob);
 const link = document.createElement('link');
-link.rel  = 'manifest';
-link.href = manifestURL;
+link.rel = 'manifest'; link.href = manifestURL;
 document.head.appendChild(link);
 </script>
 
