@@ -2373,18 +2373,23 @@ async function renderTxLogoEl(el, tx) {
   const manifest = await getLogoManifest();
   const entry    = manifest[key];
   if (entry) {
+    // Explicitly set to initials — stop here, show nothing
     if (entry.status === 'initials') return;
     const url = entry.githubUrl || (entry.file ? GITHUB_RAW + encodeURIComponent(entry.file) : null);
     if (url) { logoPickCache[key] = url; applyLogoToEl(el, url, color); return; }
   }
 
-  // 2. Fall back to a consistent variant pick from variants.json
+  // 2. Fall back to a non-flagged variant from variants.json
   const variants = await getVariantsManifest();
   const list     = variants[key];
   if (list && list.length > 0) {
-    const idx = Math.abs(key.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % list.length;
-    const url = list[idx].githubUrl;
-    if (url) { logoPickCache[key] = url; applyLogoToEl(el, url, color); }
+    const nonFlagged = list.filter(v => !v.flagged);
+    if (nonFlagged.length > 0) {
+      const idx = Math.abs(key.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % nonFlagged.length;
+      const url = nonFlagged[idx].githubUrl;
+      if (url) { logoPickCache[key] = url; applyLogoToEl(el, url, color); }
+    }
+    // If all variants are flagged and no logos.json entry, show initials (return without applying)
   }
 }
 
@@ -2701,9 +2706,40 @@ async function confirmRejection() {
   renderLogoGrid();
   updateFlagButton();
 
+  // If no unflagged variants remain, update logos.json to initials
+  // so the transaction card stops showing the old confirmed logo
+  const anyUnflagged = logoVariants.length > 0;
+  if (!anyUnflagged && failed === 0) {
+    try {
+      await jsonpFetch(LOGO_PICKER_URL + '?action=useNone&fileKey=' + encodeURIComponent(key));
+    } catch(e) {}
+    logoManifest   = null; logoManifestTs   = 0;
+    delete logoPickCache[key];
+    // Reset modal logo to initials
+    const name    = tx.cleanName || tx.merchant;
+    const color   = personColour(tx.person);
+    const logoEl  = document.getElementById('modal-logo');
+    if (logoEl) {
+      logoEl.innerHTML        = initials(name);
+      logoEl.style.background = color + '22';
+      logoEl.style.border     = '1px solid ' + color + '44';
+      logoEl.style.color      = color;
+      logoEl.classList.remove('has-logo');
+    }
+    // Reset transaction card logo to initials
+    const cardEl = document.getElementById('txlogo-' + tx.id);
+    if (cardEl) {
+      cardEl.innerHTML        = initials(name);
+      cardEl.style.background = color + '22';
+      cardEl.style.border     = '1px solid ' + color + '44';
+      cardEl.style.color      = color;
+      cardEl.style.padding    = '';
+    }
+  }
+
   const flagged = indices.length - failed;
   if (failed === 0) {
-    showToast('✗ ' + flagged + ' logo' + (flagged > 1 ? 's' : '') + ' flagged');
+    showToast('✗ ' + flagged + ' logo' + (flagged > 1 ? 's' : '') + ' flagged' + (!anyUnflagged ? ' — using initials' : ''));
   } else {
     showToast('⚠️ ' + flagged + ' flagged, ' + failed + ' failed');
   }
