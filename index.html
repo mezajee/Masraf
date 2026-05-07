@@ -1957,15 +1957,13 @@ function renderSpendView() {
 function applyFilter(filter) {
   activeFilter = filter;
 
-  // Build filter pills based on role
+  // Build filter pills
   const pills = ['All', 'Today'];
   if (userRole === 'admin') {
     const persons = [...new Set(allTx.map(t => t.person).filter(Boolean))];
     persons.forEach(p => { if (!pills.includes(p)) pills.push(p); });
   }
-
-  const pillsEl = document.getElementById('filter-pills');
-  pillsEl.innerHTML = pills.map(p =>
+  document.getElementById('filter-pills').innerHTML = pills.map(p =>
     `<button class="pill ${p === activeFilter ? 'active' : ''}" onclick="applyFilter('${p}')">${p}</button>`
   ).join('');
 
@@ -1976,82 +1974,83 @@ function applyFilter(filter) {
     return tx.person === filter;
   });
 
-  // Open person detail sheet when a person pill is tapped
-  if (filter !== 'All' && filter !== 'Today') {
-    openPersonDetail(filter);
-  }
+  const isPerson  = filter !== 'All' && filter !== 'Today';
+  const monthTx   = allTx.filter(t => isThisMonth(t.dateObj));
+  const color     = isPerson ? personColour(filter) : null;
 
-  // Compute summary — always from current month
-  const monthTx    = allTx.filter(t => isThisMonth(t.dateObj));
-  const totalMonth = monthTx.reduce((s, t) => s + t.amountAed, 0);
-  const totalToday = allTx.filter(t => isToday(t.dateObj)).reduce((s, t) => s + t.amountAed, 0);
-  const totalIntl  = monthTx.filter(t => t.isIntl).length;
+  // ── Summary card totals ──
+  // When viewing a person: show their stats. Otherwise show global month stats.
+  const baseTx      = isPerson ? allTx.filter(t => t.person === filter && isThisMonth(t.dateObj)) : monthTx;
+  const todayBaseTx = isPerson ? allTx.filter(t => t.person === filter && isToday(t.dateObj))     : allTx.filter(t => isToday(t.dateObj));
 
-  const totalLocal = monthTx.filter(t => !t.isIntl).length;
+  const totalMonth = baseTx.reduce((s, t) => s + t.amountAed, 0);
+  const totalToday = todayBaseTx.reduce((s, t) => s + t.amountAed, 0);
+  const totalLocal = baseTx.filter(t => !t.isIntl).length;
+  const totalIntl  = baseTx.filter(t =>  t.isIntl).length;
+
+  // Card label: "Month to date" or "Abdulla — May 2026"
+  const now = new Date();
+  const monthLabel = now.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
+  document.getElementById('spend-month-title').textContent = isPerson
+    ? filter + ' · ' + monthLabel
+    : monthLabel;
 
   document.getElementById('total-month').textContent = totalMonth.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   document.getElementById('total-today').textContent = totalToday.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   document.getElementById('total-txns').textContent  = totalLocal;
   document.getElementById('total-intl').textContent  = totalIntl;
 
-  // Per person breakdown — admin only
-  const breakdownEl = document.getElementById('person-breakdown');
+  // ── Person breakdown — only show on "All" view ──
+  const breakdownEl   = document.getElementById('person-breakdown');
   const breakdownRows = document.getElementById('person-breakdown-rows');
 
-  if (userRole === 'admin') {
-    // Build per-person totals from month transactions
+  if (userRole === 'admin' && !isPerson) {
     const personTotals = {};
     monthTx.forEach(t => {
       if (!t.person) return;
       personTotals[t.person] = (personTotals[t.person] || 0) + t.amountAed;
     });
-
-    const sorted = Object.entries(personTotals).sort((a, b) => b[1] - a[1]);
+    const sorted   = Object.entries(personTotals).sort((a, b) => b[1] - a[1]);
     const maxSpend = sorted[0]?.[1] || 1;
 
     breakdownRows.innerHTML = sorted.map(([person, spend]) => {
-      const color = personColour(person);
-      const pct   = Math.round((spend / totalMonth) * 100);
-      const barW  = Math.round((spend / maxSpend) * 100);
+      const c   = personColour(person);
+      const pct = Math.round((spend / totalMonth) * 100);
+      const barW = Math.round((spend / maxSpend) * 100);
       return `
         <div class="person-breakdown-row-tap" onclick="applyFilter('${person}')">
           <div style="display:flex; align-items:center; gap:10px;">
-            <div style="
-              width:28px; height:28px; border-radius:8px; flex-shrink:0;
-              background:${color}22; border:1px solid ${color}44;
-              display:flex; align-items:center; justify-content:center;
-              font-size:10px; font-weight:700; color:${color};
-            ">${person[0].toUpperCase()}</div>
+            <div style="width:28px;height:28px;border-radius:8px;flex-shrink:0;background:${c}22;border:1px solid ${c}44;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${c};">${person[0].toUpperCase()}</div>
             <div style="flex:1;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                <span style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.8);">${person}</span>
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <span style="font-size:12px; font-weight:700; color:${color};">${spend.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} <span style="font-size:10px; font-weight:400; color:rgba(255,255,255,0.3);">AED · ${pct}%</span></span>
-                  <span style="font-size:14px; color:${color}; opacity:0.5;">›</span>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.8);">${person}</span>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:12px;font-weight:700;color:${c};">${spend.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0})} <span style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.3);">AED · ${pct}%</span></span>
+                  <span style="font-size:14px;color:${c};opacity:0.5;">›</span>
                 </div>
               </div>
-              <div style="background:rgba(255,255,255,0.06); border-radius:3px; height:4px; overflow:hidden;">
-                <div style="height:100%; width:${barW}%; background:${color}; border-radius:3px; transition:width 0.6s ease;"></div>
+              <div style="background:rgba(255,255,255,0.06);border-radius:3px;height:4px;overflow:hidden;">
+                <div style="height:100%;width:${barW}%;background:${c};border-radius:3px;transition:width 0.6s ease;"></div>
               </div>
             </div>
           </div>
         </div>`;
     }).join('');
-
     breakdownEl.style.display = 'block';
   } else {
     breakdownEl.style.display = 'none';
   }
 
   renderTxList();
-  renderTopMerchants(filteredTx);
+  renderTopMerchants(baseTx, color);
 }
 
-function renderTopMerchants(txs) {
+function renderTopMerchants(txs, accentColor) {
   const section = document.getElementById('top-merchants-section');
   if (!txs || txs.length === 0) { section.style.display = 'none'; return; }
 
-  // Build merchant stats from the current filtered set
+  const color = accentColor || 'var(--gold)';
+
   const spend = {}, visits = {};
   txs.forEach(t => {
     const name = t.cleanName || t.merchant;
@@ -2069,13 +2068,12 @@ function renderTopMerchants(txs) {
     const logoHtml = cached
       ? `<img src="${cached}" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">`
       : `<span style="font-size:8px;font-weight:800;">${initials(name)}</span>`;
-
     return `<div style="display:flex; align-items:center; gap:7px;">
       <span style="font-size:9px; font-weight:700; color:rgba(255,255,255,0.2); width:10px; flex-shrink:0;">${rank}</span>
       <div style="width:26px; height:26px; border-radius:7px; background:#ffffff18; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden;">${logoHtml}</div>
       <div style="flex:1; min-width:0;">
         <div style="font-size:11px; font-weight:600; color:rgba(255,255,255,0.85); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${name}</div>
-        <div style="font-size:10px; color:rgba(255,255,255,0.35);">${value} <span style="opacity:0.6;">${sub}</span></div>
+        <div style="font-size:10px; color:${color}; opacity:0.9;">${value} <span style="opacity:0.5; color:rgba(255,255,255,0.4);">${sub}</span></div>
       </div>
     </div>`;
   }
