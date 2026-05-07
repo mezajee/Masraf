@@ -2064,26 +2064,24 @@ function renderTopMerchants(txs, accentColor) {
 
   const color = accentColor || 'var(--gold)';
 
-  const spend = {}, visits = {};
+  const spend = {}, visits = {}, merchantTx = {};
   txs.forEach(t => {
     const name = t.cleanName || t.merchant;
-    spend[name]  = (spend[name]  || 0) + t.amountAed;
-    visits[name] = (visits[name] || 0) + 1;
+    spend[name]      = (spend[name]  || 0) + t.amountAed;
+    visits[name]     = (visits[name] || 0) + 1;
+    if (!merchantTx[name]) merchantTx[name] = t; // keep one tx per merchant for key lookup
   });
 
   const top5spend  = Object.entries(spend).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const top5visits = Object.entries(visits).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-  function merchantItem(rank, name, value, sub) {
-    const tx       = allTx.find(t => (t.cleanName || t.merchant) === name);
-    const key      = tx?.domain || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    const cached   = logoPickCache[key];
-    const logoHtml = cached
-      ? `<img src="${cached}" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">`
-      : `<span style="font-size:8px;font-weight:800;color:#555;">${initials(name)}</span>`;
+  function merchantItem(listId, rank, name, value, sub) {
+    const elId = listId + '-logo-' + rank;
     return `<div style="display:flex; align-items:center; gap:7px;">
       <span style="font-size:9px; font-weight:700; color:rgba(255,255,255,0.2); width:10px; flex-shrink:0;">${rank}</span>
-      <div style="width:26px; height:26px; border-radius:7px; background:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; padding:2px;">${logoHtml}</div>
+      <div id="${elId}" style="width:26px; height:26px; border-radius:7px; background:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; padding:2px;">
+        <span style="font-size:8px;font-weight:800;color:#555;">${initials(name)}</span>
+      </div>
       <div style="flex:1; min-width:0;">
         <div style="font-size:11px; font-weight:600; color:rgba(255,255,255,0.85); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${name}</div>
         <div style="font-size:10px; color:${color}; opacity:0.9;">${value} <span style="opacity:0.5; color:rgba(255,255,255,0.4);">${sub}</span></div>
@@ -2092,16 +2090,60 @@ function renderTopMerchants(txs, accentColor) {
   }
 
   document.getElementById('top-spend-list').innerHTML = top5spend.map(([name, amt], i) =>
-    merchantItem(i + 1, name,
-      amt.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 }),
-      'AED')
+    merchantItem('spend', i + 1, name,
+      amt.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 }), 'AED')
   ).join('');
 
   document.getElementById('top-visits-list').innerHTML = top5visits.map(([name, cnt], i) =>
-    merchantItem(i + 1, name, cnt, cnt === 1 ? 'visit' : 'visits')
+    merchantItem('visits', i + 1, name, cnt, cnt === 1 ? 'visit' : 'visits')
   ).join('');
 
   section.style.display = 'block';
+
+  // Async-load logos into each merchant logo box
+  const allMerchants = [...new Set([...top5spend.map(e => e[0]), ...top5visits.map(e => e[0])])];
+  allMerchants.forEach(name => {
+    const tx  = merchantTx[name];
+    const key = tx?.domain || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+    async function loadMerchantLogo() {
+      let url = logoPickCache[key] || null;
+
+      if (!url) {
+        const manifest = await getLogoManifest();
+        const entry    = manifest[key];
+        if (entry && entry.status !== 'initials') {
+          url = entry.githubUrl || (entry.file ? GITHUB_RAW + encodeURIComponent(entry.file) : null);
+        }
+        if (!url) {
+          const variants = await getVariantsManifest();
+          const list     = variants[key];
+          if (list && list.length > 0) {
+            const nonFlagged = list.filter(v => !v.flagged);
+            if (nonFlagged.length > 0) {
+              const idx = Math.abs(key.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % nonFlagged.length;
+              url = nonFlagged[idx].githubUrl || null;
+            }
+          }
+        }
+        if (url) logoPickCache[key] = url;
+      }
+
+      if (!url) return;
+
+      // Apply to both spend and visits logo boxes for this merchant
+      ['spend', 'visits'].forEach((listId, li) => {
+        const list = li === 0 ? top5spend : top5visits;
+        const idx  = list.findIndex(e => e[0] === name);
+        if (idx === -1) return;
+        const el = document.getElementById(listId + '-logo-' + (idx + 1));
+        if (!el) return;
+        el.innerHTML = `<img src="${url}" style="width:22px;height:22px;object-fit:contain;" onerror="this.parentElement.innerHTML='<span style=\\'font-size:8px;font-weight:800;color:#555;\\'>${initials(name)}</span>'">`;
+      });
+    }
+
+    loadMerchantLogo();
+  });
 }
 
 function renderTxList() {
