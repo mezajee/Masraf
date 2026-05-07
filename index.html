@@ -1266,6 +1266,23 @@
       <div style="height:1px; background:rgba(255,255,255,0.06); margin-bottom:14px;"></div>
       <div id="person-breakdown-rows" style="display:flex; flex-direction:column; gap:10px;"></div>
     </div>
+
+    <!-- Top merchants -->
+    <div id="top-merchants-section" style="margin-top:16px; display:none;">
+      <div style="height:1px; background:rgba(255,255,255,0.06); margin-bottom:14px;"></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <!-- Top by spend -->
+        <div>
+          <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); font-weight:400; margin-bottom:10px;">Top by Spend</div>
+          <div id="top-spend-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+        <!-- Top by visits -->
+        <div>
+          <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); font-weight:400; margin-bottom:10px;">Top by Visits</div>
+          <div id="top-visits-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Filters -->
@@ -1959,6 +1976,11 @@ function applyFilter(filter) {
     return tx.person === filter;
   });
 
+  // Open person detail sheet when a person pill is tapped
+  if (filter !== 'All' && filter !== 'Today') {
+    openPersonDetail(filter);
+  }
+
   // Compute summary — always from current month
   const monthTx    = allTx.filter(t => isThisMonth(t.dateObj));
   const totalMonth = monthTx.reduce((s, t) => s + t.amountAed, 0);
@@ -1992,7 +2014,7 @@ function applyFilter(filter) {
       const pct   = Math.round((spend / totalMonth) * 100);
       const barW  = Math.round((spend / maxSpend) * 100);
       return `
-        <div class="person-breakdown-row-tap" onclick="openPersonDetail('${person}')">
+        <div class="person-breakdown-row-tap" onclick="applyFilter('${person}')">
           <div style="display:flex; align-items:center; gap:10px;">
             <div style="
               width:28px; height:28px; border-radius:8px; flex-shrink:0;
@@ -2001,9 +2023,12 @@ function applyFilter(filter) {
               font-size:10px; font-weight:700; color:${color};
             ">${person[0].toUpperCase()}</div>
             <div style="flex:1;">
-              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                 <span style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.8);">${person}</span>
-                <span style="font-size:12px; font-weight:700; color:${color};">${spend.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} <span style="font-size:10px; font-weight:400; color:rgba(255,255,255,0.3);">AED · ${pct}%</span></span>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="font-size:12px; font-weight:700; color:${color};">${spend.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} <span style="font-size:10px; font-weight:400; color:rgba(255,255,255,0.3);">AED · ${pct}%</span></span>
+                  <span style="font-size:14px; color:${color}; opacity:0.5;">›</span>
+                </div>
               </div>
               <div style="background:rgba(255,255,255,0.06); border-radius:3px; height:4px; overflow:hidden;">
                 <div style="height:100%; width:${barW}%; background:${color}; border-radius:3px; transition:width 0.6s ease;"></div>
@@ -2019,6 +2044,53 @@ function applyFilter(filter) {
   }
 
   renderTxList();
+  renderTopMerchants(filteredTx);
+}
+
+function renderTopMerchants(txs) {
+  const section = document.getElementById('top-merchants-section');
+  if (!txs || txs.length === 0) { section.style.display = 'none'; return; }
+
+  // Build merchant stats from the current filtered set
+  const spend = {}, visits = {};
+  txs.forEach(t => {
+    const name = t.cleanName || t.merchant;
+    spend[name]  = (spend[name]  || 0) + t.amountAed;
+    visits[name] = (visits[name] || 0) + 1;
+  });
+
+  const top5spend  = Object.entries(spend).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const top5visits = Object.entries(visits).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+  function merchantItem(rank, name, value, sub) {
+    const tx       = allTx.find(t => (t.cleanName || t.merchant) === name);
+    const key      = tx?.domain || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const cached   = logoPickCache[key];
+    const logoHtml = cached
+      ? `<img src="${cached}" style="width:22px;height:22px;object-fit:contain;" onerror="this.style.display='none'">`
+      : `<span style="font-size:8px;font-weight:800;">${initials(name)}</span>`;
+
+    return `<div style="display:flex; align-items:center; gap:7px;">
+      <span style="font-size:9px; font-weight:700; color:rgba(255,255,255,0.2); width:10px; flex-shrink:0;">${rank}</span>
+      <div style="width:26px; height:26px; border-radius:7px; background:#ffffff18; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden;">${logoHtml}</div>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:11px; font-weight:600; color:rgba(255,255,255,0.85); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${name}</div>
+        <div style="font-size:10px; color:rgba(255,255,255,0.35);">${value} <span style="opacity:0.6;">${sub}</span></div>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('top-spend-list').innerHTML = top5spend.map(([name, amt], i) =>
+    merchantItem(i + 1, name,
+      amt.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 }),
+      'AED')
+  ).join('');
+
+  document.getElementById('top-visits-list').innerHTML = top5visits.map(([name, cnt], i) =>
+    merchantItem(i + 1, name, cnt, cnt === 1 ? 'visit' : 'visits')
+  ).join('');
+
+  section.style.display = 'block';
 }
 
 function renderTxList() {
