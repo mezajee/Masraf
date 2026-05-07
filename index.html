@@ -1974,31 +1974,44 @@ function applyFilter(filter) {
     return tx.person === filter;
   });
 
-  const isPerson  = filter !== 'All' && filter !== 'Today';
-  const monthTx   = allTx.filter(t => isThisMonth(t.dateObj));
-  const color     = isPerson ? personColour(filter) : null;
+  const isPerson     = filter !== 'All' && filter !== 'Today';
+  const isToday_filter = filter === 'Today';
+  const monthTx      = allTx.filter(t => isThisMonth(t.dateObj));
+  const color        = isPerson ? personColour(filter) : null;
 
-  // ── Summary card totals ──
-  // When viewing a person: show their stats. Otherwise show global month stats.
-  const baseTx      = isPerson ? allTx.filter(t => t.person === filter && isThisMonth(t.dateObj)) : monthTx;
-  const todayBaseTx = isPerson ? allTx.filter(t => t.person === filter && isToday(t.dateObj))     : allTx.filter(t => isToday(t.dateObj));
+  // Base transaction set for summary card totals
+  const baseTx = isPerson
+    ? allTx.filter(t => t.person === filter && isThisMonth(t.dateObj))
+    : isToday_filter
+      ? allTx.filter(t => isToday(t.dateObj))
+      : monthTx;
+
+  const todayBaseTx = isPerson
+    ? allTx.filter(t => t.person === filter && isToday(t.dateObj))
+    : allTx.filter(t => isToday(t.dateObj));
 
   const totalMonth = baseTx.reduce((s, t) => s + t.amountAed, 0);
   const totalToday = todayBaseTx.reduce((s, t) => s + t.amountAed, 0);
   const totalLocal = baseTx.filter(t => !t.isIntl).length;
   const totalIntl  = baseTx.filter(t =>  t.isIntl).length;
 
-  // Card label: "Month to date" or "Abdulla — May 2026"
+  // Card label
   const now = new Date();
   const monthLabel = now.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
   document.getElementById('spend-month-title').textContent = isPerson
     ? filter + ' · ' + monthLabel
-    : monthLabel;
+    : isToday_filter
+      ? 'Today'
+      : monthLabel;
 
   document.getElementById('total-month').textContent = totalMonth.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   document.getElementById('total-today').textContent = totalToday.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   document.getElementById('total-txns').textContent  = totalLocal;
   document.getElementById('total-intl').textContent  = totalIntl;
+
+  // Hide "Today" sub-stat when Today is already the active filter (redundant)
+  const todayStatEl = document.getElementById('total-today')?.closest('div[style]');
+  if (todayStatEl) todayStatEl.style.display = isToday_filter ? 'none' : '';
 
   // ── Person breakdown — only show on "All" view ──
   const breakdownEl   = document.getElementById('person-breakdown');
