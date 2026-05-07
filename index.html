@@ -975,6 +975,77 @@
     .btn-search-again  { background: rgba(196,164,100,0.12); color: var(--gold); border: 1px solid rgba(196,164,100,0.3); }
     .btn-cancel-logo   { background: transparent; color: var(--text-dim); font-size: 13px; }
     .logo-sel-empty { text-align: center; padding: 24px 0 8px; color: var(--text-dim); font-size: 13px; }
+
+    /* ── PER-VARIANT ACTION BUTTONS ── */
+    .logo-var-btns {
+      display: flex; gap: 5px; margin-top: 7px; justify-content: center;
+    }
+    .logo-var-btn {
+      width: 30px; height: 28px; border-radius: 8px; border: none;
+      cursor: pointer; font-size: 13px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s; -webkit-tap-highlight-color: transparent;
+      font-family: inherit; font-weight: 600;
+    }
+    .logo-var-btn.v-confirm { background: rgba(6,214,160,0.12); color: var(--green); }
+    .logo-var-btn.v-confirm.on { background: var(--green); color: #000; }
+    .logo-var-btn.v-star { background: rgba(196,164,100,0.12); color: var(--gold); }
+    .logo-var-btn.v-star.on { background: var(--gold); color: #000; }
+    .logo-var-btn.v-flag { background: rgba(255,75,75,0.12); color: var(--red); }
+    .logo-var-btn:disabled { opacity: 0.22; cursor: not-allowed; }
+    .logo-sel-box.is-confirmed { border-color: var(--green) !important; box-shadow: 0 0 0 2px rgba(6,214,160,0.18); }
+    .logo-sel-box.is-active { border-color: var(--gold) !important; box-shadow: 0 0 0 3px rgba(196,164,100,0.28); }
+    .logo-active-star {
+      position: absolute; top: 3px; right: 3px; font-size: 10px; line-height: 1; pointer-events: none;
+    }
+
+    /* ── REJECTION REASON SHEET ── */
+    .rejection-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 300;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .rejection-overlay.open { display: flex; }
+    .rejection-sheet {
+      background: #141418;
+      border-radius: 28px 28px 0 0;
+      border: 1px solid rgba(255,255,255,0.07); border-bottom: none;
+      padding: 0 20px calc(40px + var(--safe-bot));
+      width: 100%; max-width: 430px;
+    }
+    .rejection-title {
+      font-size: 16px; font-weight: 700; text-align: center; padding: 20px 0 4px;
+    }
+    .rejection-hint { font-size: 12px; color: var(--text-dim); text-align: center; margin-bottom: 14px; }
+    .rejection-reason {
+      display: flex; align-items: center; gap: 14px; padding: 13px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .rejection-check {
+      width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
+      border: 2px solid rgba(255,75,75,0.35);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; transition: all 0.15s;
+    }
+    .rejection-reason.sel .rejection-check { background: var(--red); border-color: var(--red); color: #fff; content: '✓'; }
+    .rejection-reason-label { font-size: 14px; font-weight: 500; }
+    .rejection-reason-sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+    .btn-flag-confirm {
+      width: 100%; padding: 14px; background: var(--red); color: #fff;
+      border: none; border-radius: 14px; font-size: 14px; font-weight: 700;
+      cursor: pointer; margin-top: 16px; font-family: inherit;
+      -webkit-tap-highlight-color: transparent; transition: opacity 0.15s;
+    }
+    .btn-flag-confirm:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-flag-confirm:active { opacity: 0.75; }
+    .btn-flag-cancel {
+      width: 100%; padding: 12px; background: transparent; color: var(--text-dim);
+      border: none; font-size: 13px; cursor: pointer; margin-top: 6px; font-family: inherit;
+    }
     .logo-sel-loading {
       display: flex; flex-direction: column; align-items: center;
       gap: 10px; padding: 32px 0; color: var(--text-dim); font-size: 13px;
@@ -1266,7 +1337,7 @@
     <div class="sheet-handle"></div>
     <div class="logo-sel-header">
       <div class="logo-sel-merchant" id="logo-sel-merchant-name"></div>
-      <div class="logo-sel-hint">Tap a logo to select it</div>
+      <div class="logo-sel-hint">✅ Confirm good &nbsp;·&nbsp; ⭐ Set active &nbsp;·&nbsp; ✗ Flag bad</div>
     </div>
     <div id="logo-sel-content">
       <div class="logo-sel-loading" id="logo-sel-loading">
@@ -1277,12 +1348,24 @@
     </div>
     <div class="logo-sel-divider"></div>
     <div class="logo-sel-actions">
-      <button class="logo-sel-btn btn-confirm-logo" id="btn-confirm-logo" onclick="confirmLogoSelection()" disabled>✓ Use Selected Logo</button>
-      <button class="logo-sel-btn btn-search-again" id="btn-search-again" onclick="searchAgain()">🔍 None of these — Search Again</button>
+      <button class="logo-sel-btn btn-search-again" id="btn-search-again" onclick="searchAgain()">🔍 Search Again for More Logos</button>
       <button class="logo-sel-btn btn-take-photo" onclick="takeLogoPhoto()">📷 Take Photo of Logo</button>
-      <button class="logo-sel-btn btn-use-initials" onclick="useInitials()">✕ Use Initials</button>
+      <button class="logo-sel-btn btn-use-initials" onclick="useInitials()">✕ Use Initials Instead</button>
       <button class="logo-sel-btn btn-cancel-logo" onclick="closeLogoSelector()">Cancel</button>
     </div>
+  </div>
+</div>
+
+<!-- Rejection Reason Sheet -->
+
+<div class="rejection-overlay" id="rejection-overlay" onclick="closeRejectionSheet()">
+  <div class="rejection-sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="rejection-title">Why is this logo wrong?</div>
+    <div class="rejection-hint">Select all that apply</div>
+    <div id="rejection-reasons-list"></div>
+    <button class="btn-flag-confirm" id="btn-flag-confirm" onclick="confirmRejection()" disabled>✗ Flag This Logo</button>
+    <button class="btn-flag-cancel" onclick="closeRejectionSheet()">Cancel</button>
   </div>
 </div>
 
@@ -2164,15 +2247,26 @@ const LOGO_PICKER_URL = 'https://script.google.com/macros/s/AKfycbzHj35-Q4Y_Cpz9
 const GITHUB_RAW      = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/`;
 
 // Cache
-let logoManifest     = null;  // logos.json — confirmed logos
+let logoManifest     = null;  // logos.json — active logos
 let logoManifestTs   = 0;
-let variantsManifest = null;  // variants.json — unconfirmed variants
+let variantsManifest = null;  // variants.json — all variants with confirmed/active/flagged
 let variantsTs       = 0;
 let currentLogoTx    = null;
-let selectedVariant  = null;
-let logoVariants     = [];
-let confirmedFile    = null;  // currently confirmed file for open merchant
+let logoVariants     = [];    // non-flagged variants for current merchant
+let variantStates    = {};    // file → { confirmed, active, flagged } — local session state
 const logoPickCache  = {};    // domain → url, so same merchant always shows same logo
+
+// Rejection sheet state
+let pendingFlagIndex        = null;
+let selectedRejectionReasons = new Set();
+
+const REJECTION_REASONS = [
+  { id: 'wrong_brand',        label: 'Wrong brand',               sub: 'Logo belongs to a different company' },
+  { id: 'not_logo_unrelated', label: 'Not a logo — Unrelated',    sub: 'Wrong content with no connection to this merchant' },
+  { id: 'not_logo_related',   label: 'Not a logo — Related',      sub: 'Correct merchant, but it\'s a photo, product, or storefront' },
+  { id: 'low_quality',        label: 'Low quality',               sub: 'Blurry, pixelated, watermarked, or too small' },
+  { id: 'generic',            label: 'Generic / placeholder',     sub: 'Too generic, not brand-specific (e.g. a fork or star icon)' },
+];
 
 // ── JSONP helper — used only for confirm/save/photo actions ──
 function jsonpFetch(url) {
@@ -2264,8 +2358,10 @@ async function openLogoSelector() {
   if (!currentLogoTx) return;
   const tx = currentLogoTx;
 
-  selectedVariant = null;
-  logoVariants    = [];
+  logoVariants = [];
+  variantStates = {};
+  pendingFlagIndex = null;
+  selectedRejectionReasons = new Set();
 
   const name = tx.cleanName || tx.merchant;
   const key  = tx.domain || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -2273,18 +2369,22 @@ async function openLogoSelector() {
   document.getElementById('logo-sel-merchant-name').textContent = name;
   document.getElementById('logo-sel-loading').style.display     = 'flex';
   document.getElementById('logo-sel-grid').style.display        = 'none';
-  document.getElementById('btn-confirm-logo').disabled          = true;
   document.getElementById('logo-selector-overlay').classList.add('open');
 
-  // Load variants directly from GitHub — no JSONP, no CORS issues
-  // Always show ALL variants regardless of confirmation status
-  const variants = await getVariantsManifest();
-  logoVariants   = variants[key] || [];
+  // Load both manifests in parallel
+  const [variants, manifest] = await Promise.all([getVariantsManifest(), getLogoManifest()]);
 
-  // Mark currently confirmed variant so it shows as selected by default
-  const manifest     = await getLogoManifest();
-  const confirmedEntry = manifest[key];
-  const confirmedFile  = confirmedEntry?.file || null;
+  const allVariants = variants[key] || [];
+
+  // Initialize local state from manifests — exclude flagged from display list
+  allVariants.forEach(v => {
+    variantStates[v.file] = {
+      confirmed: v.confirmed || false,
+      active:    v.active    || false,
+      flagged:   v.flagged   || false,
+    };
+  });
+  logoVariants = allVariants.filter(v => !v.flagged);
 
   document.getElementById('logo-sel-loading').style.display = 'none';
   renderLogoGrid();
@@ -2296,7 +2396,7 @@ function renderLogoGrid() {
   grid.style.display = 'flex';
 
   if (logoVariants.length === 0) {
-    grid.innerHTML = `<div class="logo-sel-empty">No logo variants found yet.<br>Run buildLogoRepo() in Apps Script<br>or take a photo below.</div>`;
+    grid.innerHTML = `<div class="logo-sel-empty">No logo variants found yet.<br>Use Search Again or take a photo below.</div>`;
     return;
   }
 
@@ -2306,71 +2406,185 @@ function renderLogoGrid() {
   };
 
   grid.innerHTML = logoVariants.map((v, i) => {
-    const isConfirmed = confirmedFile && v.file === confirmedFile;
+    const s = variantStates[v.file] || {};
+    const boxClass = s.active ? 'is-active' : s.confirmed ? 'is-confirmed' : '';
     return `
-    <div class="logo-sel-item" onclick="selectLogoVariant(${i})">
-      <div class="logo-sel-box loading-img ${isConfirmed ? 'selected' : ''}" id="lsbox-${i}">
+    <div class="logo-sel-item" id="lsitem-${i}">
+      <div class="logo-sel-box loading-img ${boxClass}" id="lsbox-${i}" style="position:relative;">
         <img src="${v.githubUrl}"
              style="width:60px;height:60px;object-fit:contain;"
              onload="this.parentElement.classList.remove('loading-img')"
              onerror="this.parentElement.innerHTML='<span style=\'font-size:9px;color:#999\'>Error</span>'">
-        <div class="logo-sel-check">✓</div>
+        ${s.active ? '<div class="logo-active-star">⭐</div>' : ''}
       </div>
-      <div class="logo-sel-label">${isConfirmed ? '★ ' : ''}${sourceLabels[v.source] || v.source}</div>
+      <div class="logo-sel-label">${sourceLabels[v.source] || v.source || ''}</div>
+      <div class="logo-var-btns">
+        <button class="logo-var-btn v-confirm ${(s.confirmed || s.active) ? 'on' : ''}"
+                onclick="toggleConfirm(${i})" title="Confirm good logo">✓</button>
+        <button class="logo-var-btn v-star ${s.active ? 'on' : ''}"
+                onclick="setActive(${i})"
+                ${!(s.confirmed || s.active) ? 'disabled' : ''}
+                title="Set as active logo">⭐</button>
+        <button class="logo-var-btn v-flag"
+                onclick="openRejectionSheet(${i})" title="Flag bad logo">✗</button>
+      </div>
     </div>`;
   }).join('');
-  // Pre-select confirmed variant
-  if (confirmedFile) {
-    const idx = logoVariants.findIndex(v => v.file === confirmedFile);
-    if (idx >= 0) { selectedVariant = logoVariants[idx]; document.getElementById('btn-confirm-logo').disabled = false; }
+}
+
+// ── Toggle confirm on a variant ──
+async function toggleConfirm(index) {
+  const v     = logoVariants[index];
+  const state = variantStates[v.file] || {};
+
+  // Can't unconfirm the active one directly — must star another first
+  if (state.active) { showToast('Set another logo as ⭐ active first'); return; }
+
+  const newConfirmed = !state.confirmed;
+  variantStates[v.file] = { ...state, confirmed: newConfirmed };
+
+  // If this is the first confirmed and nothing is active yet, auto-set as active
+  const anyActive = logoVariants.some(lv => variantStates[lv.file]?.active);
+  if (newConfirmed && !anyActive) {
+    await setActive(index, true);
+    return;
   }
+
+  renderLogoGrid();
+
+  // Sync to Apps Script
+  try {
+    const key = _key();
+    await jsonpFetch(LOGO_PICKER_URL +
+      '?action=setConfirmed' +
+      '&fileKey='     + encodeURIComponent(key) +
+      '&variantFile=' + encodeURIComponent(v.file) +
+      '&confirmed='   + newConfirmed);
+  } catch(e) { showToast('⚠️ Sync error: ' + e.message); }
 }
 
-// ── Select a logo variant ──
-function selectLogoVariant(index) {
-  selectedVariant = logoVariants[index];
-  logoVariants.forEach((_, i) => document.getElementById('lsbox-' + i)?.classList.remove('selected'));
-  document.getElementById('lsbox-' + index)?.classList.add('selected');
-  document.getElementById('btn-confirm-logo').disabled = false;
+// ── Set a variant as the active logo ──
+async function setActive(index, silent = false) {
+  const v     = logoVariants[index];
+  const state = variantStates[v.file] || {};
+
+  // Auto-confirm when starring
+  variantStates[v.file] = { ...state, confirmed: true, active: true };
+
+  // Clear active on all others
+  logoVariants.forEach((lv, i) => {
+    if (i !== index && variantStates[lv.file]) variantStates[lv.file].active = false;
+  });
+
+  renderLogoGrid();
+
+  // Update modal and card immediately
+  const url = v.githubUrl;
+  if (url && currentLogoTx) {
+    logoPickCache[_key()] = url;
+    updateModalLogo(url, 'official');
+  }
+
+  // Sync to Apps Script
+  try {
+    const key = _key();
+    await jsonpFetch(LOGO_PICKER_URL +
+      '?action=setActive' +
+      '&fileKey='     + encodeURIComponent(key) +
+      '&variantFile=' + encodeURIComponent(v.file));
+    logoManifest = null; logoManifestTs = 0;
+    variantsManifest = null; variantsTs = 0;
+    if (!silent) showToast('⭐ Active logo updated');
+  } catch(e) { if (!silent) showToast('⚠️ Sync error: ' + e.message); }
 }
 
-// ── Confirm logo selection ──
-async function confirmLogoSelection() {
-  if (!selectedVariant || !currentLogoTx) return;
-  const btn = document.getElementById('btn-confirm-logo');
-  btn.textContent = 'Saving...';
+// ── Open rejection reason sheet ──
+function openRejectionSheet(index) {
+  pendingFlagIndex         = index;
+  selectedRejectionReasons = new Set();
+
+  document.getElementById('rejection-reasons-list').innerHTML = REJECTION_REASONS.map(r => `
+    <div class="rejection-reason" id="rr-${r.id}" onclick="toggleRejectionReason('${r.id}')">
+      <div class="rejection-check" id="rc-${r.id}"></div>
+      <div>
+        <div class="rejection-reason-label">${r.label}</div>
+        <div class="rejection-reason-sub">${r.sub}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('btn-flag-confirm').disabled = true;
+  document.getElementById('rejection-overlay').classList.add('open');
+}
+
+function toggleRejectionReason(id) {
+  const el = document.getElementById('rr-' + id);
+  const ck = document.getElementById('rc-' + id);
+  if (selectedRejectionReasons.has(id)) {
+    selectedRejectionReasons.delete(id);
+    el.classList.remove('sel');
+    ck.textContent = '';
+  } else {
+    selectedRejectionReasons.add(id);
+    el.classList.add('sel');
+    ck.textContent = '✓';
+  }
+  document.getElementById('btn-flag-confirm').disabled = selectedRejectionReasons.size === 0;
+}
+
+function closeRejectionSheet() {
+  document.getElementById('rejection-overlay').classList.remove('open');
+  pendingFlagIndex = null;
+  selectedRejectionReasons = new Set();
+}
+
+async function confirmRejection() {
+  if (pendingFlagIndex === null || selectedRejectionReasons.size === 0) return;
+
+  const btn = document.getElementById('btn-flag-confirm');
+  btn.textContent = 'Flagging...';
   btn.disabled    = true;
 
-  const tx  = currentLogoTx;
-  const key = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const v       = logoVariants[pendingFlagIndex];
+  const tx      = currentLogoTx;
+  const key     = _key();
+  const reasons = [...selectedRejectionReasons];
+
+  // Record which logo is currently active (for training data)
+  const activeV = logoVariants.find(lv => variantStates[lv.file]?.active);
 
   try {
-    const url = LOGO_PICKER_URL +
-      '?action=confirmVariant' +
+    await jsonpFetch(LOGO_PICKER_URL +
+      '?action=flagVariant' +
       '&fileKey='     + encodeURIComponent(key) +
-      '&variantFile=' + encodeURIComponent(selectedVariant.file) +
-      '&variantUrl='  + encodeURIComponent(selectedVariant.githubUrl);
+      '&variantFile=' + encodeURIComponent(v.file) +
+      '&variantUrl='  + encodeURIComponent(v.githubUrl) +
+      '&source='      + encodeURIComponent(v.source || '') +
+      '&reasons='     + encodeURIComponent(JSON.stringify(reasons)) +
+      '&activeFile='  + encodeURIComponent(activeV?.file || '') +
+      '&activeUrl='   + encodeURIComponent(activeV?.githubUrl || '') +
+      '&brandName='   + encodeURIComponent(tx.cleanName || tx.merchant) +
+      '&domain='      + encodeURIComponent(tx.domain || ''));
 
-    const data = await jsonpFetch(url);
-    if (data.error) throw new Error(data.error);
+    // Remove from local display list
+    variantStates[v.file] = { confirmed: false, active: false, flagged: true };
+    logoVariants.splice(pendingFlagIndex, 1);
+    variantsManifest = null; variantsTs = 0;
 
-    // Invalidate both caches and pick cache so updated logo shows immediately
-    logoManifest     = null; logoManifestTs   = 0;
-    variantsManifest = null; variantsTs       = 0;
-    if (currentLogoTx) {
-      const k = currentLogoTx.domain || (currentLogoTx.cleanName || currentLogoTx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      delete logoPickCache[k];
-    }
-
-    closeLogoSelector();
-    showToast('✓ Logo saved!');
-    if (data.githubUrl) updateModalLogo(data.githubUrl, 'official');
-
+    closeRejectionSheet();
+    renderLogoGrid();
+    showToast('✗ Logo flagged');
   } catch(e) {
-    btn.textContent = '✓ Use Selected Logo';
+    btn.textContent = '✗ Flag This Logo';
     btn.disabled    = false;
-    showToast('❌ Save failed: ' + e.message);
+    showToast('❌ Flag failed: ' + e.message);
   }
+}
+
+// ── Helper: derive key from currentLogoTx ──
+function _key() {
+  if (!currentLogoTx) return '';
+  const tx = currentLogoTx;
+  return tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
 // ── Take a photo of the logo ──
@@ -2426,11 +2640,11 @@ function cropImageToSquare(file) {
 // ── Use initials ──
 async function useInitials() {
   if (!currentLogoTx) return;
-  const tx  = currentLogoTx;
-  const key = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const key = _key();
   try {
     await jsonpFetch(LOGO_PICKER_URL + '?action=useNone&fileKey=' + encodeURIComponent(key));
     logoManifest = null; logoManifestTs = 0;
+    delete logoPickCache[key];
   } catch(e) {}
   closeLogoSelector();
   showToast('✓ Using initials');
@@ -2460,7 +2674,7 @@ logoEl.appendChild(img2);
   }
 }
 
-// ── Search Again — ask Claude to re-search with a more targeted prompt ──
+// ── Search Again — re-search with a more targeted prompt ──
 async function searchAgain() {
   if (!currentLogoTx) return;
   const btn = document.getElementById('btn-search-again');
@@ -2468,28 +2682,31 @@ async function searchAgain() {
   btn.disabled    = true;
 
   const tx  = currentLogoTx;
-  const key = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const key = _key();
 
   try {
     const url = LOGO_PICKER_URL +
       '?action=searchAgain' +
-      '&fileKey='    + encodeURIComponent(key) +
-      '&brandName='  + encodeURIComponent(tx.cleanName || tx.merchant) +
-      '&domain='     + encodeURIComponent(tx.domain || '');
+      '&fileKey='   + encodeURIComponent(key) +
+      '&brandName=' + encodeURIComponent(tx.cleanName || tx.merchant) +
+      '&domain='    + encodeURIComponent(tx.domain || '');
 
     const data = await jsonpFetch(url);
     if (data.error) throw new Error(data.error);
 
     // Invalidate variants cache so new results load
-    variantsManifest = null;
-    variantsTs       = 0;
+    variantsManifest = null; variantsTs = 0;
 
-    // Reload variants in the selector
-    const variants   = await getVariantsManifest();
-    logoVariants     = variants[key] || [];
-    selectedVariant  = null;
+    // Reload non-flagged variants
+    const variants = await getVariantsManifest();
+    const allVars  = variants[key] || [];
+    allVars.forEach(v => {
+      if (!variantStates[v.file]) {
+        variantStates[v.file] = { confirmed: v.confirmed || false, active: v.active || false, flagged: v.flagged || false };
+      }
+    });
+    logoVariants = allVars.filter(v => !variantStates[v.file]?.flagged);
 
-    document.getElementById('btn-confirm-logo').disabled = true;
     renderLogoGrid();
     showToast(data.found > 0 ? `✓ Found ${data.found} new logo(s)!` : '😕 No new logos found');
 
@@ -2497,7 +2714,7 @@ async function searchAgain() {
     showToast('❌ Search failed: ' + e.message);
   }
 
-  btn.textContent = '🔍 None of these — Search Again';
+  btn.textContent = '🔍 Search Again for More Logos';
   btn.disabled    = false;
 }
 
