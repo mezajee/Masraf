@@ -2436,6 +2436,35 @@ async function openLogoSelector() {
   });
   logoVariants = allVariants.filter(v => !v.flagged);
 
+  // ── Cross-reference logos.json so the currently active logo always shows ──
+  // Handles cases where logos were confirmed via old flow (variants.json has no active flag)
+  const logoEntry = manifest[key];
+  if (logoEntry && (logoEntry.status === 'official' || logoEntry.status === 'photo') && logoEntry.githubUrl) {
+    const anyActive = logoVariants.some(v => variantStates[v.file]?.active);
+    if (!anyActive) {
+      // Try to find the matching variant by file or URL and mark it active
+      const matchByFile = logoVariants.find(v =>
+        v.file === logoEntry.file || v.file === logoEntry.variantFile
+      );
+      const matchByUrl = !matchByFile && logoVariants.find(v => v.githubUrl === logoEntry.githubUrl);
+      const match = matchByFile || matchByUrl;
+
+      if (match) {
+        // Variant exists but wasn't marked active — mark it now
+        variantStates[match.file] = { ...variantStates[match.file], confirmed: true, active: true };
+      } else {
+        // Active logo not in variants.json at all — inject it as a synthetic entry at the top
+        const syntheticFile = logoEntry.file || (key + (logoEntry.status === 'photo' ? '-photo.png' : '.png'));
+        logoVariants.unshift({
+          file:      syntheticFile,
+          githubUrl: logoEntry.githubUrl,
+          source:    logoEntry.status === 'photo' ? 'photo' : 'confirmed',
+        });
+        variantStates[syntheticFile] = { confirmed: true, active: true, flagged: false };
+      }
+    }
+  }
+
   document.getElementById('logo-sel-loading').style.display = 'none';
   renderLogoGrid();
 }
