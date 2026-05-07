@@ -2601,11 +2601,12 @@ const REJECTION_REASONS = [
 ];
 
 // ── JSONP helper — used only for confirm/save/photo actions ──
-function jsonpFetch(url) {
+function jsonpFetch(url, timeoutMs) {
+  timeoutMs = timeoutMs || 15000;
   return new Promise((resolve, reject) => {
     const cbName = 'masraf_cb_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
     const script  = document.createElement('script');
-    const timeout = setTimeout(() => { cleanup(); reject(new Error('JSONP timeout')); }, 15000);
+    const timeout = setTimeout(() => { cleanup(); reject(new Error('JSONP timeout')); }, timeoutMs);
     window[cbName] = function(data) { cleanup(); resolve(data); };
     function cleanup() {
       clearTimeout(timeout);
@@ -3135,7 +3136,7 @@ function updateModalLogo(url, status) {
   }
 }
 
-// ── Search Again — re-search with a more targeted prompt ──
+// ── Search Again — two-phase: SerpAPI first, then download each image individually ──
 async function searchAgain() {
   if (!currentLogoTx) return;
   const btn = document.getElementById('btn-search-again');
@@ -3146,30 +3147,60 @@ async function searchAgain() {
   const key = _key();
 
   try {
-    const url = LOGO_PICKER_URL +
+    // Phase 1: SerpAPI only — fast (~5-15s), returns new URLs
+    const searchUrl = LOGO_PICKER_URL +
       '?action=searchAgain' +
       '&fileKey='   + encodeURIComponent(key) +
       '&brandName=' + encodeURIComponent(tx.cleanName || tx.merchant) +
       '&domain='    + encodeURIComponent(tx.domain || '');
 
-    const data = await jsonpFetch(url);
+    const data = await jsonpFetch(searchUrl, 30000);
     if (data.error) throw new Error(data.error);
 
-    // Invalidate variants cache so new results load
+    const newUrls = data.newUrls || [];
+    if (newUrls.length === 0) {
+      showToast('😕 No new logos found');
+      btn.textContent = '🔍 Search Again for More Logos';
+      btn.disabled    = false;
+      return;
+    }
+
+    showToast('🔍 Found ' + newUrls.length + ' new — downloading...');
+    btn.textContent = '⏳ Downloading ' + newUrls.length + ' logo(s)...';
+
+    // Phase 2: Download each URL individually (each call is fast: 1 image + 1 GitHub upload)
+    let downloaded = 0;
+    for (const item of newUrls) {
+      try {
+        const dlUrl = LOGO_PICKER_URL +
+          '?action=downloadVariant' +
+          '&fileKey='  + encodeURIComponent(key) +
+          '&url='      + encodeURIComponent(item.url) +
+          '&serpNum='  + item.serpNum;
+
+        const dlData = await jsonpFetch(dlUrl, 30000);
+        if (dlData.success && dlData.variant) {
+          // Add to local state immediately so it appears in the grid
+          const v = dlData.variant;
+          variantStates[v.file] = { confirmed: false, active: false, flagged: false };
+          logoVariants.push(v);
+          downloaded++;
+          renderLogoGrid();
+          btn.textContent = '⏳ Downloaded ' + downloaded + '/' + newUrls.length + '...';
+        }
+      } catch(e) {
+        // Skip failed downloads, continue with the rest
+      }
+    }
+
+    // Invalidate cache so future opens reload from GitHub
     variantsManifest = null; variantsTs = 0;
 
-    // Reload non-flagged variants
-    const variants = await getVariantsManifest();
-    const allVars  = variants[key] || [];
-    allVars.forEach(v => {
-      if (!variantStates[v.file]) {
-        variantStates[v.file] = { confirmed: v.confirmed || false, active: v.active || false, flagged: v.flagged || false };
-      }
-    });
-    logoVariants = allVars.filter(v => !variantStates[v.file]?.flagged);
-
-    renderLogoGrid();
-    showToast(data.found > 0 ? `✓ Found ${data.found} new logo(s)!` : '😕 No new logos found');
+    if (downloaded > 0) {
+      showToast('✓ Added ' + downloaded + ' new logo' + (downloaded > 1 ? 's' : '') + '!');
+    } else {
+      showToast('😕 Downloads failed — try again');
+    }
 
   } catch(e) {
     showToast('❌ Search failed: ' + e.message);
