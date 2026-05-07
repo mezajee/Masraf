@@ -2408,6 +2408,17 @@ function applyLogoToEl(el, url, personColor) {
   el.style.justifyContent = 'center';
 }
 
+// ── Update ALL transaction cards for a merchant key ──
+function updateAllCardsForMerchant(key, url) {
+  allTx.forEach(tx => {
+    const txKey = tx.domain || (tx.cleanName || tx.merchant)?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    if (txKey === key) {
+      const cardEl = document.getElementById('txlogo-' + tx.id);
+      if (cardEl) applyLogoToEl(cardEl, url, personColour(tx.person));
+    }
+  });
+}
+
 // ── Open logo selector ──
 async function openLogoSelector() {
   if (!currentLogoTx) return;
@@ -2568,8 +2579,10 @@ async function setActive(index, silent = false) {
   // Update modal and card immediately
   const url = v.githubUrl;
   if (url && currentLogoTx) {
-    logoPickCache[_key()] = url;
+    const k = _key();
+    logoPickCache[k] = url;
     updateModalLogo(url, 'official');
+    updateAllCardsForMerchant(k, url);
   }
 
   // Sync to Apps Script
@@ -2820,22 +2833,23 @@ function updateModalLogo(url, status) {
   const logoEl  = document.getElementById('modal-logo');
   const badgeEl = document.getElementById('modal-logo-badge');
   logoEl.innerHTML = '';
-logoEl.style.display = 'flex';
-logoEl.style.alignItems = 'center';
-logoEl.style.justifyContent = 'center';
-const img2 = document.createElement('img');
-img2.src = url;
-img2.style.cssText = 'width:46px;height:46px;object-fit:contain;border-radius:10px;flex-shrink:0;';
-img2.onerror = function(){ this.style.display='none'; };
-logoEl.appendChild(img2);
+  logoEl.style.display = 'flex';
+  logoEl.style.alignItems = 'center';
+  logoEl.style.justifyContent = 'center';
+  const img2 = document.createElement('img');
+  img2.src = url;
+  img2.style.cssText = 'width:46px;height:46px;object-fit:contain;border-radius:10px;flex-shrink:0;';
+  img2.onerror = function(){ this.style.display='none'; };
+  logoEl.appendChild(img2);
   if (status === 'photo') logoEl.innerHTML += '<div class="photo-badge">📸</div>';
   if (badgeEl) badgeEl.style.display = 'none';
   logoEl.classList.add('has-logo');
   logoEl.style.color = '';
-  // Also update the card immediately
+  // Update ALL transaction cards for this merchant — not just the open one
   if (currentLogoTx) {
-    const cardEl = document.getElementById('txlogo-' + currentLogoTx.id);
-    if (cardEl) applyLogoToEl(cardEl, url);
+    const key = _key();
+    logoPickCache[key] = url;
+    updateAllCardsForMerchant(key, url);
   }
 }
 
