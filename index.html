@@ -2377,33 +2377,49 @@ function openModal(txId) {
   const key = tx.domain || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
   async function loadModalLogo() {
-    const manifest    = await getLogoManifest();
-    const entry       = manifest[key];
-    const isConfirmed = entry && (entry.status === 'official' || entry.status === 'photo');
+    const [manifest, variants, aliases] = await Promise.all([
+      getLogoManifest(), getVariantsManifest(), getAliasesManifest()
+    ]);
 
-    // Tappable if: admin always, or non-admin only when NOT yet confirmed
-    const canEdit = userRole === 'admin' || !isConfirmed;
+    // Resolve key through aliases or fuzzy cache
+    let resolvedKey  = key;
+    let isFuzzyMatch = false;
+    if (aliases[key]) {
+      resolvedKey = aliases[key]; isFuzzyMatch = true;
+    } else if (fuzzyMatchCache[key]) {
+      resolvedKey = fuzzyMatchCache[key]; isFuzzyMatch = true;
+    } else if (!variants[key] && !manifest[key]) {
+      const allKeys = [...Object.keys(manifest), ...Object.keys(variants)];
+      const fuzzy   = clientFuzzyMatch(key, allKeys);
+      if (fuzzy) { resolvedKey = fuzzy; isFuzzyMatch = true; fuzzyMatchCache[key] = fuzzy; }
+    }
+
+    const entry       = manifest[resolvedKey];
+    const isConfirmed = entry && (entry.status === 'official' || entry.status === 'photo');
+    const canEdit     = userRole === 'admin' || !isConfirmed;
+
     logoEl.style.cursor = canEdit ? 'pointer' : 'default';
     logoEl.onclick      = canEdit ? openLogoSelector : null;
     if (badgeEl) badgeEl.style.display = canEdit ? 'flex' : 'none';
 
-    // Use cached URL if available — same as what the card shows
+    // Use cached URL if available
     let url = logoPickCache[key] || null;
 
-    // If not cached yet, resolve it the same way renderTxLogoEl does
     if (!url) {
       if (isConfirmed) {
         url = entry.githubUrl || (entry.file ? GITHUB_RAW + encodeURIComponent(entry.file) : null);
       }
       if (!url) {
-        const variants = await getVariantsManifest();
-        const list     = variants[key];
+        const list = variants[resolvedKey];
         if (list && list.length > 0) {
-          const idx = Math.abs(key.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % list.length;
-          url = list[idx].githubUrl || null;
+          const nonFlagged = list.filter(v => !v.flagged);
+          if (nonFlagged.length > 0) {
+            const idx = Math.abs(resolvedKey.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % nonFlagged.length;
+            url = nonFlagged[idx].githubUrl || null;
+          }
         }
       }
-      if (url) logoPickCache[key] = url; // cache it for consistency
+      if (url) logoPickCache[key] = url;
     }
 
     if (url) {
@@ -2417,7 +2433,6 @@ function openModal(txId) {
       img1.style.cssText = 'width:46px;height:46px;object-fit:contain;border-radius:10px;flex-shrink:0;';
       img1.onerror = function(){ logoEl.textContent = initials(name); };
       logoEl.appendChild(img1);
-      // Badge is position:absolute so it does NOT affect flex layout
       if (badgeEl && canEdit) {
         badgeEl.style.position = 'absolute';
         badgeEl.style.bottom   = '-3px';
@@ -2426,6 +2441,21 @@ function openModal(txId) {
       }
       logoEl.classList.add('has-logo');
       logoEl.style.color = '';
+
+      // Show fuzzy match info row in transaction detail
+      if (isFuzzyMatch && resolvedKey !== key) {
+        const existingFuzzyRow = document.getElementById('fuzzy-match-row');
+        if (existingFuzzyRow) existingFuzzyRow.remove();
+        const fuzzyRow = document.createElement('div');
+        fuzzyRow.id = 'fuzzy-match-row';
+        fuzzyRow.className = 'sheet-row';
+        fuzzyRow.innerHTML =
+          '<span class="sheet-row-label">Logo match</span>' +
+          '<span class="sheet-row-value" style="color:var(--gold);font-size:12px;">🔗 ' + resolvedKey + '<br>' +
+          '<span style="color:var(--text-faint);font-size:10px;">Auto-matched · ⭐ to confirm</span></span>';
+        const modalRows = document.getElementById('modal-rows');
+        if (modalRows) modalRows.insertBefore(fuzzyRow, modalRows.firstChild);
+      }
     }
   }
 
@@ -2797,10 +2827,21 @@ async function openLogoSelector() {
   document.getElementById('logo-sel-grid').style.display        = 'none';
   document.getElementById('logo-selector-overlay').classList.add('open');
 
-  // Load all manifests in parallel
-  const [variants, manifest, aliases] = await Promise.all([
-    getVariantsManifest(), getLogoManifest(), getAliasesManifest()
-  ]);
+  // Load all manifests with a 15s timeout so loading never gets stuck
+  let variants = {}, manifest = {}, aliases = {};
+  try {
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 15000));
+    [variants, manifest, aliases] = await Promise.race([
+      Promise.all([getVariantsManifest(), getLogoManifest(), getAliasesManifest()]),
+      timeout.then(() => { throw new Error('timeout'); })
+    ]);
+  } catch(e) {
+    document.getElementById('logo-sel-loading').style.display = 'none';
+    document.getElementById('logo-sel-grid').style.display    = 'flex';
+    document.getElementById('logo-sel-grid').innerHTML =
+      '<div class="logo-sel-empty" style="color:var(--red);">Failed to load logo data.<br>Check your connection and try again.</div>';
+    return;
+  }
 
   // Resolve key through aliases or fuzzy cache
   let resolvedKey = rawKey;
@@ -2856,6 +2897,13 @@ async function openLogoSelector() {
   }
 
   document.getElementById('logo-sel-loading').style.display = 'none';
+
+  // Store diagnostic info for the empty state
+  openLogoSelector._lastRawKey      = rawKey;
+  openLogoSelector._lastResolvedKey = resolvedKey;
+  openLogoSelector._lastIsFuzzy     = isFuzzyMatch;
+  openLogoSelector._totalKnownKeys  = Object.keys(variants).length + Object.keys(manifest).length;
+
   renderLogoGrid();
 }
 
@@ -2865,7 +2913,27 @@ function renderLogoGrid() {
   grid.style.display = 'flex';
 
   if (logoVariants.length === 0) {
-    grid.innerHTML = `<div class="logo-sel-empty">No logo variants found yet.<br>Use Search Again or take a photo below.</div>`;
+    const rawKey      = openLogoSelector._lastRawKey      || '';
+    const resolvedKey = openLogoSelector._lastResolvedKey || rawKey;
+    const isFuzzy     = openLogoSelector._lastIsFuzzy     || false;
+    const totalKeys   = openLogoSelector._totalKnownKeys  || 0;
+    const name        = currentLogoTx ? (currentLogoTx.cleanName || currentLogoTx.merchant) : '';
+
+    const keyInfo = isFuzzy
+      ? '<span style="color:var(--text-faint);">Looking up: </span><span style="color:var(--gold);">' + resolvedKey + '</span><br><span style="color:var(--text-faint);font-size:10px;">auto-matched from ' + rawKey + '</span>'
+      : '<span style="color:var(--text-faint);">Looking up: </span><span style="color:var(--gold);">' + resolvedKey + '</span>';
+
+    grid.innerHTML = `
+      <div class="logo-sel-empty">
+        <div style="font-size:22px; margin-bottom:10px;">📭</div>
+        <div style="font-size:13px; font-weight:600; color:rgba(255,255,255,0.7); margin-bottom:8px;">No logos in repository</div>
+        <div style="font-size:11px; line-height:1.7; margin-bottom:12px;">${keyInfo}</div>
+        <div style="font-size:11px; color:var(--text-faint); line-height:1.6; background:rgba(255,255,255,0.04); border-radius:10px; padding:10px 12px; text-align:left;">
+          <div style="margin-bottom:4px;">📦 Repository has <strong style="color:rgba(255,255,255,0.6);">${totalKeys}</strong> merchant logos</div>
+          <div style="margin-bottom:4px;">🔍 No match found for this merchant</div>
+          <div>💡 Run <strong style="color:var(--gold);">buildAliases()</strong> in Apps Script to auto-match</div>
+        </div>
+      </div>`;
     return;
   }
 
