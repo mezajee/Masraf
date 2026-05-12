@@ -2583,10 +2583,13 @@ let logoManifest     = null;  // logos.json — active logos
 let logoManifestTs   = 0;
 let variantsManifest = null;  // variants.json — all variants with confirmed/active/flagged
 let variantsTs       = 0;
+let aliasesManifest  = null;  // aliases.json — fuzzy key mappings
+let aliasesTs        = 0;
 let currentLogoTx    = null;
 let logoVariants     = [];    // non-flagged variants for current merchant
 let variantStates    = {};    // file → { confirmed, active, flagged } — local session state
 const logoPickCache  = {};    // domain → url, so same merchant always shows same logo
+const fuzzyMatchCache = {};   // rawKey → matchedKey (auto-matched, not yet confirmed)
 
 // Rejection sheet state
 let pendingFlagIndices       = new Set();
@@ -2643,36 +2646,110 @@ async function getVariantsManifest() {
   return variantsManifest;
 }
 
-// ── Render logo in transaction card ──
-async function renderTxLogoEl(el, tx) {
-  const key   = tx.domain || (tx.cleanName || tx.merchant)?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const color = personColour(tx.person);
-  if (!key) return;
+// ── Load aliases.json (fuzzy key mappings) ──
+async function getAliasesManifest() {
+  const now = Date.now();
+  if (aliasesManifest && (now - aliasesTs) < 5 * 60 * 1000) return aliasesManifest;
+  try {
+    const resp = await fetch(`${GITHUB_RAW}aliases.json?t=${now}`);
+    aliasesManifest = resp.ok ? await resp.json() : {};
+    aliasesTs       = now;
+  } catch(e) { aliasesManifest = {}; }
+  return aliasesManifest;
+}
 
-  // Return cached result immediately — same merchant always shows same logo
-  if (logoPickCache[key]) { applyLogoToEl(el, logoPickCache[key], color); return; }
+// ── Client-side fuzzy key matching (fallback if not in aliases.json) ──
+function clientFuzzyMatch(rawKey, knownKeys) {
+  const STOP = ['the','and','for','mall','dubai','uae','abu','dhabi','al','llc','fze','fzc',
+    'branch','shop','store','cafe','restaurant','hotel','centre','center',
+    'trading','general','services','international','group','est'];
 
-  // 1. Check confirmed logos.json first
-  const manifest = await getLogoManifest();
-  const entry    = manifest[key];
-  if (entry) {
-    // Explicitly set to initials — stop here, show nothing
-    if (entry.status === 'initials') return;
-    const url = entry.githubUrl || (entry.file ? GITHUB_RAW + encodeURIComponent(entry.file) : null);
-    if (url) { logoPickCache[key] = url; applyLogoToEl(el, url, color); return; }
+  function clean(k) {
+    return k.toLowerCase()
+      .replace(/\.(com|ae|net|org|io|me|gg|sa|qa|kw|bh|om)$/i, '')
+      .replace(/[^a-z0-9]+/g, ' ').trim().split(' ')
+      .filter(w => w.length > 2 && !STOP.includes(w));
   }
 
-  // 2. Fall back to a non-flagged variant from variants.json
-  const variants = await getVariantsManifest();
-  const list     = variants[key];
+  const newWords = clean(rawKey);
+  if (newWords.length === 0) return null;
+
+  let bestMatch = null, bestScore = 0;
+  knownKeys.forEach(existingKey => {
+    const exWords = clean(existingKey);
+    if (exWords.length === 0) return;
+    const matched = exWords.filter(w => newWords.includes(w)).length;
+    if (matched === exWords.length && matched > bestScore) {
+      bestScore = matched;
+      bestMatch = existingKey;
+    }
+  });
+  return bestMatch;
+}
+
+// ── Render logo in transaction card ──
+async function renderTxLogoEl(el, tx) {
+  const rawKey = tx.domain || (tx.cleanName || tx.merchant)?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const color  = personColour(tx.person);
+  if (!rawKey) return;
+
+  // Return cached result immediately
+  if (logoPickCache[rawKey]) { applyLogoToEl(el, logoPickCache[rawKey], color); return; }
+
+  // Load all manifests in parallel
+  const [manifest, variants, aliases] = await Promise.all([
+    getLogoManifest(), getVariantsManifest(), getAliasesManifest()
+  ]);
+
+  // 1. Check aliases.json — map to canonical key if found
+  let key = rawKey;
+  if (aliases[rawKey]) {
+    key = aliases[rawKey];
+    fuzzyMatchCache[rawKey] = key; // remember it was auto-matched
+  }
+
+  // 2. Check logos.json with resolved key
+  const entry = manifest[key];
+  if (entry) {
+    if (entry.status === 'initials') return;
+    const url = entry.githubUrl || (entry.file ? GITHUB_RAW + encodeURIComponent(entry.file) : null);
+    if (url) { logoPickCache[rawKey] = url; applyLogoToEl(el, url, color); return; }
+  }
+
+  // 3. Check variants.json with resolved key
+  const list = variants[key];
   if (list && list.length > 0) {
     const nonFlagged = list.filter(v => !v.flagged);
     if (nonFlagged.length > 0) {
       const idx = Math.abs(key.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % nonFlagged.length;
       const url = nonFlagged[idx].githubUrl;
-      if (url) { logoPickCache[key] = url; applyLogoToEl(el, url, color); }
+      if (url) { logoPickCache[rawKey] = url; applyLogoToEl(el, url, color); return; }
     }
-    // If all variants are flagged and no logos.json entry, show initials (return without applying)
+    return; // all flagged
+  }
+
+  // 4. Client-side fuzzy match as last resort (rawKey had no alias and no exact match)
+  if (key === rawKey) {
+    const allKeys    = [...Object.keys(manifest), ...Object.keys(variants)];
+    const fuzzyKey   = clientFuzzyMatch(rawKey, allKeys);
+    if (fuzzyKey) {
+      fuzzyMatchCache[rawKey] = fuzzyKey; // store for selector banner
+      // Resolve URL from the matched key
+      const fEntry = manifest[fuzzyKey];
+      if (fEntry && fEntry.status !== 'initials') {
+        const url = fEntry.githubUrl || (fEntry.file ? GITHUB_RAW + encodeURIComponent(fEntry.file) : null);
+        if (url) { logoPickCache[rawKey] = url; applyLogoToEl(el, url, color); return; }
+      }
+      const fList = variants[fuzzyKey];
+      if (fList && fList.length > 0) {
+        const nonFlagged = fList.filter(v => !v.flagged);
+        if (nonFlagged.length > 0) {
+          const idx = Math.abs(fuzzyKey.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % nonFlagged.length;
+          const url = nonFlagged[idx].githubUrl;
+          if (url) { logoPickCache[rawKey] = url; applyLogoToEl(el, url, color); }
+        }
+      }
+    }
   }
 }
 
@@ -2712,20 +2789,45 @@ async function openLogoSelector() {
   pendingFlagIndices = new Set();
   selectedRejectionReasons = new Set();
 
-  const name = tx.cleanName || tx.merchant;
-  const key  = tx.domain || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const name   = tx.cleanName || tx.merchant;
+  const rawKey = tx.domain || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
   document.getElementById('logo-sel-merchant-name').textContent = name;
   document.getElementById('logo-sel-loading').style.display     = 'flex';
   document.getElementById('logo-sel-grid').style.display        = 'none';
   document.getElementById('logo-selector-overlay').classList.add('open');
 
-  // Load both manifests in parallel
-  const [variants, manifest] = await Promise.all([getVariantsManifest(), getLogoManifest()]);
+  // Load all manifests in parallel
+  const [variants, manifest, aliases] = await Promise.all([
+    getVariantsManifest(), getLogoManifest(), getAliasesManifest()
+  ]);
 
-  const allVariants = variants[key] || [];
+  // Resolve key through aliases or fuzzy cache
+  let resolvedKey = rawKey;
+  let isFuzzyMatch = false;
+  if (aliases[rawKey]) {
+    resolvedKey  = aliases[rawKey];
+    isFuzzyMatch = true;
+  } else if (fuzzyMatchCache[rawKey]) {
+    resolvedKey  = fuzzyMatchCache[rawKey];
+    isFuzzyMatch = true;
+  } else if (!variants[rawKey] && !manifest[rawKey]) {
+    // Try client fuzzy as last resort
+    const allKeys = [...Object.keys(manifest), ...Object.keys(variants)];
+    const fuzzy   = clientFuzzyMatch(rawKey, allKeys);
+    if (fuzzy) { resolvedKey = fuzzy; isFuzzyMatch = true; fuzzyMatchCache[rawKey] = fuzzy; }
+  }
 
-  // Initialize local state from manifests — exclude flagged from display list
+  // Show fuzzy match banner if applicable
+  const hintEl = document.getElementById('logo-sel-hint');
+  if (isFuzzyMatch && resolvedKey !== rawKey) {
+    hintEl.innerHTML = '🔗 Auto-matched from <strong style="color:var(--gold);">' + resolvedKey + '</strong> — ⭐ to confirm permanently';
+  } else {
+    hintEl.textContent = '✅ Confirm · ⭐ Set active · ✗ Flag bad · Tap to zoom';
+  }
+
+  const allVariants = variants[resolvedKey] || [];
+
   allVariants.forEach(v => {
     variantStates[v.file] = {
       confirmed: v.confirmed || false,
@@ -2735,30 +2837,19 @@ async function openLogoSelector() {
   });
   logoVariants = allVariants.filter(v => !v.flagged);
 
-  // ── Cross-reference logos.json so the currently active logo always shows ──
-  // Handles cases where logos were confirmed via old flow (variants.json has no active flag)
-  const logoEntry = manifest[key];
+  // Cross-reference logos.json so the currently active logo always shows
+  const logoEntry = manifest[resolvedKey];
   if (logoEntry && (logoEntry.status === 'official' || logoEntry.status === 'photo') && logoEntry.githubUrl) {
     const anyActive = logoVariants.some(v => variantStates[v.file]?.active);
     if (!anyActive) {
-      // Try to find the matching variant by file or URL and mark it active
-      const matchByFile = logoVariants.find(v =>
-        v.file === logoEntry.file || v.file === logoEntry.variantFile
-      );
-      const matchByUrl = !matchByFile && logoVariants.find(v => v.githubUrl === logoEntry.githubUrl);
-      const match = matchByFile || matchByUrl;
-
+      const matchByFile = logoVariants.find(v => v.file === logoEntry.file || v.file === logoEntry.variantFile);
+      const matchByUrl  = !matchByFile && logoVariants.find(v => v.githubUrl === logoEntry.githubUrl);
+      const match       = matchByFile || matchByUrl;
       if (match) {
-        // Variant exists but wasn't marked active — mark it now
         variantStates[match.file] = { ...variantStates[match.file], confirmed: true, active: true };
       } else {
-        // Active logo not in variants.json at all — inject it as a synthetic entry at the top
-        const syntheticFile = logoEntry.file || (key + (logoEntry.status === 'photo' ? '-photo.png' : '.png'));
-        logoVariants.unshift({
-          file:      syntheticFile,
-          githubUrl: logoEntry.githubUrl,
-          source:    logoEntry.status === 'photo' ? 'photo' : 'confirmed',
-        });
+        const syntheticFile = logoEntry.file || (resolvedKey + (logoEntry.status === 'photo' ? '-photo.png' : '.png'));
+        logoVariants.unshift({ file: syntheticFile, githubUrl: logoEntry.githubUrl, source: logoEntry.status === 'photo' ? 'photo' : 'confirmed' });
         variantStates[syntheticFile] = { confirmed: true, active: true, flagged: false };
       }
     }
@@ -2849,35 +2940,44 @@ async function setActive(index, silent = false) {
   const v     = logoVariants[index];
   const state = variantStates[v.file] || {};
 
-  // Auto-confirm when starring
   variantStates[v.file] = { ...state, confirmed: true, active: true };
-
-  // Clear active on all others
   logoVariants.forEach((lv, i) => {
     if (i !== index && variantStates[lv.file]) variantStates[lv.file].active = false;
   });
 
   renderLogoGrid();
 
-  // Update modal and card immediately
-  const url = v.githubUrl;
+  const url    = v.githubUrl;
+  const key    = _key();
+  const rawKey = _rawKey();
+
   if (url && currentLogoTx) {
-    const k = _key();
-    logoPickCache[k] = url;
+    logoPickCache[rawKey] = url;
+    logoPickCache[key]    = url;
     updateModalLogo(url, 'official');
-    updateAllCardsForMerchant(k, url);
+    updateAllCardsForMerchant(rawKey, url);
   }
 
-  // Sync to Apps Script
   try {
-    const key = _key();
     await jsonpFetch(LOGO_PICKER_URL +
       '?action=setActive' +
       '&fileKey='     + encodeURIComponent(key) +
       '&variantFile=' + encodeURIComponent(v.file));
+
+    // If this was a fuzzy match, permanently save the alias now that user confirmed
+    if (rawKey !== key) {
+      try {
+        await jsonpFetch(LOGO_PICKER_URL +
+          '?action=saveAlias' +
+          '&fromKey=' + encodeURIComponent(rawKey) +
+          '&toKey='   + encodeURIComponent(key));
+        aliasesManifest = null; aliasesTs = 0; // invalidate cache
+      } catch(e) { /* alias save failure is non-critical */ }
+    }
+
     logoManifest = null; logoManifestTs = 0;
     variantsManifest = null; variantsTs = 0;
-    if (!silent) showToast('⭐ Active logo updated');
+    if (!silent) showToast('⭐ Active logo updated' + (rawKey !== key ? ' & alias saved' : ''));
   } catch(e) { if (!silent) showToast('⚠️ Sync error: ' + e.message); }
 }
 
@@ -3043,6 +3143,14 @@ async function confirmRejection() {
 
 // ── Helper: derive key from currentLogoTx ──
 function _key() {
+  if (!currentLogoTx) return '';
+  const tx     = currentLogoTx;
+  const rawKey = tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  // Return resolved key if fuzzy-matched, otherwise raw key
+  return fuzzyMatchCache[rawKey] || rawKey;
+}
+
+function _rawKey() {
   if (!currentLogoTx) return '';
   const tx = currentLogoTx;
   return tx.domain || (tx.cleanName || tx.merchant).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
