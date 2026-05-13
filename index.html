@@ -2894,18 +2894,21 @@ async function openLogoSelector() {
   const outcome   = await Promise.race([loadAll, safetyNet]);
 
   if (outcome) {
-    // loadAll completed within timeout
     if (outcome[0].status === 'fulfilled') variants = outcome[0].value || {};
     if (outcome[1].status === 'fulfilled') manifest = outcome[1].value || {};
     if (outcome[2].status === 'fulfilled') aliases  = outcome[2].value || {};
   } else {
-    // Safety net fired — use whatever is already cached
     variants = variantsManifest || {};
     manifest = logoManifest     || {};
     aliases  = aliasesManifest  || {};
   }
 
   document.getElementById('logo-sel-loading').style.display = 'none';
+
+  // ── Diagnostic toast so we can see what's happening ──
+  const vKeys = Object.keys(variants).length;
+  const mKeys = Object.keys(manifest).length;
+  showToast(`variants: ${vKeys} keys · logos: ${mKeys} keys · looking up: ${rawKey}`, 6000);
 
   // Resolve key through aliases or fuzzy cache
   let resolvedKey = rawKey;
@@ -3484,11 +3487,11 @@ function closeLogoZoom() {
 }
 
 // ── Toast ──
-function showToast(msg) {
+function showToast(msg, duration) {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2500);
+  setTimeout(() => el.classList.remove('show'), duration || 2500);
 }
 
 // ── PWA MANIFEST ──
