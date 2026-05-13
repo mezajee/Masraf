@@ -1231,7 +1231,7 @@
         <div class="header-label">Masraf</div>
         <div class="header-title" id="spend-month-title">May 2026</div>
       </div>
-      <div class="avatar" id="avatar-btn" onclick="showView('profile')">R</div>
+      <div class="avatar" id="avatar-btn" onclick="showView('profile')" ondblclick="checkGitHubAccess()">R</div>
     </div>
   </div>
 
@@ -1820,6 +1820,9 @@ async function loadUserAndData() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('main-app').style.display = 'flex';
     showView('spend');
+
+    // Check GitHub repo is accessible — shows toast immediately if there's an issue
+    checkGitHubAccess();
 
   } catch (err) {
     debug('Error: ' + err.message);
@@ -2658,22 +2661,38 @@ async function getLogoManifest() {
   if (logoManifest && (now - logoManifestTs) < 5 * 60 * 1000) return logoManifest;
   try {
     const resp = await fetch(`${GITHUB_RAW}logos.json?t=${now}`);
-    logoManifest   = resp.ok ? await resp.json() : {};
-    logoManifestTs = now;
-  } catch(e) { logoManifest = {}; }
-  return logoManifest;
+    if (resp.ok) {
+      logoManifest   = await resp.json();
+      logoManifestTs = now;
+    } else {
+      debug('logos.json fetch failed: HTTP ' + resp.status);
+      if (!logoManifest) logoManifest = {}; // use empty only if no prior good data
+    }
+  } catch(e) {
+    debug('logos.json fetch error: ' + e.message);
+    if (!logoManifest) logoManifest = {};
+  }
+  return logoManifest || {};
 }
 
-// ── Load variants.json from GitHub (unconfirmed variants, cached 5 min) ──
+// ── Load variants.json from GitHub ──
 async function getVariantsManifest() {
   const now = Date.now();
   if (variantsManifest && (now - variantsTs) < 5 * 60 * 1000) return variantsManifest;
   try {
     const resp = await fetch(`${GITHUB_RAW}variants.json?t=${now}`);
-    variantsManifest = resp.ok ? await resp.json() : {};
-    variantsTs       = now;
-  } catch(e) { variantsManifest = {}; }
-  return variantsManifest;
+    if (resp.ok) {
+      variantsManifest = await resp.json();
+      variantsTs       = now;
+    } else {
+      debug('variants.json fetch failed: HTTP ' + resp.status);
+      if (!variantsManifest) variantsManifest = {};
+    }
+  } catch(e) {
+    debug('variants.json fetch error: ' + e.message);
+    if (!variantsManifest) variantsManifest = {};
+  }
+  return variantsManifest || {};
 }
 
 // ── Load aliases.json (fuzzy key mappings) ──
@@ -2682,10 +2701,36 @@ async function getAliasesManifest() {
   if (aliasesManifest && (now - aliasesTs) < 5 * 60 * 1000) return aliasesManifest;
   try {
     const resp = await fetch(`${GITHUB_RAW}aliases.json?t=${now}`);
-    aliasesManifest = resp.ok ? await resp.json() : {};
-    aliasesTs       = now;
-  } catch(e) { aliasesManifest = {}; }
-  return aliasesManifest;
+    if (resp.ok) {
+      aliasesManifest = await resp.json();
+      aliasesTs       = now;
+    }
+    // 404 is expected if buildAliases() hasn't been run — not an error, don't cache failure
+  } catch(e) { /* aliases.json is optional */ }
+  return aliasesManifest || {};
+}
+
+// ── GitHub connectivity diagnostic ──
+async function checkGitHubAccess() {
+  debug('Checking GitHub repo access...');
+  try {
+    const resp = await fetch(GITHUB_RAW + 'logos.json?t=' + Date.now());
+    if (resp.ok) {
+      const data = await resp.json();
+      const count = Object.keys(data).length;
+      debug('GitHub OK — logos.json has ' + count + ' entries');
+      showToast('✓ GitHub connected — ' + count + ' logos');
+    } else if (resp.status === 404) {
+      debug('GitHub 404 — logos.json not found. Is the repo public and does the file exist?');
+      showToast('❌ GitHub: logos.json not found (repo may be private)');
+    } else {
+      debug('GitHub error: HTTP ' + resp.status);
+      showToast('❌ GitHub error: HTTP ' + resp.status);
+    }
+  } catch(e) {
+    debug('GitHub unreachable: ' + e.message);
+    showToast('❌ GitHub unreachable: ' + e.message);
+  }
 }
 
 // ── Client-side fuzzy key matching (fallback if not in aliases.json) ──
@@ -2827,21 +2872,18 @@ async function openLogoSelector() {
   document.getElementById('logo-sel-grid').style.display        = 'none';
   document.getElementById('logo-selector-overlay').classList.add('open');
 
-  // Load all manifests with a 15s timeout so loading never gets stuck
+  // Load manifests independently — a failure on one doesn't block the others
   let variants = {}, manifest = {}, aliases = {};
-  try {
-    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 15000));
-    [variants, manifest, aliases] = await Promise.race([
-      Promise.all([getVariantsManifest(), getLogoManifest(), getAliasesManifest()]),
-      timeout.then(() => { throw new Error('timeout'); })
-    ]);
-  } catch(e) {
-    document.getElementById('logo-sel-loading').style.display = 'none';
-    document.getElementById('logo-sel-grid').style.display    = 'flex';
-    document.getElementById('logo-sel-grid').innerHTML =
-      '<div class="logo-sel-empty" style="color:var(--red);">Failed to load logo data.<br>Check your connection and try again.</div>';
-    return;
-  }
+  const results = await Promise.allSettled([
+    getVariantsManifest(),
+    getLogoManifest(),
+    getAliasesManifest()
+  ]);
+  if (results[0].status === 'fulfilled') variants = results[0].value || {};
+  if (results[1].status === 'fulfilled') manifest = results[1].value || {};
+  if (results[2].status === 'fulfilled') aliases  = results[2].value || {};
+
+  document.getElementById('logo-sel-loading').style.display = 'none';
 
   // Resolve key through aliases or fuzzy cache
   let resolvedKey = rawKey;
@@ -2938,8 +2980,15 @@ function renderLogoGrid() {
   }
 
   const sourceLabels = {
-    logodev: 'Logo.dev', logodev_name: 'Logo.dev', seeklogo: 'Seeklogo',
-    wikipedia: 'Wikipedia', worldvectorlogo: 'WorldVector', favicon: 'Favicon'
+    logodev:         'Logo.dev',
+    logodev_name:    'Logo.dev',
+    clearbit:        'Clearbit',
+    favicon:         'Google Favicon',
+    seeklogo:        'Seeklogo',
+    wikipedia:       'Wikipedia',
+    worldvectorlogo: 'WorldVector',
+    confirmed:       'Confirmed',
+    photo:           'Photo',
   };
 
   grid.innerHTML = logoVariants.map((v, i) => {
@@ -3312,7 +3361,7 @@ function updateModalLogo(url, status) {
   }
 }
 
-// ── Search Again — two-phase: SerpAPI first, then download each image individually ──
+// ── Search Again — Phase 1: server downloads Clearbit/favicon + SerpAPI URLs returned for Phase 2 ──
 async function searchAgain() {
   if (!currentLogoTx) return;
   const btn = document.getElementById('btn-search-again');
@@ -3323,7 +3372,8 @@ async function searchAgain() {
   const key = _key();
 
   try {
-    // Phase 1: SerpAPI only — fast (~5-15s), returns new URLs
+    // Phase 1: server-side search — returns already-downloaded variants (Clearbit/favicon)
+    //          plus SerpAPI URLs for client-side download
     const searchUrl = LOGO_PICKER_URL +
       '?action=searchAgain' +
       '&fileKey='   + encodeURIComponent(key) +
@@ -3333,49 +3383,59 @@ async function searchAgain() {
     const data = await jsonpFetch(searchUrl, 30000);
     if (data.error) throw new Error(data.error);
 
+    let added = 0;
+
+    // Add server-downloaded variants (Clearbit, favicon) immediately
+    const newVariants = data.newVariants || [];
+    newVariants.forEach(v => {
+      if (!variantStates[v.file]) {
+        variantStates[v.file] = { confirmed: false, active: false, flagged: false };
+        logoVariants.push(v);
+        added++;
+      }
+    });
+    if (added > 0) renderLogoGrid();
+
     const newUrls = data.newUrls || [];
-    if (newUrls.length === 0) {
+    if (newUrls.length === 0 && added === 0) {
       showToast('😕 No new logos found');
       btn.textContent = '🔍 Search Again for More Logos';
       btn.disabled    = false;
       return;
     }
 
-    showToast('🔍 Found ' + newUrls.length + ' new — downloading...');
-    btn.textContent = '⏳ Downloading ' + newUrls.length + ' logo(s)...';
+    if (newUrls.length > 0) {
+      showToast('🔍 Found ' + newUrls.length + ' new SerpAPI — downloading...');
+      btn.textContent = '⏳ Downloading ' + newUrls.length + ' logo(s)...';
 
-    // Phase 2: Download each URL individually (each call is fast: 1 image + 1 GitHub upload)
-    let downloaded = 0;
-    for (const item of newUrls) {
-      try {
-        const dlUrl = LOGO_PICKER_URL +
-          '?action=downloadVariant' +
-          '&fileKey='  + encodeURIComponent(key) +
-          '&url='      + encodeURIComponent(item.url) +
-          '&serpNum='  + item.serpNum;
+      // Phase 2: download each SerpAPI URL individually
+      for (const item of newUrls) {
+        try {
+          const dlUrl = LOGO_PICKER_URL +
+            '?action=downloadVariant' +
+            '&fileKey='  + encodeURIComponent(key) +
+            '&url='      + encodeURIComponent(item.url) +
+            '&serpNum='  + item.serpNum;
 
-        const dlData = await jsonpFetch(dlUrl, 30000);
-        if (dlData.success && dlData.variant) {
-          // Add to local state immediately so it appears in the grid
-          const v = dlData.variant;
-          variantStates[v.file] = { confirmed: false, active: false, flagged: false };
-          logoVariants.push(v);
-          downloaded++;
-          renderLogoGrid();
-          btn.textContent = '⏳ Downloaded ' + downloaded + '/' + newUrls.length + '...';
-        }
-      } catch(e) {
-        // Skip failed downloads, continue with the rest
+          const dlData = await jsonpFetch(dlUrl, 30000);
+          if (dlData.success && dlData.variant) {
+            const v = dlData.variant;
+            variantStates[v.file] = { confirmed: false, active: false, flagged: false };
+            logoVariants.push(v);
+            added++;
+            renderLogoGrid();
+            btn.textContent = '⏳ Downloaded ' + added + '...';
+          }
+        } catch(e) { /* skip failed downloads */ }
       }
     }
 
-    // Invalidate cache so future opens reload from GitHub
     variantsManifest = null; variantsTs = 0;
 
-    if (downloaded > 0) {
-      showToast('✓ Added ' + downloaded + ' new logo' + (downloaded > 1 ? 's' : '') + '!');
+    if (added > 0) {
+      showToast('✓ Added ' + added + ' new logo' + (added > 1 ? 's' : '') + '!');
     } else {
-      showToast('😕 Downloads failed — try again');
+      showToast('😕 No new logos could be downloaded');
     }
 
   } catch(e) {
