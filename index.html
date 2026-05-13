@@ -2905,11 +2905,6 @@ async function openLogoSelector() {
 
   document.getElementById('logo-sel-loading').style.display = 'none';
 
-  // ── Diagnostic toast so we can see what's happening ──
-  const vKeys = Object.keys(variants).length;
-  const mKeys = Object.keys(manifest).length;
-  showToast(`variants: ${vKeys} keys · logos: ${mKeys} keys · looking up: ${rawKey}`, 6000);
-
   // Resolve key through aliases or fuzzy cache
   let resolvedKey = rawKey;
   let isFuzzyMatch = false;
@@ -2925,6 +2920,21 @@ async function openLogoSelector() {
     const fuzzy   = clientFuzzyMatch(rawKey, allKeys);
     if (fuzzy) { resolvedKey = fuzzy; isFuzzyMatch = true; fuzzyMatchCache[rawKey] = fuzzy; }
   }
+
+  // ── Diagnostic toast ──
+  const vKeys = Object.keys(variants).length;
+  const mKeys = Object.keys(manifest).length;
+  const aKeys = Object.keys(aliases).length;
+  const foundInVariants = !!(variants[resolvedKey] && variants[resolvedKey].length);
+  const foundInLogos    = !!(manifest[resolvedKey] && manifest[resolvedKey].githubUrl);
+  showToast(
+    'v:' + vKeys + ' l:' + mKeys + ' a:' + aKeys +
+    ' · key: ' + resolvedKey +
+    (foundInVariants ? ' ✓var' : '') +
+    (foundInLogos    ? ' ✓log' : '') +
+    (!foundInVariants && !foundInLogos ? ' ✗miss' : ''),
+    8000
+  );
 
   // Show fuzzy match banner if applicable
   const hintEl = document.getElementById('logo-sel-hint');
@@ -2961,6 +2971,16 @@ async function openLogoSelector() {
         variantStates[syntheticFile] = { confirmed: true, active: true, flagged: false };
       }
     }
+  }
+
+  // ── Fallback: if STILL no variants, use the thumbnail logo the server already resolved ──
+  // This handles cases where the server found the logo via aliases/fuzzy but the client key
+  // resolution doesn't match (e.g. "eatkokoro.xyz" → server found "kokoro-hand-roll-bar")
+  if (logoVariants.length === 0 && tx.logoUrl) {
+    const fallbackFile = rawKey + '-server-resolved.png';
+    logoVariants.push({ file: fallbackFile, githubUrl: tx.logoUrl, source: 'server' });
+    variantStates[fallbackFile] = { confirmed: false, active: false, flagged: false };
+    hintEl.innerHTML = '⚠️ Loaded from server match — ⭐ to confirm permanently for <strong style="color:var(--gold);">' + rawKey + '</strong>';
   }
 
   document.getElementById('logo-sel-loading').style.display = 'none';
@@ -3014,6 +3034,7 @@ function renderLogoGrid() {
     worldvectorlogo: 'WorldVector',
     confirmed:       'Confirmed',
     photo:           'Photo',
+    server:          'Server match',
   };
 
   grid.innerHTML = logoVariants.map((v, i) => {
