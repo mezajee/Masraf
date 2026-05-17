@@ -21,8 +21,8 @@
       --surface:   #141418;
       --surface2:  #1C1C22;
       --border:    rgba(255,255,255,0.07);
-      --gold:      #C4A464;
-      --gold-dim:  rgba(196,164,100,0.15);
+      --gold:      #FF7900;
+      --gold-dim:  rgba(255,121,0,0.15);
       --green:     #06D6A0;
       --red:       #FF4B4B;
       --text:      #FFFFFF;
@@ -80,17 +80,21 @@
     .ptr-spinner {
       width: 22px; height: 22px;
       border: 2.5px solid rgba(255,255,255,0.12);
-      border-top-color: var(--gold, #C4A464);
+      border-top-color: var(--gold, #FF7900);
       border-radius: 50%;
     }
     .ptr-spinner.spinning { animation: ptr-spin 0.7s linear infinite; }
     @keyframes ptr-spin { to { transform: rotate(360deg); } }
 
     /* ── BACK BUTTON on modal ── */
+    .modal-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0 18px;
+    }
+    .modal-top-bar .sheet-handle { margin: 0; }
     .sheet-back-btn {
-      position: absolute;
-      top: 18px;
-      left: 20px;
       width: 34px; height: 34px;
       border-radius: 50%;
       background: rgba(255,255,255,0.08);
@@ -98,9 +102,9 @@
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       color: var(--text-dim, rgba(255,255,255,0.5));
-      font-size: 18px;
+      font-size: 20px;
       line-height: 1;
-      z-index: 2;
+      flex-shrink: 0;
     }
     .sheet-back-btn:active { opacity: 0.6; }
 
@@ -123,7 +127,7 @@
       width: 300px;
       height: 300px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(196,164,100,0.12) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(255,121,0,0.12) 0%, transparent 70%);
       top: 50%;
       left: 50%;
       transform: translate(-50%, -60%);
@@ -204,7 +208,7 @@
     .spinner {
       width: 32px;
       height: 32px;
-      border: 2px solid rgba(196,164,100,0.2);
+      border: 2px solid rgba(255,121,0,0.2);
       border-top-color: var(--gold);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
@@ -255,7 +259,7 @@
       width: 38px;
       height: 38px;
       border-radius: 12px;
-      background: linear-gradient(135deg, var(--gold), #8B6914);
+      background: linear-gradient(135deg, var(--gold), #CC6000);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -272,7 +276,7 @@
       background: linear-gradient(135deg, #1A1A26 0%, #0F0F18 100%);
       border-radius: 20px;
       padding: 22px;
-      border: 1px solid rgba(196,164,100,0.2);
+      border: 1px solid rgba(255,121,0,0.2);
       position: relative;
       overflow: hidden;
     }
@@ -284,7 +288,7 @@
       right: -40px;
       width: 140px;
       height: 140px;
-      background: radial-gradient(circle, rgba(196,164,100,0.12) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(255,121,0,0.12) 0%, transparent 70%);
       pointer-events: none;
     }
 
@@ -309,7 +313,7 @@
     .summary-currency {
       font-size: 16px;
       font-weight: 400;
-      color: rgba(196,164,100,0.5);
+      color: rgba(255,121,0,0.5);
       margin-left: 4px;
     }
 
@@ -827,7 +831,7 @@
       width: 72px;
       height: 72px;
       border-radius: 22px;
-      background: linear-gradient(135deg, var(--gold), #8B6914);
+      background: linear-gradient(135deg, var(--gold), #CC6000);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1014,7 +1018,7 @@
     .btn-confirm-logo  { background: var(--green); color: #000; }
     .btn-take-photo    { background: #1C1C22; color: var(--text); border: 1px solid rgba(255,255,255,0.07); }
     .btn-use-initials  { background: rgba(255,75,75,0.1); color: var(--red); border: 1px solid rgba(255,75,75,0.2); }
-    .btn-search-again  { background: rgba(196,164,100,0.12); color: var(--gold); border: 1px solid rgba(196,164,100,0.3); }
+    .btn-search-again  { background: rgba(255,121,0,0.12); color: var(--gold); border: 1px solid rgba(255,121,0,0.3); }
     .btn-cancel-logo   { background: transparent; color: var(--text-dim); font-size: 13px; }
     .logo-sel-empty { text-align: center; padding: 24px 0 8px; color: var(--text-dim); font-size: 13px; }
 
@@ -1031,13 +1035,13 @@
     }
     .logo-var-btn.v-confirm { background: rgba(6,214,160,0.12); color: var(--green); }
     .logo-var-btn.v-confirm.on { background: var(--green); color: #000; }
-    .logo-var-btn.v-star { background: rgba(196,164,100,0.12); color: var(--gold); }
+    .logo-var-btn.v-star { background: rgba(255,121,0,0.12); color: var(--gold); }
     .logo-var-btn.v-star.on { background: var(--gold); color: #000; }
     .logo-var-btn.v-flag { background: rgba(255,75,75,0.12); color: var(--red); }
     .logo-var-btn.v-flag.on { background: var(--red); color: #fff; }
     .logo-var-btn:disabled { opacity: 0.22; cursor: not-allowed; }
     .logo-sel-box.is-confirmed { border-color: var(--green) !important; box-shadow: 0 0 0 2px rgba(6,214,160,0.18); }
-    .logo-sel-box.is-active { border-color: var(--gold) !important; box-shadow: 0 0 0 3px rgba(196,164,100,0.28); }
+    .logo-sel-box.is-active { border-color: var(--gold) !important; box-shadow: 0 0 0 3px rgba(255,121,0,0.28); }
     .logo-sel-box.pending-flag {
       border-color: var(--red) !important;
       box-shadow: 0 0 0 2px rgba(255,75,75,0.25) !important;
@@ -1264,8 +1268,8 @@
 
   <div id="main-app" style="display:none; flex-direction:column; height:100%;">
 
-```
 <!-- Spend View -->
+
 <div id="view-spend" class="scroll-area" style="display:none;">
   <div class="ptr-indicator" id="ptr-indicator"><div class="ptr-spinner" id="ptr-spinner"></div></div>
   <div class="header">
@@ -1274,13 +1278,32 @@
         <div class="header-label">Masraf</div>
         <div class="header-title" id="spend-month-title">May 2026</div>
       </div>
-      <div class="avatar" id="avatar-btn" onclick="showView('profile')" ondblclick="checkGitHubAccess()">R</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="last-updated-badge" style="font-size:9px;letter-spacing:0.5px;color:rgba(255,255,255,0.25);text-align:right;line-height:1.4;display:none;">
+          <div>Updated</div>
+          <div id="last-updated-time" style="color:var(--gold);">—</div>
+        </div>
+        <div class="avatar" id="avatar-btn" onclick="showView('profile')" ondblclick="checkGitHubAccess()">R</div>
+      </div>
     </div>
   </div>
 
   <div class="error-banner" id="error-banner">Unable to load data. Check your connection.</div>
 
+  <!-- Pending deposits banner -->
+
+  <div id="deposits-banner" style="display:none; margin:0 20px 12px; padding:12px 14px; background:rgba(255,121,0,0.07); border:1px solid rgba(255,121,0,0.18); border-radius:12px; cursor:pointer;" onclick="showDepositsSheet()">
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div>
+        <div style="font-size:12px; font-weight:700; color:var(--gold); margin-bottom:2px;">🔒 Pending Deposits</div>
+        <div id="deposits-banner-sub" style="font-size:11px; color:rgba(255,255,255,0.45);"></div>
+      </div>
+      <div style="color:var(--gold); opacity:0.6; font-size:16px;">›</div>
+    </div>
+  </div>
+
   <!-- Summary card -->
+
   <div class="summary-card fade-up">
     <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
       <!-- Left: month total -->
@@ -1304,38 +1327,44 @@
       </div>
     </div>
 
-    <!-- Per person breakdown -->
-    <div id="person-breakdown" style="margin-top:16px; display:none;">
-      <div style="height:1px; background:rgba(255,255,255,0.06); margin-bottom:14px;"></div>
-      <div id="person-breakdown-rows" style="display:flex; flex-direction:column; gap:10px;"></div>
-    </div>
+```
+<!-- Per person breakdown -->
+<div id="person-breakdown" style="margin-top:16px; display:none;">
+  <div style="height:1px; background:rgba(255,255,255,0.06); margin-bottom:14px;"></div>
+  <div id="person-breakdown-rows" style="display:flex; flex-direction:column; gap:10px;"></div>
+</div>
 
-    <!-- Top merchants -->
-    <div id="top-merchants-section" style="margin-top:16px; display:none;">
-      <div style="height:1px; background:rgba(255,255,255,0.06); margin-bottom:14px;"></div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-        <!-- Top by spend -->
-        <div>
-          <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); font-weight:400; margin-bottom:10px;">Top by Spend</div>
-          <div id="top-spend-list" style="display:flex; flex-direction:column; gap:8px;"></div>
-        </div>
-        <!-- Top by visits -->
-        <div>
-          <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); font-weight:400; margin-bottom:10px;">Top by Visits</div>
-          <div id="top-visits-list" style="display:flex; flex-direction:column; gap:8px;"></div>
-        </div>
-      </div>
+<!-- Top merchants -->
+<div id="top-merchants-section" style="margin-top:16px; display:none;">
+  <div style="height:1px; background:rgba(255,255,255,0.06); margin-bottom:14px;"></div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+    <!-- Top by spend -->
+    <div>
+      <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); font-weight:400; margin-bottom:10px;">Top by Spend</div>
+      <div id="top-spend-list" style="display:flex; flex-direction:column; gap:8px;"></div>
     </div>
+    <!-- Top by visits -->
+    <div>
+      <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); font-weight:400; margin-bottom:10px;">Top by Visits</div>
+      <div id="top-visits-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+  </div>
+</div>
+```
+
   </div>
 
   <!-- Filters -->
+
   <div class="filters" id="filter-pills"></div>
 
   <!-- Transaction list -->
+
   <div id="tx-list"></div>
 </div>
 
 <!-- Analytics View -->
+
 <div id="view-analytics" class="scroll-area" style="display:none;">
   <div class="header">
     <div class="header-top">
@@ -1347,6 +1376,29 @@
     </div>
   </div>
 
+  <!-- Person tabs (admin only) -->
+
+  <div id="analytics-person-tabs" style="display:none; padding:0 20px 4px; overflow-x:auto; white-space:nowrap; scrollbar-width:none;">
+    <div id="analytics-tabs-inner" style="display:inline-flex; gap:8px; padding-bottom:2px;"></div>
+  </div>
+
+  <!-- Overall summary cards -->
+
+  <div class="analytics-section">
+    <div class="stats-grid" id="stats-grid"></div>
+  </div>
+
+  <!-- 6-month trend bars -->
+
+  <div class="analytics-section">
+    <div class="analytics-card">
+      <div class="analytics-card-title">6-Month Trend</div>
+      <div id="trend-chart" style="display:flex; align-items:flex-end; gap:6px; height:80px; margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <!-- Category breakdown -->
+
   <div class="analytics-section">
     <div class="analytics-card">
       <div class="analytics-card-title">Spend by Category</div>
@@ -1354,12 +1406,42 @@
     </div>
   </div>
 
+  <!-- Spending habits insights -->
+
   <div class="analytics-section">
-    <div class="stats-grid" id="stats-grid"></div>
+    <div class="analytics-card" id="habits-card">
+      <div class="analytics-card-title">Spending Habits</div>
+      <div id="habits-content" style="margin-top:8px;"></div>
+    </div>
+  </div>
+
+  <!-- Top merchants -->
+
+  <div class="analytics-section" id="analytics-top-merchants-section" style="display:none;">
+    <div class="analytics-card">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div>
+          <div class="analytics-card-title" style="margin-bottom:10px;">Top by Spend</div>
+          <div id="a-top-spend-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+        <div>
+          <div class="analytics-card-title" style="margin-bottom:10px;">Most Visited</div>
+          <div id="a-top-visits-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trips section -->
+
+  <div class="analytics-section" id="trips-section" style="display:none;">
+    <div class="analytics-card-title" style="padding:0 0 10px;">✈️ Detected Trips</div>
+    <div id="trips-list"></div>
   </div>
 </div>
 
 <!-- Cards View -->
+
 <div id="view-cards" class="scroll-area" style="display:none;">
   <div class="header">
     <div class="header-top">
@@ -1371,9 +1453,31 @@
     </div>
   </div>
   <div style="padding: 0 24px;" id="cardholders-list"></div>
+  <!-- Unassigned cards section -->
+  <div id="unassigned-section" style="display:none; padding:0 24px;">
+    <div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);font-weight:600;margin:20px 0 10px;">Unassigned Cards</div>
+    <div id="unassigned-list"></div>
+  </div>
+</div>
+
+<!-- Assign Card Modal -->
+
+<div class="modal-overlay" id="assign-modal" onclick="closeAssignModal()" style="display:none;">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-top-bar">
+      <button class="sheet-back-btn" onclick="closeAssignModal()">‹</button>
+      <div class="sheet-handle"></div>
+      <div style="width:34px;flex-shrink:0;"></div>
+    </div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:6px;">Assign Card</div>
+    <div id="assign-card-info" style="font-size:13px;color:var(--text-dim);margin-bottom:20px;"></div>
+    <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">Select Person</div>
+    <div id="assign-person-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;"></div>
+  </div>
 </div>
 
 <!-- Profile View -->
+
 <div id="view-profile" class="scroll-area" style="display:none;">
   <div class="header">
     <div class="header-top">
@@ -1438,6 +1542,7 @@
 </div>
 
 <!-- Bottom Nav -->
+
 <nav class="bottom-nav">
   <button class="nav-btn active" id="nav-spend" onclick="showView('spend')">
     <span class="nav-icon">⊟</span>
@@ -1456,7 +1561,6 @@
     <span class="nav-label">Profile</span>
   </button>
 </nav>
-```
 
   </div>
 
@@ -1465,9 +1569,12 @@
 <!-- Transaction Detail Modal -->
 
 <div class="modal-overlay" id="tx-modal" onclick="closeModal()">
-  <div class="modal-sheet" onclick="event.stopPropagation()" style="position:relative;">
-    <button class="sheet-back-btn" onclick="closeModal()">‹</button>
-    <div class="sheet-handle"></div>
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-top-bar">
+      <button class="sheet-back-btn" onclick="closeModal()">‹</button>
+      <div class="sheet-handle"></div>
+      <div style="width:34px;flex-shrink:0;"></div>
+    </div>
     <div class="sheet-merchant-header">
       <div class="sheet-logo" id="modal-logo">
         <span class="add-logo-badge" id="modal-logo-badge" style="display:none;">＋</span>
@@ -1482,6 +1589,36 @@
       <div class="sheet-intl" id="modal-intl" style="display:none;">🌍 International Transaction</div>
     </div>
     <div id="modal-rows"></div>
+    <!-- Security deposit banner (shown for hotel/car rental) -->
+    <div id="deposit-banner" style="display:none; margin-bottom:12px; padding:12px 14px; background:rgba(255,121,0,0.08); border:1px solid rgba(255,121,0,0.2); border-radius:12px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <div>
+          <div style="font-size:12px; font-weight:700; color:var(--gold); margin-bottom:2px;">Security Deposit?</div>
+          <div style="font-size:11px; color:rgba(255,255,255,0.45); line-height:1.4;">Hotels and car rentals often pre-authorise a refundable deposit. Flag it to track the credit back.</div>
+        </div>
+        <button id="deposit-flag-btn" onclick="flagAsDeposit()" style="
+          padding:8px 14px; border-radius:10px; border:1px solid rgba(255,121,0,0.3);
+          background:rgba(255,121,0,0.15); color:var(--gold); font-size:12px; font-weight:700;
+          cursor:pointer; font-family:inherit; white-space:nowrap; flex-shrink:0;">
+          Flag it
+        </button>
+      </div>
+    </div>
+    <!-- Already flagged as deposit indicator -->
+    <div id="deposit-flagged" style="display:none; margin-bottom:12px; padding:12px 14px; background:rgba(6,214,160,0.08); border:1px solid rgba(6,214,160,0.2); border-radius:12px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <div>
+          <div style="font-size:12px; font-weight:700; color:var(--green); margin-bottom:2px;">🔒 Security Deposit</div>
+          <div style="font-size:11px; color:rgba(255,255,255,0.45);">Tracked — tap to mark as credited when refunded.</div>
+        </div>
+        <button onclick="markDepositCredited()" style="
+          padding:8px 14px; border-radius:10px; border:1px solid rgba(6,214,160,0.3);
+          background:rgba(6,214,160,0.12); color:var(--green); font-size:12px; font-weight:700;
+          cursor:pointer; font-family:inherit; white-space:nowrap; flex-shrink:0;">
+          Credited ✓
+        </button>
+      </div>
+    </div>
     <div class="sheet-actions">
       <button class="action-btn">
         <span class="action-icon">📷</span>
@@ -1499,7 +1636,34 @@
   </div>
 </div>
 
-<!-- Logo Selector Bottom Sheet -->
+<!-- Deposits Tracking Sheet -->
+
+<div class="modal-overlay" id="deposits-modal" onclick="closeDepositsModal()" style="display:none;">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-top-bar">
+      <button class="sheet-back-btn" onclick="closeDepositsModal()">‹</button>
+      <div class="sheet-handle"></div>
+      <div style="width:34px;flex-shrink:0;"></div>
+    </div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:4px;">Security Deposits</div>
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:20px;">Pre-authorisations & holds pending credit</div>
+    <div id="deposits-list"></div>
+    <div id="deposits-empty" style="display:none;text-align:center;padding:32px 0;color:var(--text-dim);font-size:13px;">No pending deposits tracked yet.</div>
+  </div>
+</div>
+
+<!-- Trip Detail Sheet -->
+
+<div class="modal-overlay" id="trip-modal" onclick="closeTripModal()" style="display:none;">
+  <div class="modal-sheet" onclick="event.stopPropagation()" style="max-height:90vh;">
+    <div class="modal-top-bar">
+      <button class="sheet-back-btn" onclick="closeTripModal()">‹</button>
+      <div class="sheet-handle"></div>
+      <div style="width:34px;flex-shrink:0;"></div>
+    </div>
+    <div id="trip-detail-content"></div>
+  </div>
+</div>
 
 <div class="logo-selector-overlay" id="logo-selector-overlay" onclick="closeLogoSelector()">
   <div class="logo-selector-sheet" onclick="event.stopPropagation()">
@@ -1588,21 +1752,25 @@ const SCOPES = [
 ].join(' ');
 
 // ── STATE ──
-let currentUser  = null;
-let userRole     = 'user';
-let userCards    = [];
-let allTx        = [];
-let filteredTx   = [];
-let activeFilter = 'All';
-let accessToken  = null;
+let currentUser          = null;
+let userRole             = 'user';
+let userCards            = [];
+let allTx                = [];
+let allCards             = [];
+let filteredTx           = [];
+let activeFilter         = 'All';
+let accessToken          = null;
+let lastLoadTime         = null;
+let analyticsPersonFilter = 'All';
+let pendingAssignCard    = null;
 
 // ── PERSON COLOUR MAP — fixed colours per cardholder ──
 const PERSON_COLOURS = {
   'abdulla': '#06D6A0', // Green
   'salama':  '#E9C46A', // Yellow
   'driver':  '#457B9D', // Blue
-  'me':      '#C4A464', // Gold
-  'rashed':  '#C4A464', // Gold (same as Me)
+  'me':      '#FF7900', // Orange
+  'rashed':  '#FF7900', // Orange
   'default': '#888888', // Grey fallback
 };
 
@@ -1614,7 +1782,7 @@ function personColour(person) {
 // Keep merchant colour for non-person contexts if needed
 function merchantColour(name) {
   const COLOURS = [
-    '#C4A464', '#06D6A0', '#457B9D', '#E63946',
+    '#FF7900', '#06D6A0', '#457B9D', '#E63946',
     '#6A0572', '#E9C46A', '#F4A261', '#264653',
   ];
   let h = 0;
@@ -1900,6 +2068,17 @@ async function loadUserAndData() {
     const txRows = txData.values || [];
     debug('Transaction rows: ' + txRows.length);
 
+    // 3b. Load Card Directory (for unassigned card detection)
+    try {
+      const cdData = await sheetsGet('Card Directory!A:D');
+      allCards = (cdData.values || []).slice(1).filter(r => r[0]).map(r => ({
+        last4:    (r[0] || '').toString().trim(),
+        person:   (r[1] || '').toString().trim(),
+        bank:     (r[2] || '').toString().trim(),
+        nickname: (r[3] || '').toString().trim()
+      }));
+    } catch(e) { allCards = []; }
+
     allTx = parseTransactions(txRows, userRole, userCards);
     debug('Parsed ' + allTx.length + ' transactions');
 
@@ -1907,6 +2086,15 @@ async function loadUserAndData() {
     renderSpendView();
     renderAnalyticsView();
     if (userRole === 'admin') renderCardsView();
+
+    // Track load time and update timestamp badge
+    lastLoadTime = new Date();
+    updateTimestamp();
+    if (window._tsInterval) clearInterval(window._tsInterval);
+    window._tsInterval = setInterval(updateTimestamp, 60000);
+
+    // Load deposits async (non-blocking)
+    loadDeposits().catch(() => {});
 
     // Show app
     document.getElementById('login-screen').style.display = 'none';
@@ -1931,6 +2119,17 @@ async function sheetsGet(range) {
     debug('API error body: ' + body.substring(0, 200));
     throw new Error(`Sheets API error: ${resp.status}`);
   }
+  return resp.json();
+}
+
+async function sheetsPut(range, values) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?valueInputOption=RAW`;
+  const resp = await fetch(url, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ range, majorDimension: 'ROWS', values })
+  });
+  if (!resp.ok) throw new Error(`Sheets write error: ${resp.status}`);
   return resp.json();
 }
 
@@ -2354,84 +2553,544 @@ function buildMeta(tx) {
 }
 
 // ── RENDER ANALYTICS ──
+function updateTimestamp() {
+  if (!lastLoadTime) return;
+  const el = document.getElementById('last-updated-badge');
+  const te = document.getElementById('last-updated-time');
+  if (!el || !te) return;
+  const mins = Math.round((Date.now() - lastLoadTime.getTime()) / 60000);
+  te.textContent = mins < 1 ? 'just now' : mins === 1 ? '1 min ago' : `${mins} min ago`;
+  el.style.display = 'block';
+}
+
 function renderAnalyticsView() {
-  const monthTx = allTx.filter(t => isThisMonth(t.dateObj));
+  const persons = [...new Set(allTx.map(t => t.person).filter(Boolean))];
+  const isAdmin = userRole === 'admin';
+
+  // Person tabs (admin only, multiple people)
+  const tabsWrap = document.getElementById('analytics-person-tabs');
+  const tabsInner = document.getElementById('analytics-tabs-inner');
+  if (isAdmin && persons.length > 1) {
+    tabsWrap.style.display = 'block';
+    const tabs = ['All', ...persons];
+    tabsInner.innerHTML = tabs.map(p => {
+      const c = p === 'All' ? 'var(--gold)' : personColour(p);
+      const active = p === analyticsPersonFilter;
+      return `<button onclick="setAnalyticsPerson('${p}')" style="
+        padding:6px 14px; border-radius:20px; border:1px solid ${active ? c : 'rgba(255,255,255,0.1)'};
+        background:${active ? c + '22' : 'transparent'}; color:${active ? c : 'rgba(255,255,255,0.5)'};
+        font-size:12px; font-weight:600; white-space:nowrap; cursor:pointer; font-family:inherit;">${p === 'All' ? 'Everyone' : p}</button>`;
+    }).join('');
+  } else { tabsWrap.style.display = 'none'; }
+
+  // Filter transactions by selected person
+  const baseTx = analyticsPersonFilter === 'All' ? allTx
+    : allTx.filter(t => (t.person || '').toLowerCase() === analyticsPersonFilter.toLowerCase());
+
+  const monthTx = baseTx.filter(t => isThisMonth(t.dateObj));
   const total   = monthTx.reduce((s, t) => s + t.amountAed, 0);
+  const accentColor = analyticsPersonFilter === 'All' ? 'var(--gold)' : personColour(analyticsPersonFilter);
 
-  // Category breakdown
+  // ── Stats grid ──
   const cats = {};
-  monthTx.forEach(t => {
-    const c = t.category || 'Other';
-    cats[c] = (cats[c] || 0) + t.amountAed;
-  });
-  const sorted = Object.entries(cats).sort((a, b) => b[1] - a[1]).slice(0, 8);
-  const max    = sorted[0]?.[1] || 1;
+  monthTx.forEach(t => { const c = t.category || 'Other'; cats[c] = (cats[c] || 0) + t.amountAed; });
+  const topCat  = Object.entries(cats).sort((a, b) => b[1] - a[1])[0];
+  const merch   = {};
+  monthTx.forEach(t => { const n = t.cleanName || t.merchant; merch[n] = (merch[n] || 0) + 1; });
+  const topMerch = Object.entries(merch).sort((a, b) => b[1] - a[1])[0];
+  const avgTx   = monthTx.length ? (total / monthTx.length) : 0;
+  const intlCount = monthTx.filter(t => t.isIntl).length;
 
+  document.getElementById('stats-grid').innerHTML = [
+    { label: 'This Month',     value: `${total.toLocaleString('en-GB',{maximumFractionDigits:0})}`, sub: 'AED total' },
+    { label: 'Transactions',   value: monthTx.length, sub: `${intlCount} international` },
+    { label: 'Avg Transaction', value: `${avgTx.toFixed(0)} AED`, sub: 'Per transaction' },
+    { label: 'Top Category',   value: topCat?.[0] || '—', sub: topCat ? `${topCat[1].toFixed(0)} AED` : '' },
+  ].map(s => `
+    <div class="stat-card">
+      <div class="stat-card-label">${s.label}</div>
+      <div class="stat-card-value" style="color:${accentColor};">${s.value}</div>
+      <div class="stat-card-sub">${s.sub}</div>
+    </div>`).join('');
+
+  // ── 6-month trend bars ──
+  const now = new Date();
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ label: d.toLocaleString('default', { month: 'short' }), year: d.getFullYear(), month: d.getMonth() });
+  }
+  const monthlyTotals = months.map(m => ({
+    ...m,
+    total: baseTx.filter(t => t.dateObj && t.dateObj.getMonth() === m.month && t.dateObj.getFullYear() === m.year)
+                 .reduce((s, t) => s + t.amountAed, 0)
+  }));
+  const maxMonthly = Math.max(...monthlyTotals.map(m => m.total), 1);
+  document.getElementById('trend-chart').innerHTML = monthlyTotals.map((m, i) => {
+    const h = Math.max(Math.round((m.total / maxMonthly) * 70), m.total > 0 ? 4 : 2);
+    const isCurrentMonth = i === 5;
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+      <div style="font-size:9px;color:rgba(255,255,255,0.4);">${m.total > 0 ? (m.total/1000).toFixed(0)+'k' : ''}</div>
+      <div style="width:100%;height:${h}px;border-radius:4px 4px 2px 2px;background:${isCurrentMonth ? accentColor : 'rgba(255,255,255,0.12)'};transition:height 0.4s ease;"></div>
+      <div style="font-size:9px;color:${isCurrentMonth ? accentColor : 'rgba(255,255,255,0.4)'};">${m.label}</div>
+    </div>`;
+  }).join('');
+
+  // ── Category chart ──
+  const sorted = Object.entries(cats).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const maxCat = sorted[0]?.[1] || 1;
   document.getElementById('category-chart').innerHTML = sorted.map(([cat, amt]) => `
     <div class="category-row">
       <div class="category-row-top">
         <span>${cat}</span>
-        <span style="color:var(--text-dim)">${amt.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} AED</span>
+        <span style="color:var(--text-dim)">${amt.toLocaleString('en-GB',{maximumFractionDigits:0})} AED</span>
       </div>
       <div class="category-bar-bg">
-        <div class="category-bar-fill" style="width:${(amt/max*100).toFixed(1)}%"></div>
+        <div class="category-bar-fill" style="width:${(amt/maxCat*100).toFixed(1)}%;background:${accentColor};"></div>
       </div>
     </div>`).join('');
 
-  // Merchant frequency
-  const merch = {};
-  monthTx.forEach(t => { const n = t.cleanName || t.merchant; merch[n] = (merch[n] || 0) + 1; });
-  const topMerch = Object.entries(merch).sort((a, b) => b[1] - a[1])[0];
+  // ── Spending habits ──
+  const wdSpend = [0,0,0,0,0,0,0], wdCount = [0,0,0,0,0,0,0];
+  monthTx.forEach(t => {
+    if (!t.dateObj) return;
+    const d = t.dateObj.getDay();
+    wdSpend[d] += t.amountAed; wdCount[d]++;
+  });
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const topDay = wdSpend.indexOf(Math.max(...wdSpend));
+  const weekdayTotal = [1,2,3,4,5].reduce((s,d) => s + wdSpend[d], 0);
+  const weekendTotal = [0,6].reduce((s,d) => s + wdSpend[d], 0);
+  const avgWeekday = weekdayTotal / 5;
+  const avgWeekend = weekendTotal / 2;
+  const intlPct = monthTx.length ? Math.round(intlCount / monthTx.length * 100) : 0;
 
-  // Person breakdown (admin only)
-  const persons = {};
-  monthTx.forEach(t => { if (t.person) persons[t.person] = (persons[t.person] || 0) + t.amountAed; });
-  const topPerson = Object.entries(persons).sort((a, b) => b[1] - a[1])[0];
+  // Last month comparison
+  const lastMonthTx = baseTx.filter(t => t.dateObj && t.dateObj.getMonth() === ((now.getMonth() + 11) % 12) && t.dateObj.getFullYear() === (now.getMonth() === 0 ? now.getFullYear()-1 : now.getFullYear()));
+  const lastMonthTotal = lastMonthTx.reduce((s, t) => s + t.amountAed, 0);
+  const monthDiff = lastMonthTotal > 0 ? ((total - lastMonthTotal) / lastMonthTotal * 100) : null;
 
-  const avgDaily = total / new Date().getDate();
+  const habitLines = [];
+  if (topDay !== -1 && wdSpend[topDay] > 0) habitLines.push(`Most active day is <strong style="color:${accentColor}">${days[topDay]}</strong> with ${wdSpend[topDay].toFixed(0)} AED spent.`);
+  if (avgWeekend > avgWeekday * 1.2) habitLines.push(`Weekend spending is <strong style="color:${accentColor}">${Math.round(avgWeekend/avgWeekday*100-100)}% higher</strong> than weekdays.`);
+  else if (avgWeekday > avgWeekend * 1.2) habitLines.push(`Weekday spending dominates — ${Math.round(avgWeekday/Math.max(avgWeekend,1)*100-100)}% more than weekends.`);
+  if (intlPct > 0) habitLines.push(`<strong style="color:${accentColor}">${intlPct}%</strong> of transactions are international.`);
+  if (monthDiff !== null) habitLines.push(`Spending is <strong style="color:${monthDiff > 0 ? 'var(--red)' : 'var(--green)'};">${monthDiff > 0 ? '▲' : '▼'} ${Math.abs(monthDiff).toFixed(0)}%</strong> vs last month (${lastMonthTotal.toFixed(0)} AED).`);
+  if (topMerch) habitLines.push(`Favourite spot this month: <strong style="color:${accentColor}">${topMerch[0]}</strong> with ${topMerch[1]} visit${topMerch[1]>1?'s':''}.`);
 
-  document.getElementById('stats-grid').innerHTML = [
-    { label: 'Top Merchant',  value: topMerch?.[0] || '—',  sub: topMerch ? `${topMerch[1]} visits` : '' },
-    { label: 'Avg Daily',     value: `${avgDaily.toFixed(0)} AED`, sub: 'This month' },
-    { label: 'International', value: `${monthTx.filter(t => t.isIntl).length}`, sub: 'Foreign transactions' },
-    { label: 'Most Active',   value: topPerson?.[0] || '—', sub: topPerson ? `${topPerson[1].toFixed(0)} AED` : '' },
-  ].map(s => `
-    <div class="stat-card">
-      <div class="stat-card-label">${s.label}</div>
-      <div class="stat-card-value">${s.value}</div>
-      <div class="stat-card-sub">${s.sub}</div>
-    </div>`).join('');
+  document.getElementById('habits-content').innerHTML = habitLines.length
+    ? habitLines.map(l => `<div style="font-size:13px;color:rgba(255,255,255,0.65);padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);line-height:1.5;">${l}</div>`).join('')
+    : `<div style="font-size:13px;color:var(--text-dim);">Not enough data yet.</div>`;
+
+  // ── Top merchants ──
+  const topSection = document.getElementById('analytics-top-merchants-section');
+  if (monthTx.length > 0) {
+    topSection.style.display = 'block';
+    const spend = {}, visits = {};
+    monthTx.forEach(t => {
+      const n = t.cleanName || t.merchant;
+      spend[n]  = (spend[n]  || 0) + t.amountAed;
+      visits[n] = (visits[n] || 0) + 1;
+    });
+    const mkItem = (name, val, sub) => `<div style="display:flex;align-items:center;gap:8px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.85);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</div>
+        <div style="font-size:10px;color:${accentColor};">${val} <span style="color:rgba(255,255,255,0.4);">${sub}</span></div>
+      </div></div>`;
+    document.getElementById('a-top-spend-list').innerHTML  = Object.entries(spend).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([n,a]) => mkItem(n, a.toFixed(0), 'AED')).join('');
+    document.getElementById('a-top-visits-list').innerHTML = Object.entries(visits).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([n,c]) => mkItem(n, c, c===1?'visit':'visits')).join('');
+  } else { topSection.style.display = 'none'; }
+
+  // ── Trips ──
+  detectedTrips = detectTrips(allTx);
+  renderTrips();
 }
 
-// ── RENDER CARDS VIEW (admin only) ──
+function setAnalyticsPerson(person) {
+  analyticsPersonFilter = person;
+  renderAnalyticsView();
+}
+
+// ── TRIP DETECTION ──
+const ONLINE_CATEGORIES = new Set(['Online Shopping','Utilities','Gaming','Streaming','Subscriptions','Education']);
+
+function detectTrips(transactions) {
+  const sorted = [...transactions]
+    .filter(t => t.dateObj && t.isIntl && t.country && t.country !== 'UAE' && !ONLINE_CATEGORIES.has(t.category))
+    .sort((a, b) => a.dateObj - b.dateObj);
+
+  if (sorted.length < 3) return [];
+
+  const trips = [], allSorted = [...transactions].filter(t => t.dateObj).sort((a, b) => a.dateObj - b.dateObj);
+  let inTrip = false, currentTxs = [], gapCount = 0;
+
+  for (const tx of allSorted) {
+    const isIntlPhysical = tx.isIntl && tx.country && tx.country !== 'UAE' && !ONLINE_CATEGORIES.has(tx.category);
+    if (isIntlPhysical) {
+      inTrip = true; gapCount = 0;
+      currentTxs.push(tx);
+    } else if (inTrip) {
+      gapCount++;
+      if (gapCount > 3) {
+        if (currentTxs.length >= 3) trips.push(buildTrip(currentTxs));
+        currentTxs = []; inTrip = false; gapCount = 0;
+      }
+    }
+  }
+  if (currentTxs.length >= 3) trips.push(buildTrip(currentTxs));
+  return trips.reverse(); // most recent first
+}
+
+function buildTrip(txs) {
+  const start = txs[0].dateObj, end = txs[txs.length-1].dateObj;
+  const days  = Math.max(1, Math.round((end - start) / 86400000) + 1);
+  const total = txs.reduce((s, t) => s + t.amountAed, 0);
+  const cats  = {}, countries = new Set(), cities = new Set();
+  txs.forEach(t => {
+    cats[t.category || 'Other'] = (cats[t.category || 'Other'] || 0) + t.amountAed;
+    if (t.country) countries.add(t.country);
+    if (t.city)    cities.add(t.city);
+  });
+  const destination = [...countries].slice(0, 3).join(' · ');
+  const topCats = Object.entries(cats).sort((a,b) => b[1]-a[1]).slice(0, 3);
+  return { txs, start, end, days, total, cats, topCats, destination, countries: [...countries] };
+}
+
+function renderTrips() {
+  const trips = detectTrips(allTx);
+  const section = document.getElementById('trips-section');
+  const list    = document.getElementById('trips-list');
+  if (!trips.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  list.innerHTML = trips.map((trip, i) => {
+    const fmt = d => d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year: d.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined });
+    const catBars = trip.topCats.map(([c, amt]) =>
+      `<div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.55);padding:3px 0;">
+        <span>${c}</span><span style="color:var(--gold);">${amt.toFixed(0)} AED</span>
+      </div>`).join('');
+
+    return `<div class="analytics-card" style="margin-bottom:12px;cursor:pointer;" onclick="openTripDetail(${i})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+        <div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:2px;">✈️ ${trip.destination}</div>
+          <div style="font-size:12px;color:var(--text-dim);">${fmt(trip.start)} – ${fmt(trip.end)} · ${trip.days} day${trip.days>1?'s':''} · ${trip.txs.length} transactions</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:17px;font-weight:800;color:var(--gold);">${trip.total.toLocaleString('en-GB',{maximumFractionDigits:0})}</div>
+          <div style="font-size:10px;color:var(--text-dim);">AED</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;border-top:1px solid rgba(255,255,255,0.06);padding-top:10px;">${catBars}</div>
+    </div>`;
+  }).join('');
+}
+
+let detectedTrips = [];
+function openTripDetail(idx) {
+  if (!detectedTrips[idx]) return;
+  const trip = detectedTrips[idx];
+  const fmt = d => d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  const content = document.getElementById('trip-detail-content');
+
+  const txRows = trip.txs.map(t => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+      <div>
+        <div style="font-size:13px;font-weight:600;">${t.cleanName || t.merchant}</div>
+        <div style="font-size:11px;color:var(--text-dim);">${t.dateObj.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} · ${t.category||'Other'} · ${t.city||t.country}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:13px;font-weight:700;color:var(--gold);">${t.amountAed.toFixed(0)} AED</div>
+        ${t.currency !== 'AED' ? `<div style="font-size:10px;color:var(--text-dim);">${t.currency} ${t.amount.toFixed(2)}</div>` : ''}
+      </div>
+    </div>`).join('');
+
+  const catRows = Object.entries(trip.cats).sort((a,b)=>b[1]-a[1]).map(([c,amt]) => {
+    const pct = Math.round(amt / trip.total * 100);
+    return `<div style="margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;">
+        <span>${c}</span><span style="color:var(--gold);">${amt.toFixed(0)} AED · ${pct}%</span>
+      </div>
+      <div style="height:3px;background:rgba(255,255,255,0.08);border-radius:2px;">
+        <div style="height:100%;width:${pct}%;background:var(--gold);border-radius:2px;"></div>
+      </div></div>`;
+  }).join('');
+
+  content.innerHTML = `
+    <div style="font-size:22px;font-weight:800;margin-bottom:4px;">✈️ ${trip.destination}</div>
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:20px;">${fmt(trip.start)} – ${fmt(trip.end)} · ${trip.days} day${trip.days>1?'s':''}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+      <div class="stat-card"><div class="stat-card-label">Total Spent</div><div class="stat-card-value" style="color:var(--gold);">${trip.total.toLocaleString('en-GB',{maximumFractionDigits:0})}</div><div class="stat-card-sub">AED</div></div>
+      <div class="stat-card"><div class="stat-card-label">Daily Avg</div><div class="stat-card-value" style="color:var(--gold);">${(trip.total/trip.days).toFixed(0)}</div><div class="stat-card-sub">AED / day</div></div>
+    </div>
+    <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;">Spending by Category</div>
+    ${catRows}
+    <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin:16px 0 4px;">All Transactions</div>
+    ${txRows}`;
+
+  document.getElementById('trip-modal').style.display = 'flex';
+}
+
+function closeTripModal() { document.getElementById('trip-modal').style.display = 'none'; }
+
+
+// ── SECURITY DEPOSITS ──
+const DEPOSIT_HOTEL_KEYWORDS    = /hotel|resort|ritz|palace|hyatt|hilton|marriott|sheraton|intercontinental|four seasons|sofitel|westin|radisson|ibis|novotel|pullman|anantara|armani|atlantis|jumeirah|rotana|mövenpick|movenpick|kempinski/i;
+const DEPOSIT_CARRENTAL_KEYWORDS = /avis|hertz|budget car|enterprise|europcar|sixt|thrifty|dollar rent|alamo|national car|rent a car|car rental|autorent/i;
+const DEPOSIT_CATEGORIES         = new Set(['Travel', 'Hotel', 'Accommodation', 'Automotive', 'Transport']);
+
+let deposits        = [];      // cached from Sheets
+let currentDepositTxId = null; // tx being flagged
+
+function isDepositMerchant(tx) {
+  const name = (tx.cleanName || tx.merchant || '').toLowerCase();
+  return DEPOSIT_HOTEL_KEYWORDS.test(name) || DEPOSIT_CARRENTAL_KEYWORDS.test(name)
+    || DEPOSIT_CATEGORIES.has(tx.category);
+}
+
+async function loadDeposits() {
+  try {
+    const data = await sheetsGet('Deposits!A:I');
+    const rows = (data.values || []).slice(1).filter(r => r[0]);
+    deposits = rows.map(r => ({
+      txId:        r[0] || '',
+      merchant:    r[1] || '',
+      amount:      parseFloat(r[2]) || 0,
+      amountAed:   parseFloat(r[3]) || 0,
+      last4:       r[4] || '',
+      flaggedDate: r[5] || '',
+      status:      r[6] || 'Pending',
+      creditedDate:r[7] || '',
+      sheetRow:    0, // will need to track
+    }));
+    renderDepositsBanner();
+  } catch(e) { deposits = []; }
+}
+
+async function sheetsAppend(sheetName, values) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(sheetName)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ majorDimension: 'ROWS', values })
+  });
+  if (!resp.ok) throw new Error(`Sheets append error: ${resp.status}`);
+  return resp.json();
+}
+
+async function flagAsDeposit() {
+  if (!currentDepositTxId) return;
+  const tx = allTx.find(t => t.id === currentDepositTxId);
+  if (!tx) return;
+
+  const btn = document.getElementById('deposit-flag-btn');
+  btn.textContent = 'Saving…'; btn.disabled = true;
+
+  try {
+    // Try to create Deposits sheet header if needed
+    const today = new Date().toLocaleDateString('en-GB');
+    await sheetsAppend('Deposits', [[
+      tx.id, tx.cleanName || tx.merchant,
+      tx.amount, tx.amountAed, tx.last4,
+      today, 'Pending', ''
+    ]]);
+
+    deposits.push({ txId: tx.id, merchant: tx.cleanName || tx.merchant, amount: tx.amount, amountAed: tx.amountAed, last4: tx.last4, flaggedDate: today, status: 'Pending', creditedDate: '' });
+
+    document.getElementById('deposit-banner').style.display  = 'none';
+    document.getElementById('deposit-flagged').style.display = 'block';
+    renderDepositsBanner();
+    showToast('🔒 Flagged as security deposit');
+  } catch(e) {
+    btn.textContent = 'Flag it'; btn.disabled = false;
+    showToast('Error: ' + e.message);
+  }
+}
+
+async function markDepositCredited() {
+  if (!currentDepositTxId) return;
+  const dep = deposits.find(d => d.txId === currentDepositTxId);
+  if (!dep) return;
+
+  // Find the row in Deposits sheet (by scanning)
+  try {
+    const data = await sheetsGet('Deposits!A:I');
+    const rows = data.values || [];
+    let rowNum = -1;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0] === currentDepositTxId) { rowNum = i + 1; break; }
+    }
+    if (rowNum > 0) {
+      const today = new Date().toLocaleDateString('en-GB');
+      await sheetsPut(`Deposits!G${rowNum}:H${rowNum}`, [['Credited', today]]);
+      dep.status = 'Credited'; dep.creditedDate = today;
+    }
+    document.getElementById('deposit-flagged').style.display = 'none';
+    renderDepositsBanner();
+    showToast('✓ Deposit marked as credited');
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+function renderDepositsBanner() {
+  const pending = deposits.filter(d => d.status === 'Pending');
+  const banner  = document.getElementById('deposits-banner');
+  const sub     = document.getElementById('deposits-banner-sub');
+  if (pending.length > 0) {
+    const total = pending.reduce((s, d) => s + d.amountAed, 0);
+    sub.textContent = `${pending.length} deposit${pending.length>1?'s':''} · ${total.toFixed(0)} AED pending credit`;
+    banner.style.display = 'block';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function showDepositsSheet() {
+  const list  = document.getElementById('deposits-list');
+  const empty = document.getElementById('deposits-empty');
+  const pending = deposits.filter(d => d.status === 'Pending');
+
+  if (pending.length === 0) {
+    list.innerHTML  = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    list.innerHTML = pending.map(d => `
+      <div style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px;">${d.merchant}</div>
+            <div style="font-size:11px;color:var(--text-dim);">···· ${d.last4} · Flagged ${d.flaggedDate}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:16px;font-weight:800;color:var(--gold);">${d.amountAed.toFixed(0)} AED</div>
+            <div style="font-size:10px;color:var(--text-dim);">Pending</div>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+  document.getElementById('deposits-modal').style.display = 'flex';
+}
+
+function closeDepositsModal() { document.getElementById('deposits-modal').style.display = 'none'; }
+
 function renderCardsView() {
   const monthTx = allTx.filter(t => isThisMonth(t.dateObj));
+
+  // Build per-person spending from transactions
   const persons = {};
   monthTx.forEach(t => {
     if (!t.person) return;
-    if (!persons[t.person]) persons[t.person] = { spend: 0, card: t.cardNick, last4: t.last4, bank: t.bank };
-    persons[t.person].spend += t.amountAed;
+    const key = t.person.toLowerCase();
+    if (!persons[key]) persons[key] = { name: t.person, spend: 0, cards: new Set() };
+    persons[key].spend += t.amountAed;
+    if (t.last4) persons[key].cards.add(t.last4);
   });
 
   document.getElementById('cardholders-list').innerHTML = Object.entries(persons)
     .sort((a, b) => b[1].spend - a[1].spend)
-    .map(([name, data]) => {
-      const color = personColour(name);
+    .map(([key, data]) => {
+      const color = personColour(data.name);
+      const cardList = [...data.cards].map(l4 => {
+        const cd = allCards.find(c => c.last4 === l4);
+        return cd ? cd.nickname : `···· ${l4}`;
+      }).join(' · ');
       return `
         <div class="cardholder-card">
           <div class="cardholder-avatar" style="background:${color}22; border:1px solid ${color}44; color:${color};">
-            ${initials(name)}
+            ${initials(data.name)}
           </div>
           <div class="cardholder-info">
-            <div class="cardholder-name">${name}</div>
-            <div class="cardholder-sub">${data.card} · ···· ${data.last4} · ${data.bank}</div>
+            <div class="cardholder-name">${data.name}</div>
+            <div class="cardholder-sub">${cardList || 'No cards this month'}</div>
           </div>
           <div class="cardholder-spend">
-            <div class="cardholder-amount" style="color:${color}">${data.spend.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
+            <div class="cardholder-amount" style="color:${color}">${data.spend.toLocaleString('en-GB', { maximumFractionDigits: 0 })}</div>
             <div class="cardholder-label">AED this month</div>
           </div>
         </div>`;
     }).join('');
+
+  // Unassigned cards — in Card Directory but person = Unassigned or blank
+  const unassigned = allCards.filter(c =>
+    !c.person || c.person.toLowerCase() === 'unassigned' || c.person === ''
+  );
+
+  const unassignedSection = document.getElementById('unassigned-section');
+  const unassignedList    = document.getElementById('unassigned-list');
+
+  if (unassigned.length > 0) {
+    unassignedSection.style.display = 'block';
+    unassignedList.innerHTML = unassigned.map(c => `
+      <div class="cardholder-card" style="opacity:0.7;">
+        <div class="cardholder-avatar" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.3);">?</div>
+        <div class="cardholder-info">
+          <div class="cardholder-name" style="color:rgba(255,255,255,0.5);">Unassigned</div>
+          <div class="cardholder-sub">${c.nickname || c.bank} · ···· ${c.last4}</div>
+        </div>
+        <button onclick="openAssignModal('${c.last4}')" style="
+          padding:7px 14px; border-radius:20px; border:1px solid rgba(255,121,0,0.3);
+          background:rgba(255,121,0,0.1); color:var(--gold); font-size:12px;
+          font-weight:600; cursor:pointer; font-family:inherit; flex-shrink:0;">
+          Assign
+        </button>
+      </div>`).join('');
+  } else {
+    unassignedSection.style.display = 'none';
+  }
+}
+
+function openAssignModal(last4) {
+  pendingAssignCard = last4;
+  const card = allCards.find(c => c.last4 === last4);
+  document.getElementById('assign-card-info').textContent =
+    `${card?.nickname || card?.bank || 'Card'} · ···· ${last4}`;
+
+  // Build person list from known people in App_User + transaction persons
+  const knownPersons = [...new Set([
+    ...allTx.map(t => t.person).filter(Boolean),
+  ])].sort();
+
+  document.getElementById('assign-person-list').innerHTML = knownPersons.map(p => {
+    const color = personColour(p);
+    return `<button onclick="assignCardToPerson('${p}')" style="
+      display:flex; align-items:center; gap:12px; width:100%; padding:12px 16px;
+      background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+      border-radius:12px; cursor:pointer; font-family:inherit;">
+      <div style="width:32px;height:32px;border-radius:10px;background:${color}22;border:1px solid ${color}44;color:${color};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">${initials(p)}</div>
+      <span style="font-size:15px;font-weight:600;color:rgba(255,255,255,0.85);">${p}</span>
+    </button>`;
+  }).join('');
+
+  document.getElementById('assign-modal').style.display = 'flex';
+}
+
+function closeAssignModal() {
+  document.getElementById('assign-modal').style.display = 'none';
+  pendingAssignCard = null;
+}
+
+async function assignCardToPerson(person) {
+  if (!pendingAssignCard) return;
+  const last4 = pendingAssignCard;
+
+  // Find row index in Card Directory (1-indexed, header is row 1)
+  const cardIdx = allCards.findIndex(c => c.last4 === last4);
+  if (cardIdx === -1) return;
+  const sheetRow = cardIdx + 2; // +1 for 0-index, +1 for header
+
+  try {
+    // Update person column (B) in Card Directory
+    await sheetsPut(`Card Directory!B${sheetRow}`, [[person]]);
+
+    // Update local state
+    allCards[cardIdx].person = person;
+
+    closeAssignModal();
+    renderCardsView();
+    showToast(`✓ Card ···· ${last4} assigned to ${person}`);
+  } catch(err) {
+    showToast('Failed to save: ' + err.message);
+  }
 }
 
 // ── SETUP PROFILE UI ──
@@ -2594,6 +3253,26 @@ function openModal(txId) {
 
   document.getElementById('tx-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
+
+  // ── Security deposit detection ──
+  currentDepositTxId = txId;
+  const depBanner  = document.getElementById('deposit-banner');
+  const depFlagged = document.getElementById('deposit-flagged');
+  const alreadyFlagged = deposits.some(d => d.txId === txId && d.status === 'Pending');
+  const alreadyCredited = deposits.some(d => d.txId === txId && d.status === 'Credited');
+
+  if (alreadyFlagged) {
+    depBanner.style.display  = 'none';
+    depFlagged.style.display = 'block';
+  } else if (!alreadyCredited && isDepositMerchant(tx)) {
+    depBanner.style.display  = 'block';
+    depFlagged.style.display = 'none';
+    document.getElementById('deposit-flag-btn').textContent = 'Flag it';
+    document.getElementById('deposit-flag-btn').disabled    = false;
+  } else {
+    depBanner.style.display  = 'none';
+    depFlagged.style.display = 'none';
+  }
 }
 
 function closeModal() {
@@ -3607,21 +4286,51 @@ function showToast(msg, duration) {
   setTimeout(() => el.classList.remove('show'), duration || 2500);
 }
 
-// ── PWA MANIFEST ──
+// ── PWA MANIFEST + APP ICON ──
+function generateMasrafIcon(size) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  // Black background with rounded corners
+  const r = size * 0.22;
+  ctx.beginPath();
+  ctx.moveTo(r, 0); ctx.lineTo(size-r, 0);
+  ctx.quadraticCurveTo(size, 0, size, r);
+  ctx.lineTo(size, size-r); ctx.quadraticCurveTo(size, size, size-r, size);
+  ctx.lineTo(r, size); ctx.quadraticCurveTo(0, size, 0, size-r);
+  ctx.lineTo(0, r); ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.fillStyle = '#000000';
+  ctx.fill();
+  // Orange "Masraf" text
+  ctx.fillStyle = '#FF7900';
+  ctx.font = `bold ${Math.round(size * 0.22)}px -apple-system, "SF Pro Display", sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Masraf', size / 2, size / 2);
+  return canvas.toDataURL('image/png');
+}
+
+// Set apple-touch-icon
+const iconData = generateMasrafIcon(180);
+const touchLink = document.createElement('link');
+touchLink.rel  = 'apple-touch-icon';
+touchLink.href = iconData;
+document.head.appendChild(touchLink);
+
 const manifest = {
   name: 'Masraf',
   short_name: 'Masraf',
   description: 'Personal spend intelligence',
   start_url: '/',
   display: 'standalone',
-  background_color: '#0A0A0F',
-  theme_color: '#0A0A0F',
+  background_color: '#000000',
+  theme_color: '#000000',
   orientation: 'portrait',
-  icons: [{
-    src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230A0A0F'/%3E%3Ctext y='.9em' font-size='80' x='10'%3E💰%3C/text%3E%3C/svg%3E",
-    sizes: '192x192',
-    type: 'image/svg+xml',
-  }]
+  icons: [
+    { src: generateMasrafIcon(192), sizes: '192x192', type: 'image/png' },
+    { src: generateMasrafIcon(512), sizes: '512x512', type: 'image/png' },
+  ]
 };
 
 const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
